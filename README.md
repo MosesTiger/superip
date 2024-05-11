@@ -1,70 +1,53 @@
-# Getting Started with Create React App
+# 슈퍼IP 프로젝트 README
+> AI를 활용한 슈퍼IP 컨텐츠 제작 및 흥행률 분석
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 기술 스택
+프론트엔드:
+![react](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)  
+백엔드:
+![node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
 
-## Available Scripts
+## 페이지 구성
+### 1. 메인 페이지
+- 초기 화면 및 프로젝트 소개
+- 사용자 인터랙션을 위한 메인 인터페이스
+- 기능별 접근성 강화
 
-In the project directory, you can run:
+### 2. 제작 페이지
+- AI를 통한 스토리라인 제작 툴
+- 사용자 피드백 기반 스토리 수정 기능
+- 실시간 흥행 분석 툴 통합
 
-### `npm start`
+## 페이지 세부 기능 명세서
+### 메인 페이지
+- 사용자 계정 관리
+- 프로젝트의 기본 개요 및 탐색
+- 최신 컨텐츠 업데이트 및 알림
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 제작 페이지
+- 스토리 템플릿 선택: 판타지, 액션 등
+- 캐릭터 및 챕터 구성: 주인공 이름, 챕터 별 분량
+- 스토리 생성 및 수정: AI 도구를 사용한 동적 스토리라인 조정
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 추가 기능 구현
+### 메인 기능
+- 사용자 피드백을 통한 스토리 제작
+- 흥행률 분석 및 예측
 
-### `npm test`
+### 서브 기능
+- AI 기반 컨텐츠 제작의 자동화
+- 피드백 및 데이터를 통한 컨텐츠 최적화
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 개발 워크플로우
+1. **피그마로 UI 구성** - 디자인 팀이 기본 UI를 설계
+2. **최초 핵심 기능 구현 논의** - 개발 팀과 기획 팀의 미팅
+3. **역할 배분** - 팀원별 책임 구역을 할당
+4. **구현할 것**
+   - 장르별 초기 설정: 판타지, 액션
+   - 캐릭터 설정: 주인공 이름, 서브 캐릭터
+   - 챕터 분량 결정
+5. **스토리 형상관리** - 버전 관리 시스템을 통한 업데이트 관리
+6. **스토리 짜주기 및 흥행도 예측**
+   - 스토리 일관성 검사
+   - 흥행도 분석을 통한 마케팅 전략 수립
+7. **창의적이고 모순 없는 스토리 IP 생성** - 지속적인 개선과 혁신을 통해 새로운 콘텐츠 제작
