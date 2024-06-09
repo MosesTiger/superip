@@ -1,0 +1,35 @@
+/* src/Layout/Card.css */
+.card {
+  background: #ffffff;
+  color: #000;
+  width: 220px;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card-image {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.go-button {
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.go-button:hover {
+  background-color: #555;
+}
