@@ -8,55 +8,14 @@
   flex-direction: column;
 }
 
-.header {
-  display: flex;
-  background-color: #f1fbfa;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 10px 10px 10px;
-}
-
-.header::before {
-  content: "";
-  position: absolute;
-  top: 10px;
-  left: 0;
-  width: 100%;
-  height: 1px; /* 선의 두께를 설정 */
-  background-color: #182e3f; /* 선의 색상을 설정 */
-}
-
-.logo {
-  font-size: 50px;
-  padding: 10px 70px;
-  color: #111111;
-}
-
-.search-bar {
-  flex-grow: 1;
-  margin: 0 20px;
-  padding: 15px;
-  border-radius: 20px;
-  border: none;
-  background-color: #dbe9e8;
-}
-
-.notification-icon {
-  font-size: 24px;
-  color: #aaa4a3;
-  margin: 0 20px;
-  cursor: pointer;
-}
-
-.login-button {
-  font-size: 15px;
-  padding: 10px 25px;
-  margin: 0 20px;
-  background-color: #192f40;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
+.circle-icon {
+  width: 20px;
+  height: 20px;
+  background-color: #162531;
+  border-radius: 50%;
+  margin-left: 50px;
+  border: 3px solid #ffffff;
+  margin-top: 30px;
 }
 
 .title-wrapper {
@@ -65,43 +24,37 @@
   text-align: left;
   justify-content: space-between;
   padding: 0 50px;
-  margin-right: 50px;
-  margin-bottom: -35px;
 }
 
 .title {
   display: flex;
   align-items: baseline;
+  padding: 0 40px;
+  margin: 50px 0 10px 0;
+  border-top: 1px solid white;
+  border-bottom: 1px solid white;
 }
 
 .title h1 {
   font-size: 70px;
   padding-right: 100px;
-}
-
-.circle-icon {
-  width: 20px;
-  height: 20px;
-  background-color: #162531;
-  border-radius: 50%;
-  margin-left: 50px;
-  border: 4px solid #ffffff;
+  margin: 0;
 }
 
 .nav-bar {
   font-size: 20px;
   display: flex;
   justify-content: center;
-  margin-right: 100px;
+  margin: 0 50px;
 }
 
 .nav-bar span {
-  margin: 0 50px;
+  margin: 0 40px;
   cursor: pointer;
 }
 
 .nav-arrow {
-  margin-left: auto; /* 화살표를 오른쪽 끝으로 이동 */
+  margin: 30px 50px 0 0;
   font-size: 24px;
   cursor: pointer;
 }

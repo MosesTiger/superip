@@ -1,17 +1,25 @@
 import React from "react";
-import { FaBell, FaChevronRight } from "react-icons/fa";
+import { FaBell, FaChevronRight, FaSearch } from "react-icons/fa";
 import CreateStory from "./CreateStory";
 import PredictHit from "./PredictHit";
 import StoryArchive from "./StoryArchive";
 import Recommend from "./Recommend";
 import "../Layout/Main.css";
+import "../Layout/Header.css";
 
 const Main = () => {
   return (
     <div className="main-page">
       <header className="header">
-        <div className="logo">Logo</div>
-        <input type="text" className="search-bar" placeholder="영화 검색..." />
+        <img src="/로고 임시.png" alt="Logo" className="logo" />
+        <div className="search-container">
+          <input
+            type="search"
+            className="search-bar"
+            placeholder="영화 검색..."
+          />
+          <FaSearch className="search-icon" />
+        </div>
         <FaBell className="notification-icon" />
         <button className="login-button">로그인</button>
       </header>
@@ -24,9 +32,9 @@ const Main = () => {
             <span>QnA</span>
             <span>ToS</span>
             <span>Setting</span>
-            <FaChevronRight className="nav-arrow" />
           </nav>
         </div>
+        <FaChevronRight className="nav-arrow" />
       </div>
       <div className="card-container">
         <CreateStory />
