@@ -43,7 +43,7 @@
 
 .notification-icon {
   font-size: 24px;
-  color: #AAA4A3;
+  color: #aaa4a3;
   margin: 0 20px;
   cursor: pointer;
 }
@@ -59,27 +59,50 @@
   cursor: pointer;
 }
 
+.title-wrapper {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  justify-content: space-between;
+  padding: 0 50px;
+  margin-right: 50px;
+  margin-bottom: -35px;
+}
+
 .title {
   display: flex;
   align-items: baseline;
-  text-align: left;
-  font-size: 10px;
-  margin-top: 0px;
-  padding-left: 30px;
 }
 
 .title h1 {
   font-size: 70px;
-  padding: 0 60px;
+  padding-right: 100px;
 }
+
+.circle-icon {
+  width: 20px;
+  height: 20px;
+  background-color: #162531;
+  border-radius: 50%;
+  margin-left: 50px;
+  border: 4px solid #ffffff;
+}
+
 .nav-bar {
+  font-size: 20px;
   display: flex;
   justify-content: center;
-  margin: 0px 0;
+  margin-right: 100px;
 }
 
 .nav-bar span {
-  margin: 0 15px;
+  margin: 0 50px;
+  cursor: pointer;
+}
+
+.nav-arrow {
+  margin-left: auto; /* 화살표를 오른쪽 끝으로 이동 */
+  font-size: 24px;
   cursor: pointer;
 }
 
