@@ -1,4 +1,14 @@
-/* src/Layout/Card.css */
+.card-container {
+  display: flex;
+  background-color: #edf6f6;
+  margin: 0 80px 40px 80px;
+  padding: 40px 0px;
+  border-radius: 20px;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
 .card {
   background: #ffffff;
   color: #000;
