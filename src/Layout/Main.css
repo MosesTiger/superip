@@ -41,6 +41,13 @@
   background-color: #dbe9e8;
 }
 
+.notification-icon {
+  font-size: 24px;
+  color: #AAA4A3;
+  margin: 0 20px;
+  cursor: pointer;
+}
+
 .login-button {
   font-size: 15px;
   padding: 10px 25px;

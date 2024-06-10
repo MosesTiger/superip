@@ -1,4 +1,5 @@
 import React from "react";
+import { FaBell } from 'react-icons/fa';
 import CreateStory from "./CreateStory";
 import PredictHit from "./PredictHit";
 import StoryArchive from "./StoryArchive";
@@ -8,9 +9,9 @@ import "../Layout/Main.css";
 const Main = () => (
   <div className="main-page">
     <header className="header">
-      <br></br>
       <div className="logo">Logo</div>
       <input type="text" className="search-bar" placeholder="영화 검색..." />
+      <FaBell className="notification-icon" />
       <button className="login-button">로그인</button>
     </header>
     <div className="title">
