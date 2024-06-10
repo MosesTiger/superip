@@ -1,28 +1,16 @@
 import React from "react";
-import { FaBell, FaChevronRight, FaSearch } from "react-icons/fa";
+import { FaChevronRight } from "react-icons/fa";
+import Header from "./Header";
 import CreateStory from "./CreateStory";
 import PredictHit from "./PredictHit";
 import StoryArchive from "./StoryArchive";
 import Recommend from "./Recommend";
 import "../Layout/Main.css";
-import "../Layout/Header.css";
 
 const Main = () => {
   return (
     <div className="main-page">
-      <header className="header">
-        <img src="/로고 임시.png" alt="Logo" className="logo" />
-        <div className="search-container">
-          <input
-            type="search"
-            className="search-bar"
-            placeholder="영화 검색..."
-          />
-          <FaSearch className="search-icon" />
-        </div>
-        <FaBell className="notification-icon" />
-        <button className="login-button">로그인</button>
-      </header>
+      <Header />
       <div className="title-wrapper">
         <div className="circle-icon"></div>
         <div className="title">

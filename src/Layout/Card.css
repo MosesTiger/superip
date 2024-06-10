@@ -12,12 +12,24 @@
 .card {
   background: #ffffff;
   color: #000;
-  width: 220px;
-  padding: 20px;
+  width: 250px;
+  height: 500px;
+  padding: 0px;
   border-radius: 10px;
   text-align: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s;
+}
+
+.card h2 {
+  font-size: 30px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid red;
+}
+
+.card p {
+  font-size: 15px;
 }
 
 .card:hover {
@@ -26,16 +38,18 @@
 
 .card-image {
   width: 100%;
-  height: auto;
+  height: 320px;
   border-radius: 10px;
 }
 
 .go-button {
-  background-color: #333;
-  color: #fff;
+  font-size: 20px;
+  background-color: #0b1626;
+  color: #edf6f6;
+  width: 90%;
   padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
+  border: 1px solid #edf6f6;
+  border-radius: 30px;
   cursor: pointer;
   margin-top: 10px;
 }
