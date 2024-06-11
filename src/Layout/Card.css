@@ -10,22 +10,45 @@
 }
 
 .card {
-  background: #ffffff;
-  color: #000;
+  color: #f4f4ea;
   width: 250px;
   height: 500px;
   padding: 0px;
   border-radius: 10px;
   text-align: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
   transition: transform 0.2s;
 }
 
+.card1 {
+  border-radius: 10px;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to bottom, #ac8b67, 80%, #0b1626);
+}
+.card2 {
+  border-radius: 10px;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to bottom, #002645, 80%, #0b1626);
+}
+.card3 {
+  border-radius: 10px;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to bottom, #7d6443, 80%, #0b1626);
+}
+.card4 {
+  border-radius: 10px;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to bottom, #0c4c74, 80%, #0b1626);
+}
+
 .card h2 {
-  font-size: 30px;
+  font-size: 35px;
   padding: 0;
   margin: 0;
-  border: 1px solid red;
 }
 
 .card p {
@@ -52,6 +75,7 @@
   border-radius: 30px;
   cursor: pointer;
   margin-top: 10px;
+  margin-bottom: 15px;
 }
 
 .go-button:hover {
