@@ -1,19 +1,9 @@
 import React from "react";
-import "../Layout/Card.css";
 
-const CreateStory = () => (
-  <div className="card">
-    <div className="card1">
-      <img
-        src="/CreateStory_Image.jpg"
-        alt="Create Story"
-        className="card-image"
-      />
-      <h2>Create Story</h2>
-      <p>Get your stories created automatically and effortlessly</p>
-      <button className="go-button">Go!</button>
+export default function CreateStory() {
+  return (
+    <div>
+      <h1>CreateStory Page</h1>
     </div>
-  </div>
-);
-
-export default CreateStory;
+  );
+}

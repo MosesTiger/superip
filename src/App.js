@@ -1,14 +1,20 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Main from "./Components/Main";
+import CreateStory from "./Components/CreateStory";
+import PredictHit from "./Components/PredictHit";
+import StoryArchive from "./Components/StoryArchive";
+import Recommend from "./Components/Recommend";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Main />} />
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path="/" element={<Main />} />
+      <Route path="/CreateStory" element={<CreateStory />} />
+      <Route path="/PredictHit" element={<PredictHit />} />
+      <Route path="/StoryArchive" element={<StoryArchive />} />
+      <Route path="/Recommend" element={<Recommend />} />
+    </Routes>
   );
 }
 

@@ -1,10 +1,11 @@
 import React from "react";
 import { FaChevronRight } from "react-icons/fa";
 import Header from "./Header";
-import CreateStory from "./CreateStory";
-import PredictHit from "./PredictHit";
-import StoryArchive from "./StoryArchive";
-import Recommend from "./Recommend";
+import CreateStory from "./Card/CreateStory_Card";
+import PredictHit from "./Card/PredictHit_Card";
+import StoryArchive from "./Card/StoryArchive_Card";
+import Recommend from "./Card/Recommend_Card";
+import Navbar from "./Navbar";
 import "../Layout/Main.css";
 
 const Main = () => {
@@ -15,12 +16,7 @@ const Main = () => {
         <div className="circle-icon"></div>
         <div className="title">
           <h1>Create Story</h1>
-          <nav className="nav-bar">
-            <span>How</span>
-            <span>QnA</span>
-            <span>ToS</span>
-            <span>Setting</span>
-          </nav>
+          <Navbar />
         </div>
         <FaChevronRight className="nav-arrow" />
       </div>

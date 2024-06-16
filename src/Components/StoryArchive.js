@@ -1,19 +1,9 @@
 import React from "react";
-import "../Layout/Card.css";
 
-const StoryArchive = () => (
-  <div className="card">
-    <div className="card3">
-      <img
-        src="/StoryArchive_Image.jpg"
-        alt="Story Archive"
-        className="card-image"
-      />
-      <h2>Story Archive</h2>
-      <p>Your stories are securely stored for safekeeping.</p>
-      <button className="go-button">Go!</button>
+export default function StoryArchive() {
+  return (
+    <div>
+      <h1>StoryArchive Page</h1>
     </div>
-  </div>
-);
-
-export default StoryArchive;
+  );
+}
