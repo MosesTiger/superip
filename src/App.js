@@ -5,6 +5,10 @@ import CreateStory from "./Components/CreateStory";
 import PredictHit from "./Components/PredictHit";
 import StoryArchive from "./Components/StoryArchive";
 import Recommend from "./Components/Recommend";
+import How from "./Components/nav_bar/How";
+import QnA from "./Components/nav_bar/QnA";
+import ToS from "./Components/nav_bar/ToS";
+import Setting from "./Components/nav_bar/Setting";
 
 function App() {
   return (
@@ -14,6 +18,10 @@ function App() {
       <Route path="/PredictHit" element={<PredictHit />} />
       <Route path="/StoryArchive" element={<StoryArchive />} />
       <Route path="/Recommend" element={<Recommend />} />
+      <Route path="/How" element={<How />} />
+      <Route path="/QnA" element={<QnA />} />
+      <Route path="/ToS" element={<ToS />} />
+      <Route path="/Setting" element={<Setting />} />
     </Routes>
   );
 }
