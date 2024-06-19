@@ -8,13 +8,13 @@ function Navbar() {
       <Link to="/How">
         <span>How</span>
       </Link>
-      <Link to="QnA">
+      <Link to="/QnA">
         <span>QnA</span>
       </Link>
-      <Link to="ToS">
+      <Link to="/ToS">
         <span>ToS</span>
       </Link>
-      <Link to="Setting">
+      <Link to="/Setting">
         <span>Setting</span>
       </Link>
     </nav>
