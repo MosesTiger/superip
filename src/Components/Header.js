@@ -1,16 +1,16 @@
 import React from "react";
 import { FaBell, FaSearch } from "react-icons/fa";
-import "../Layout/Header.css";
+import styles from "../layout/Header.module.css";
 
 const Header = () => (
-  <header className="header">
-    <img src="/로고 임시.png" alt="Logo" className="logo" />
-    <div className="search-container">
-      <input type="search" className="search-bar" placeholder="영화 검색..." />
-      <FaSearch className="search-icon" />
+  <header className={styles.header}>
+    <img src="/로고 임시.png" alt="Logo" className={styles.logo} />
+    <div className={styles.searchContainer}>
+      <input type="search" className={styles.searchBar} placeholder="영화 검색..." />
+      <FaSearch className={styles.searchIcon} />
     </div>
-    <FaBell className="notification-icon" />
-    <button className="login-button">로그인</button>
+    <FaBell className={styles.notificationIcon} />
+    <button className={styles.loginButton}>로그인</button>
   </header>
 );
 

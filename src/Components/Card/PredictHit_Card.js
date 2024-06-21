@@ -1,19 +1,19 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import "../../Layout/Card.css";
+import Link from 'next/link';
+import styles from "../../layout/Card.module.css";
 
 const PredictHit = () => (
-  <div className="card">
-    <div className="card2">
+  <div className={styles.card}>
+    <div className={styles.card2}>
       <img
         src="/PredictHit_Image.jpg"
         alt="Predict Hit"
-        className="card-image"
+        className={styles.cardImage}
       />
       <h2>Predict Hit</h2>
       <p>Analyzing your story's success and impact.</p>
-      <Link to="/PredictHit">
-        <button className="go-button">Go!</button>
+      <Link href="/predictHit">
+        <button className={styles.goButton}>Go!</button>
       </Link>
     </div>
   </div>

@@ -1,26 +1,26 @@
 import React from "react";
 import { FaChevronRight } from "react-icons/fa";
-import Header from "./Header";
-import CreateStory from "./Card/CreateStory_Card";
-import PredictHit from "./Card/PredictHit_Card";
-import StoryArchive from "./Card/StoryArchive_Card";
-import Recommend from "./Card/Recommend_Card";
-import Navbar from "./Navbar";
-import "../Layout/Main.css";
+import Header from "../components/Header";
+import CreateStory from "../components/Card/CreateStory_Card";
+import PredictHit from "../components/Card/PredictHit_Card";
+import StoryArchive from "../components/Card/StoryArchive_Card";
+import Recommend from "../components/Card/Recommend_Card";
+import Navbar from "../components/Navbar";
+import styles from "../layout/Main.module.css";
 
 const Main = () => {
   return (
-    <div className="main-page">
+    <div className={styles.mainPage}>
       <Header />
-      <div className="title-wrapper">
-        <div className="circle-icon"></div>
-        <div className="title">
+      <div className={styles.titleWrapper}>
+        <div className={styles.circleIcon}></div>
+        <div className={styles.title}>
           <h1>Create Story</h1>
           <Navbar />
         </div>
-        <FaChevronRight className="nav-arrow" />
+        <FaChevronRight className={styles.navArrow} />
       </div>
-      <div className="card-container">
+      <div className={styles.cardContainer}>
         <CreateStory />
         <PredictHit />
         <StoryArchive />

@@ -1,0 +1,17 @@
+.navBar {
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  margin: 0 50px;
+}
+
+.navBar span {
+  margin: 0 40px;
+  cursor: pointer;
+}
+
+.navArrow {
+  margin: 40px 50px 0 0;
+  font-size: 24px;
+  cursor: pointer;
+}

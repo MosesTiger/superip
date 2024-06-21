@@ -1,22 +1,14 @@
 import React from "react";
-import "../Layout/Navbar.css";
-import { Link } from "react-router-dom";
+import Link from 'next/link';
+import styles from "../layout/Navbar.module.css";
 
 function Navbar() {
   return (
-    <nav className="nav-bar">
-      <Link to="/How">
-        <span>How</span>
-      </Link>
-      <Link to="/QnA">
-        <span>QnA</span>
-      </Link>
-      <Link to="/ToS">
-        <span>ToS</span>
-      </Link>
-      <Link to="/Setting">
-        <span>Setting</span>
-      </Link>
+    <nav className={styles.navBar}>
+      <Link href="/how"><span className={styles.navBar}>How</span></Link>
+      <Link href="/qna"><span className={styles.navBar}>QnA</span></Link>
+      <Link href="/tos"><span className={styles.navBar}>ToS</span></Link>
+      <Link href="/setting"><span className={styles.navBar}>Setting</span></Link>
     </nav>
   );
 }

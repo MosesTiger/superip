@@ -1,19 +1,19 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import "../../Layout/Card.css";
+import Link from 'next/link';
+import styles from "../../layout/Card.module.css";
 
 const CreateStory = () => (
-  <div className="card">
-    <div className="card1">
+  <div className={styles.card}>
+    <div className={styles.card1}>
       <img
         src="/CreateStory_Image.jpg"
         alt="Create Story"
-        className="card-image"
+        className={styles.cardImage}
       />
       <h2>Create Story</h2>
       <p>Get your stories created automatically and effortlessly</p>
-      <Link to="/CreateStory">
-        <button className="go-button">Go!</button>
+      <Link href="/createStory">
+        <button className={styles.goButton}>Go!</button>
       </Link>
     </div>
   </div>
