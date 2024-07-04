@@ -3,6 +3,8 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/": "pages/index.js",
+  "/how": "pages/how.js",
+  "/qna": "pages/qna.js",
   "/tos": "pages/tos.js",
-  "/qna": "pages/qna.js"
+  "/setting": "pages/setting.js"
 }

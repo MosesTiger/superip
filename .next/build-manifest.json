@@ -27,10 +27,20 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
+    "/how": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/how.js"
+    ],
     "/qna": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
       "static/chunks/pages/qna.js"
+    ],
+    "/setting": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/setting.js"
     ],
     "/tos": [
       "static/chunks/webpack.js",
