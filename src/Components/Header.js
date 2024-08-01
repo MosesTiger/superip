@@ -1,6 +1,7 @@
 import React from "react";
 import { FaBell, FaSearch } from "react-icons/fa";
 import "../Layout/Header.css";
+import { Link } from "react-router-dom";
 
 const Header = () => (
   <header className="header">
@@ -10,7 +11,9 @@ const Header = () => (
       <FaSearch className="search-icon" />
     </div>
     <FaBell className="notification-icon" />
-    <button className="login-button">로그인</button>
+    <Link to="/Login">
+      <button className="login-button">로그인</button>
+    </Link>
   </header>
 );
 

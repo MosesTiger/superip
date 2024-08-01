@@ -9,11 +9,13 @@ import How from "./Components/nav_bar/How";
 import QnA from "./Components/nav_bar/QnA";
 import ToS from "./Components/nav_bar/ToS";
 import Setting from "./Components/nav_bar/Setting";
+import Login from "./Components/Login";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Main />} />
+      <Route path="/Login" element={<Login />} />
       <Route path="/CreateStory" element={<CreateStory />} />
       <Route path="/PredictHit" element={<PredictHit />} />
       <Route path="/StoryArchive" element={<StoryArchive />} />
