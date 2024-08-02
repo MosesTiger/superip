@@ -10,6 +10,7 @@ import QnA from "./Components/nav_bar/QnA";
 import ToS from "./Components/nav_bar/ToS";
 import Setting from "./Components/nav_bar/Setting";
 import Login from "./Components/Login";
+import PageNotFound from "./Components/PageNotFound";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
       <Route path="/QnA" element={<QnA />} />
       <Route path="/ToS" element={<ToS />} />
       <Route path="/Setting" element={<Setting />} />
+      <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
 }
