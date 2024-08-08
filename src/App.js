@@ -11,6 +11,8 @@ import ToS from "./Components/nav_bar/ToS";
 import Setting from "./Components/nav_bar/Setting";
 import Login from "./Components/Login";
 import PageNotFound from "./Components/PageNotFound";
+import Findid from "./Components/Findid";
+import Signup from "./Components/Signup";
 
 function App() {
   return (
@@ -26,6 +28,8 @@ function App() {
       <Route path="/ToS" element={<ToS />} />
       <Route path="/Setting" element={<Setting />} />
       <Route path="*" element={<PageNotFound />} />
+      <Route path="/find-id" element={<Findid />} />
+      <Route path="/Signup" element={<Signup />} />
     </Routes>
   );
 }
