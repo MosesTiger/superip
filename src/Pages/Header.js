@@ -1,6 +1,6 @@
 import React from "react";
 import { FaBell, FaSearch } from "react-icons/fa";
-import "../Layout/Header.css";
+import "../stylefile/Header.css";
 import { Link } from "react-router-dom";
 
 const Header = () => (

@@ -29,7 +29,7 @@ superip/
 │   ├── StoryArchive_Image.jpg
 │   └── 로고 임시.png
 ├── src/
-│   ├── components/
+│   ├── Pages/
 │   │   ├── Card/
 │   │   │   ├── CreateStory_Card.js
 │   │   │   ├── PredictHit_Card.js
@@ -38,7 +38,7 @@ superip/
 │   │   ├── Header.js
 │   │   ├── Main.js
 │   │   └── Navbar.js
-│   ├── layout/
+│   ├── stylefile/
 │   │   ├── Card.module.css
 │   │   ├── Header.module.css
 │   │   ├── Main.module.css
@@ -111,7 +111,7 @@ export default Document;
 
 ### `index.js`
 ```jsx
-import Main from '../components/Main';
+import Main from '../Pages/Main';
 
 export default function Home() {
   return <Main />;

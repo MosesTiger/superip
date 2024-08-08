@@ -1,16 +1,16 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import Main from "./Components/Main";
-import CreateStory from "./Components/CreateStory";
-import PredictHit from "./Components/PredictHit";
-import StoryArchive from "./Components/StoryArchive";
-import Recommend from "./Components/Recommend";
-import How from "./Components/nav_bar/How";
-import QnA from "./Components/nav_bar/QnA";
-import ToS from "./Components/nav_bar/ToS";
-import Setting from "./Components/nav_bar/Setting";
-import Login from "./Components/Login";
-import PageNotFound from "./Components/PageNotFound";
+import Main from "./Pages/Main";
+import CreateStory from "./Pages/CreateStory";
+import PredictHit from "./Pages/PredictHit";
+import StoryArchive from "./Pages/StoryArchive";
+import Recommend from "./Pages/Recommend";
+import How from "./Pages/nav_bar_Page/How";
+import QnA from "./Pages/nav_bar_Page/QnA";
+import ToS from "./Pages/nav_bar_Page/ToS";
+import Setting from "./Pages/nav_bar_Page/Setting";
+import Login from "./Pages/Login";
+import PageNotFound from "./Pages/PageNotFound";
 
 function App() {
   return (

@@ -1,8 +1,17 @@
-/* src/Layout/Main.css */
+/* src/stylefile/Main.css */
 .main-page {
   font-family: "Arial", sans-serif;
   color: #ffffff;
   background: linear-gradient(to right, #182e3f, #859aa5, #182e3f);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.page {
+  font-family: "Arial", sans-serif;
+  color: #ffffff;
+  background: #182e3f;
   min-height: 100vh;
   display: flex;
   flex-direction: column;

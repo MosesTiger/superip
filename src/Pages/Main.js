@@ -6,7 +6,7 @@ import PredictHit from "./Card/PredictHit_Card";
 import StoryArchive from "./Card/StoryArchive_Card";
 import Recommend from "./Card/Recommend_Card";
 import Navbar from "./Navbar";
-import "../Layout/Main.css";
+import "../stylefile/Main.css";
 
 const Main = () => {
   return (

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "../../Layout/Card.css";
+import "../../stylefile/Card.css";
 
 const Recommend = () => (
   <div className="card">
