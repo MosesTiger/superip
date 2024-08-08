@@ -1,9 +1,13 @@
 import React from "react";
+import Header from "../Components/Header";
+import "../stylefile/Main.css";
 
 export default function Recommend() {
   return (
-    <div>
-      <h1>Recommend Page</h1>
+    <div className="page">
+      <Header />
+      
+    
     </div>
   );
 }

@@ -1,9 +1,9 @@
 import React from "react";
 
-export default function QnA() {
+export default function Inquiry() {
   return (
     <div>
-      <h1>QnA Page</h1>
+      <h1>Inquiry Page</h1>
     </div>
   );
 }

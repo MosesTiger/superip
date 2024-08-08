@@ -3,29 +3,6 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 
 // 스타일드 컴포넌트 정의
-const LoginContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #edf6f6;
-`;
-
-const LoginBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: white;
-  padding: 70px 100px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-`;
-
-const Logo = styled.img`
-  width: 400px;
-  margin-bottom: 20px;
-`;
-
 const LoginText = styled.div`
   font-size: 40px;
   font-weight: bold;
@@ -86,28 +63,28 @@ const LinkButton = styled(Link)`
 `;
 
 // 로그인 컴포넌트 정의
-function Login() {
+function FindPW() {
   return (
-    <LoginContainer>
-      <LoginBox>
-        <Link to="/">
-          <Logo src="로고 제목.png" alt="Logo" />
-        </Link>
-        <LoginText>아이디찾기</LoginText>
+    <>
+        <LoginText>비밀번호 찾기</LoginText>
+        <InputContainer>
+          <Input type="text" placeholder="아이디" />
+        </InputContainer>
         <InputContainer>
           <Input type="text" placeholder="이름" />
         </InputContainer>
         <InputContainer>
           <Input type="password" placeholder="E-mail" />
         </InputContainer>
-        <LoginButton>아이디 찾기</LoginButton>
+        <Link to="/user/findpw/result">
+            <LoginButton>비밀번호 찾기</LoginButton>
+        </Link>
         <LinkContainer>
-          <LinkButton to="/Signup">회원가입</LinkButton>
-          <LinkButton to="/login">로그인</LinkButton>
+          <LinkButton to="/user/signup">회원가입</LinkButton>
+          <LinkButton to="/user/login">로그인</LinkButton>
         </LinkContainer>
-      </LoginBox>
-    </LoginContainer>
+    </>
   );
 }
 
-export default Login;
+export default FindPW;

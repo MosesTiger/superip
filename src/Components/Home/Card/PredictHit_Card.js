@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "../../stylefile/Card.css";
+import "../../../stylefile/Card.css";
 
 const PredictHit = () => (
   <div className="card">

@@ -1,9 +1,9 @@
 import React from "react";
 
-export default function Setting() {
+export default function FAQ() {
   return (
     <div>
-      <h1>Setting Page</h1>
+      <h1>FAQ Page</h1>
     </div>
   );
 }

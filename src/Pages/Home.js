@@ -1,11 +1,11 @@
 import React from "react";
 import { FaChevronRight } from "react-icons/fa";
-import Header from "./Header";
-import CreateStory from "./Card/CreateStory_Card";
-import PredictHit from "./Card/PredictHit_Card";
-import StoryArchive from "./Card/StoryArchive_Card";
-import Recommend from "./Card/Recommend_Card";
-import Navbar from "./Navbar";
+import Header from "../Components/Header";
+import CreateStory from "../Components/Home/Card/CreateStory_Card";
+import PredictHit from "../Components/Home/Card/PredictHit_Card";
+import StoryArchive from "../Components/Home/Card/StoryArchive_Card";
+import Recommend from "../Components/Home/Card/Recommend_Card";
+import Navbar from "../Components/Home/Navbar";
 import "../stylefile/Main.css";
 
 const Main = () => {

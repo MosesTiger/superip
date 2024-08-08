@@ -1,35 +1,40 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import Main from "./Pages/Main";
+import Main from "./Pages/Home";
 import CreateStory from "./Pages/CreateStory";
-import PredictHit from "./Pages/PredictHit";
-import StoryArchive from "./Pages/StoryArchive";
+import Mypage from "./Pages/Mypage";
 import Recommend from "./Pages/Recommend";
-import How from "./Pages/nav_bar_Page/How";
-import QnA from "./Pages/nav_bar_Page/QnA";
-import ToS from "./Pages/nav_bar_Page/ToS";
-import Setting from "./Pages/nav_bar_Page/Setting";
-import Login from "./Pages/Login";
+import Detail from "./Pages/Detail";
+import Search from "./Pages/Search";
+import Info from "./Pages/Info";
+import User from "./Pages/User";
+import Login from "./Components/User/Login";
+import Signup from "./Components/User/Signup";
+import FindID from "./Components/User/FindID";
+import FindIDRes from "./Components/User/FindIDRes";
+import FindPW from "./Components/User/FindPW";
+import FindPWRes from "./Components/User/FindPWRes";
 import PageNotFound from "./Pages/PageNotFound";
-import Findid from "./Pages/Findid";
-import Signup from "./Pages/Signup";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Main />} />
-      <Route path="/Login" element={<Login />} />
+      <Route path="/user" element={<User />}>
+        <Route path="login" element={<Login />} />
+        <Route path="signup" element={<Signup />} />
+        <Route path="findid" element={<FindID />} />
+        <Route path="findpw" element={<FindPW />} />
+        <Route path="findid/result" element={<FindIDRes />} />
+        <Route path="findpw/result" element={<FindPWRes />} />
+      </Route>
       <Route path="/CreateStory" element={<CreateStory />} />
-      <Route path="/PredictHit" element={<PredictHit />} />
-      <Route path="/StoryArchive" element={<StoryArchive />} />
+      <Route path="/mypage" element={<Mypage />} />
       <Route path="/Recommend" element={<Recommend />} />
-      <Route path="/How" element={<How />} />
-      <Route path="/QnA" element={<QnA />} />
-      <Route path="/ToS" element={<ToS />} />
-      <Route path="/Setting" element={<Setting />} />
+      <Route path="/detail" element={<Detail />} />
+      <Route path="/search" element={<Search />} />
+      <Route path="/info" element={<Info />} />
       <Route path="*" element={<PageNotFound />} />
-      <Route path="/find-id" element={<Findid />} />
-      <Route path="/Signup" element={<Signup />} />
     </Routes>
   );
 }

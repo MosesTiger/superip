@@ -1,31 +1,8 @@
-import React, { useState } from "react";
 import styled from "styled-components";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 // 스타일드 컴포넌트 정의
-const SignupContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #edf6f6;
-`;
-
-const SignupBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: white;
-  padding: 70px 100px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-`;
-
-const Logo = styled.img`
-  width: 400px;
-  margin-bottom: 20px;
-`;
-
 const SignupText = styled.div`
   font-size: 40px;
   font-weight: bold;
@@ -123,11 +100,7 @@ function Signup() {
   };
 
   return (
-    <SignupContainer>
-      <SignupBox>
-        <Link to="/">
-          <Logo src="로고 제목.png" alt="Logo" />
-        </Link>
+    <>
         <SignupText>회원가입</SignupText>
         <InputContainer>
           <Input type="email" placeholder="예) abc@gmail.com" />
@@ -136,7 +109,7 @@ function Signup() {
           <Input 
             type={showPassword ? "text" : "password"} 
             placeholder="영문, 숫자 조합 8-16자" 
-          />
+            />
           <EyeButton onClick={togglePasswordVisibility}>
             {showPassword ? "👁️" : "👁️‍🗨️"}
           </EyeButton>
@@ -145,7 +118,7 @@ function Signup() {
           <Input 
             type={showPassword ? "text" : "password"} 
             placeholder="비밀번호를 한 번 더 입력해주세요." 
-          />
+            />
           <EyeButton onClick={togglePasswordVisibility}>
             {showPassword ? "👁️" : "👁️‍🗨️"}
           </EyeButton>
@@ -176,9 +149,10 @@ function Signup() {
             <span>만 14세 이상임에 필수 동의</span>
           </CheckboxLabel>
         </CheckboxContainer>
+        <Link to="/">
         <LoginButton>Sign Up</LoginButton>
-      </SignupBox>
-    </SignupContainer>
+        </Link>
+        </>
   );
 }
 

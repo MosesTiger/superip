@@ -3,28 +3,6 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 
 // 스타일드 컴포넌트 정의
-const LoginContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #edf6f6;
-`;
-
-const LoginBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: white;
-  padding: 70px 100px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-`;
-
-const Logo = styled.img`
-  width: 400px;
-  margin-bottom: 20px;
-`;
 
 const LoginText = styled.div`
   font-size: 40px;
@@ -53,7 +31,7 @@ const InputImage = styled.img`
   left: 10px; 
   top: 50%;
   transform: translateY(-50%);
-  width: 27px; 
+  width: 23px; 
   height: auto;
 `;
 
@@ -132,34 +110,29 @@ const LinkButton = styled(Link)`
 // 로그인 컴포넌트 정의
 function Login() {
   return (
-    <LoginContainer>
-      <LoginBox>
-        <Link to="/">
-          <Logo src="로고 제목.png" alt="Logo" />
-        </Link>
+    <>
         <LoginText>LOGIN</LoginText>
         <InputContainer>
-          <InputImage src="아이디.png" alt="ID Icon" />
+          <InputImage src="/아이디.svg" alt="ID Icon" />
           <Input type="text" placeholder="아이디" />
         </InputContainer>
         <InputContainer>
-          <InputImage src="비밀번호.png" alt="pass Icon" />
+          <InputImage src="/비밀번호.svg " alt="pass Icon" />
           <Input type="password" placeholder="비밀번호" />
         </InputContainer>
         <LoginButton>Login</LoginButton>
         <OAuthButton className="kakao">
-          <img src="카카오.png" alt="Ka Logo" />카카오톡 로그인
+          <img src="/카카오.png" alt="Ka Logo" />카카오톡 로그인
         </OAuthButton>
         <OAuthButton className="naver">
-          <img src="네이버.png" alt="Naver Logo" />네이버 로그인
+          <img src="/네이버.png" alt="Naver Logo" />네이버 로그인
         </OAuthButton>
         <LinkContainer>
-          <LinkButton to="/find-id">아이디 찾기</LinkButton>
-          <LinkButton to="/find-password">비밀번호 찾기</LinkButton>
-          <LinkButton to="/Signup">회원가입</LinkButton>
+          <LinkButton to="/user/findid">아이디 찾기</LinkButton>
+          <LinkButton to="/user/findpw">비밀번호 찾기</LinkButton>
+          <LinkButton to="/user/Signup">회원가입</LinkButton>
         </LinkContainer>
-      </LoginBox>
-    </LoginContainer>
+    </>
   );
 }
 
