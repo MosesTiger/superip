@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { MdOutlineKeyboardArrowUp } from "react-icons/md";
 
@@ -98,14 +98,27 @@ const ContentsWrap = styled.div`
   align-items: center;
   margin-top:-10px;
 `
+const Passwordcheck = styled.p`
+  font-size: 13px; /* 글씨 크기 조정 */
+  display: flex;
+  align-items: center;
+  margin-top:-10px;
+`
 
 // Signup 컴포넌트 정의
 function Signup() {
+  const navigate = useNavigate(); // 페이지 이동을 위해 useNavigate 훅 사용
   const [showPassword, setShowPassword] = useState(false);
+  const [open0, setOpen0] = useState(false)
   const [open1, setOpen1] = useState(false)
   const [open2, setOpen2] = useState(false)
   const [open3, setOpen3] = useState(false)
-  const [open4, setOpen4] = useState(false)
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
+  const [checkItems, setCheckItems] = useState([]);
 
   const data = [
     {
@@ -134,7 +147,22 @@ function Signup() {
     }
   ]
 
-  const [checkItems, setCheckItems] = useState([]);
+   // 필수 항목만 필터링
+   const requiredItems = data.filter(item => item.status === '(필수)');
+
+   // 필수 항목이 모두 체크되었는지 확인
+   const allRequiredChecked = requiredItems.every(item =>
+     checkItems.includes(item.id)
+   );
+
+   // 모든 입력 필드가 비어있지 않은지 확인
+  const allInputsFilled =
+  email !== '' && password !== '' && confirmPassword !== '' && name !== '';
+
+  const isPasswordMatch = password === confirmPassword;
+
+  // Sign Up 버튼이 활성화되기 위한 조건
+  const canSignUp = allInputsFilled && allRequiredChecked && isPasswordMatch;
 
   // 체크박스 개별 선택하기
   const selectChecked = (checked, id) => {
@@ -160,35 +188,76 @@ function Signup() {
     setShowPassword(prevState => !prevState);
   };
 
+  const handleSignUp = () => {
+    if (!allInputsFilled) {
+      alert('모든 필드를 입력해 주세요.');
+      return;
+    }
+
+    if (!allRequiredChecked) {
+      alert('필수 약관에 동의해 주세요.');
+      return;
+    }
+
+    if (!isPasswordMatch) {
+      alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
+    // 모든 조건이 충족되면 로그인 페이지로 이동
+    navigate('/login');
+  };
+
   return (
     <>
-        <SignupText>회원가입</SignupText>
-        <InputContainer>
-          <Input type="email" placeholder="예) abc@gmail.com" />
-        </InputContainer>
-        <InputContainer>
-          <Input 
-            type={showPassword ? "text" : "password"} 
-            placeholder="영문, 숫자 조합 8-16자" 
-            />
-          <EyeButton onClick={togglePasswordVisibility}>
-            {showPassword ? "👁️" : "👁️‍🗨️"}
-          </EyeButton>
-        </InputContainer>
-        <InputContainer>
-          <Input 
-            type={showPassword ? "text" : "password"} 
-            placeholder="비밀번호를 한 번 더 입력해주세요." 
-            />
-          <EyeButton onClick={togglePasswordVisibility}>
-            {showPassword ? "👁️" : "👁️‍🗨️"}
-          </EyeButton>
-        </InputContainer>
-        <InputContainer>
-          <Input type="text" placeholder="이름 입력" />
-        </InputContainer>
-        {/* 체크박스와 약관 */}
-        <CheckboxContainer>
+      <SignupText>회원가입</SignupText>
+      <InputContainer>
+        <Input
+          type="email"
+          placeholder="예) abc@gmail.com"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+        />
+      </InputContainer>
+      <InputContainer>
+        <Input
+          type={showPassword ? 'text' : 'password'}
+          placeholder="영문, 숫자 조합 8-16자"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+        />
+        <EyeButton onClick={togglePasswordVisibility}>
+          {showPassword ? '👁️' : '👁️‍🗨️'}
+        </EyeButton>
+      </InputContainer>
+      <InputContainer>
+        <Input
+          type={showPassword ? 'text' : 'password'}
+          placeholder="비밀번호를 한 번 더 입력해주세요."
+          value={confirmPassword}
+          onChange={e => setConfirmPassword(e.target.value)}
+        />
+        <EyeButton onClick={togglePasswordVisibility}>
+          {showPassword ? '👁️' : '👁️‍🗨️'}
+        </EyeButton>
+      </InputContainer>
+      <div style={{minHeight: '15px'}}>
+      {confirmPassword && (
+        <Passwordcheck style={{ color: isPasswordMatch ? 'green' : 'red' }}>
+          {isPasswordMatch ? '비밀번호가 일치합니다.' : '비밀번호가 일치하지 않습니다.'}
+        </Passwordcheck>
+        )}
+      </div>
+      <InputContainer>
+        <Input
+          type="text"
+          placeholder="이름 입력"
+          value={name}
+          onChange={e => setName(e.target.value)}
+        />
+      </InputContainer>
+      {/* 체크박스와 약관 */}
+      <CheckboxContainer>
           <CheckboxLabelBold>
             <input type='checkbox'
             name='all-checked'
@@ -197,8 +266,6 @@ function Signup() {
               />
             <span>약관에 모두 동의합니다.</span>
           </CheckboxLabelBold>
-          <CheckboxLabel>
-          </CheckboxLabel>
           <CheckboxLabel>
             <label>
               <input
@@ -209,17 +276,17 @@ function Signup() {
                 />
               <span style={{ marginRight: '5px', color: data[0].status === '(필수)' ? 'red' : 'gray' }}>{data[0].status}</span> {data[0].title}
             </label>
-            {open1 ?
+            {open0 ?
               <MdOutlineKeyboardArrowUp size={30} color='gray' onClick={() => {
-                setOpen1(!open1)
+                setOpen0(!open0)
               }} />
               :
               <MdOutlineKeyboardArrowDown size={30} color='gray' onClick={() => {
-                setOpen1(!open1)
+                setOpen0(!open0)
               }} />
             }
           </CheckboxLabel>
-          {open1 &&
+          {open0 &&
           <ContentsWrap>
             <p>{data[0].contents}</p>
           </ContentsWrap>
@@ -234,17 +301,17 @@ function Signup() {
                 />
               <span style={{ marginRight: '5px', color: data[1].status === '(필수)' ? 'red' : 'gray' }}>{data[1].status}</span> {data[1].title}
             </label>
-            {open2 ?
+            {open1 ?
               <MdOutlineKeyboardArrowUp size={30} color='gray' onClick={() => {
-                setOpen2(!open2)
+                setOpen1(!open1)
               }} />
               :
               <MdOutlineKeyboardArrowDown size={30} color='gray' onClick={() => {
-                setOpen2(!open2)
+                setOpen1(!open1)
               }} />
             }
           </CheckboxLabel>
-          {open2 &&
+          {open1 &&
           <ContentsWrap>
             <p>{data[1].contents}</p>
           </ContentsWrap>
@@ -259,17 +326,17 @@ function Signup() {
                 />
               <span style={{ marginRight: '5px', color: data[2].status === '(필수)' ? 'red' : 'gray' }}>{data[2].status}</span> {data[2].title}
             </label>
-            {open3 ?
+            {open2 ?
               <MdOutlineKeyboardArrowUp size={30} color='gray' onClick={() => {
-                setOpen3(!open3)
+                setOpen2(!open2)
               }} />
               :
               <MdOutlineKeyboardArrowDown size={30} color='gray' onClick={() => {
-                setOpen3(!open3)
+                setOpen2(!open2)
               }} />
             }
           </CheckboxLabel>
-          {open3 &&
+          {open2 &&
           <ContentsWrap>
             <p>{data[2].contents}</p>
           </ContentsWrap>
@@ -284,26 +351,26 @@ function Signup() {
                 />
               <span style={{ marginRight: '5px', color: data[3].status === '(필수)' ? 'red' : 'gray' }}>{data[3].status}</span> {data[3].title}
             </label>
-            {open4 ?
+            {open3 ?
               <MdOutlineKeyboardArrowUp size={30} color='gray' onClick={() => {
-                setOpen4(!open4)
+                setOpen3(!open3)
               }} />
               :
               <MdOutlineKeyboardArrowDown size={30} color='gray' onClick={() => {
-                setOpen4(!open4)
+                setOpen3(!open3)
               }} />
             }
           </CheckboxLabel>
-          {open4 &&
+          {open3 &&
           <ContentsWrap>
             <p>{data[3].contents}</p>
           </ContentsWrap>
           }
         </CheckboxContainer>
-        <Link to="/">
-        <LoginButton>Sign Up</LoginButton>
-        </Link>
-        </>
+      <LoginButton onClick={handleSignUp} disabled={!canSignUp}>
+        Sign Up
+      </LoginButton>
+    </>
   );
 }
 

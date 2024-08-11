@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthProvider";
 
 // 스타일드 컴포넌트 정의
 
@@ -109,18 +110,39 @@ const LinkButton = styled(Link)`
 
 // 로그인 컴포넌트 정의
 function Login() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const { login } = useAuth(); // login 함수 가져오기
+  const navigate = useNavigate(); // 페이지 이동을 위한 useNavigate 훅
+
+  const handleLogin = () => {
+    // 로그인 처리
+    login(username, password);
+    navigate("/"); // 로그인 후 홈 페이지로 이동
+  };
+
   return (
     <>
       <LoginText>LOGIN</LoginText>
       <InputContainer>
         <InputImage src="/아이디.svg" alt="ID Icon" />
-        <Input type="text" placeholder="아이디" />
+        <Input
+          type="text"
+          placeholder="아이디"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
       </InputContainer>
       <InputContainer>
         <InputImage src="/비밀번호.svg " alt="pass Icon" />
-        <Input type="password" placeholder="비밀번호" />
+        <Input
+          type="password"
+          placeholder="비밀번호"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
       </InputContainer>
-      <LoginButton>Login</LoginButton>
+      <LoginButton onClick={handleLogin}>Login</LoginButton>
       <OAuthButton className="kakao">
         <img src="/카카오.png" alt="Ka Logo" />
         카카오톡 로그인
