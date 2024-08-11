@@ -9,16 +9,15 @@ const LoginText = styled.div`
   margin-bottom: 20px;
 `;
 const Result = styled.div`
-    display:float;
-    font-size: 20px;
-    font-weight: 500;
-    padding:10px;
-    
-`
+  display: float;
+  font-size: 20px;
+  font-weight: 500;
+  padding: 10px;
+`;
 const ResultGroup = styled.div`
-    margin: 60px;
-    margin-right:250px;
-`
+  margin: 60px;
+  margin-right: 250px;
+`;
 const LoginButton = styled.button`
   width: 100px;
   height: 45px;
@@ -26,7 +25,7 @@ const LoginButton = styled.button`
   margin: 5px 0;
   border-radius: 5px;
   border: none;
-  background-color: #B3B3B3;
+  background-color: #b3b3b3;
   color: white;
   font-size: 16px;
   cursor: pointer;
@@ -43,7 +42,7 @@ const PWButton = styled.button`
   margin: 5px 0;
   border-radius: 5px;
   border: none;
-  background-color: #182E3F;
+  background-color: #182e3f;
   color: white;
   font-size: 16px;
   cursor: pointer;
@@ -53,37 +52,33 @@ const PWButton = styled.button`
   }
 `;
 
-const ButtonGroup= styled.div`
-    display: flex;
-    align-items:center;
-    justify-content:space-between;
-    width:300px;
-    padding: 0 10px;
-`
+const ButtonGroup = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 300px;
+  padding: 0 10px;
+`;
 
 // 로그인 컴포넌트 정의
-function FindID_End() {
+function FindIDRes() {
   return (
     <>
-        <LoginText>회원님의 아이디를 확인해주세요.</LoginText>
-        <ResultGroup>    
-        <Result>
-            이름 :
-        </Result>
-        <Result>
-            아이디 : 
-        </Result>
-        </ResultGroup>
-        <ButtonGroup>
-        <Link to="/user/login">
-            <LoginButton>로그인</LoginButton>
+      <LoginText>회원님의 아이디를 확인해주세요.</LoginText>
+      <ResultGroup>
+        <Result>이름 :</Result>
+        <Result>아이디 :</Result>
+      </ResultGroup>
+      <ButtonGroup>
+        <Link to="/login">
+          <LoginButton>로그인</LoginButton>
         </Link>
-        <Link to="/user/findpw">
-            <PWButton>비밀번호 찾기</PWButton>
+        <Link to="/login/findpw">
+          <PWButton>비밀번호 찾기</PWButton>
         </Link>
-        </ButtonGroup>
+      </ButtonGroup>
     </>
   );
 }
 
-export default FindID_End;
+export default FindIDRes;

@@ -34,7 +34,7 @@ function User() {
         <Link to="/">
           <Logo src="/로고 제목.png" alt="Logo" />
         </Link>
-        <Outlet/>
+        <Outlet />
       </LoginBox>
     </LoginContainer>
   );
