@@ -15,7 +15,7 @@ import FindIDRes from "./Components/User/FindIDRes";
 import FindPW from "./Components/User/FindPW";
 import FindPWRes from "./Components/User/FindPWRes";
 import PageNotFound from "./Pages/PageNotFound";
-import { AuthProvider, useAuth } from "./Components/AuthProvider";
+import { AuthProvider, useAuth } from "./Auth/AuthProvider";
 
 function App() {
   return (
