@@ -16,6 +16,9 @@ import FindPW from "./Components/User/FindPW";
 import FindPWRes from "./Components/User/FindPWRes";
 import PageNotFound from "./Pages/PageNotFound";
 import { AuthProvider, useAuth } from "./Auth/AuthProvider";
+import Movie from './Pages/Movie';
+import Synopsis from './Pages/Synopsis';
+import Script from './Pages/Script';
 
 function App() {
   return (
@@ -36,16 +39,18 @@ function App() {
             <ProtectedRoute>
               <CreateStory />
             </ProtectedRoute>
-          }
-          />
+          }>
+            <Route path="movie" element={<Movie />} />
+            <Route path="synopsis" element={<Synopsis />} />
+            <Route path="script" element={<Script />} />
+          </Route>
         <Route
           path="/mypage"
           element={
             <ProtectedRoute>
               <Mypage />
             </ProtectedRoute>
-          }
-          />
+          }/>
         <Route path="/Recommend" element={<Recommend />} />
         <Route path="/detail" element={<Detail />} />
         <Route path="/search" element={<Search />} />
