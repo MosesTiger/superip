@@ -15,10 +15,10 @@ import FindIDRes from "./Components/User/FindIDRes";
 import FindPW from "./Components/User/FindPW";
 import FindPWRes from "./Components/User/FindPWRes";
 import PageNotFound from "./Pages/PageNotFound";
-import { AuthProvider, useAuth } from "./Auth/AuthProvider";
-import Movie from './Pages/Movie';
-import Synopsis from './Pages/Synopsis';
-import Script from './Pages/Script';
+import { AuthProvider, useAuth } from "./context/AuthProvider";
+import Select from './Components/CreateStory/Select';
+import Synopsis from './Components/CreateStory/Synopsis';
+import Script from './Components/CreateStory/Script';
 
 function App() {
   return (
@@ -40,7 +40,7 @@ function App() {
               <CreateStory />
             </ProtectedRoute>
           }>
-            <Route path="movie" element={<Movie />} />
+            <Route path="select" element={<Select />} />
             <Route path="synopsis" element={<Synopsis />} />
             <Route path="script" element={<Script />} />
           </Route>

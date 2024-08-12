@@ -2,7 +2,7 @@ import React from "react";
 import { FaBell, FaSearch } from "react-icons/fa";
 import "../stylefile/Header.css";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from '../Auth/AuthProvider';
+import { useAuth } from '../context/AuthProvider';
 
 const Header = () => {
 

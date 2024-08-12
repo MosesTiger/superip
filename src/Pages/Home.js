@@ -14,7 +14,7 @@ function Home() {
       image: "/CreateStory_Image.jpg",
       title: "Create Story",
       description: "Get your stories created automatically and effortlessly",
-      redirectTo: "/createstory",
+      redirectTo: "/createstory/select",
     },
     {
       id: 2,

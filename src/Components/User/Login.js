@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../Auth/AuthProvider";
+import { useAuth } from "../../context/AuthProvider";
 
 // 스타일드 컴포넌트 정의
 

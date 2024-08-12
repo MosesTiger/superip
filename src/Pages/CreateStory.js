@@ -1,6 +1,9 @@
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import styled from 'styled-components';
+import Header from '../Components/Header';
+import StoryNav from '../Components/CreateStory/StoryNav';
+import "../stylefile/Main.css";
 
 const Container = styled.div`
   width: 100%;
@@ -31,7 +34,7 @@ const Main = styled.main`
   background-color: #EDF6F6;
   display: flex;
   flex-direction: column;
-  margin: 30px auto;
+  margin: 0px auto;
   padding: 0 24px;
   box-sizing: border-box;
 
@@ -43,13 +46,6 @@ const Main = styled.main`
   }
 `;
 
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 0;
-  border-bottom: 2px solid #ccc;
-`;
 
 const HeaderButton = styled(Link)`
   text-align: center;
@@ -79,21 +75,29 @@ const SaveButton = styled.button`
   }
 `;
 
+const MainWrapper = styled.div`
+  padding:10px;
+  padding-top:0px;
+  margin:0;
+`
+
 function CreateStory() {
   return (
-    <Container>
-      <Main>
-        <Header>
-          <div>
-            <HeaderButton to="movie">영화 정보</HeaderButton>
+    <div className="page">
+      <Header/>
+      <MainWrapper>
+        <StoryNav/>
+        <Main> 
+            <div>
+            <HeaderButton to="select">영화 정보</HeaderButton>
             <HeaderButton to="synopsis">시놉시스</HeaderButton>
             <HeaderButton to="script">시나리오</HeaderButton>
-          </div>
-          <SaveButton>저장</SaveButton>
-        </Header>
-        <Outlet />
-      </Main>
-    </Container>
+            </div>
+            <SaveButton>저장</SaveButton>
+            <Outlet />
+        </Main>
+      </MainWrapper>
+    </div>
   );
 }
 

@@ -7,6 +7,7 @@ const Section = styled.section`
   flex-direction: column;
   padding: 20px;
   max-width: 100%;
+  margin : 0;
   font-size: 16px;
   color: #000; /* 글자 색상 */
   font-family: 'Poppins', sans-serif;
@@ -55,13 +56,17 @@ const GenreOption = styled.div`
   align-items: center;
   padding: 8px 10px;
   border-radius: 4px;
-  background-color: ${(props) => (props.selected ? "#dc143c" : "#d3d3d3")}; /* 선택된 경우 빨간색, 그렇지 않으면 회색 */
+  background-color: ${(props) => (props.selected ? "#E23A3A" : "#d3d3d3")}; /* 선택된 경우 빨간색, 그렇지 않으면 회색 */
   color: ${(props) => (props.selected ? "#fff" : "#000")}; /* 글자 색상 */
   cursor: pointer;
 
   &:hover {
-    background-color: #dc143c; /* 호버 시 빨간색 */
+    background-color: #E23A3A ; /* 호버 시 빨간색 */
     color: #fff; /* 글자 색상 */
+  }
+  &:active {
+    background-color: #dc143c ;
+    color: #fff;
   }
 `;
 
@@ -134,7 +139,7 @@ const Checkbox = styled.input`
   width: 25px;
   height: 25px;
   margin: 0;
-  accent-color: ${(props) => (props.checked ? "#dc143c" : "#859AA5")}; /* 체크된 경우 빨간색 */
+  accent-color: ${(props) => (props.checked ? "#E23A3A" : "#859AA5")}; /* 체크된 경우 빨간색 */
 `;
 
 const Actions = styled.div`
@@ -165,7 +170,7 @@ const ActionButton = styled(Link)`
 `;
 
 const PredictionButton = styled(ActionButton)`
-  background-color: #dc143c; /* 예측 버튼은 빨간색 */
+  background-color: #E23A3A; /* 예측 버튼은 빨간색 */
   color: #fff; /* 글자 색상 */
 `;
 
@@ -253,7 +258,7 @@ function CreateStory() {
           <option value="19">19세 관람가</option>
         </Select>
         <Label>영화의 배경 국가를 선택하세요.</Label>
-        <Select multiple>
+        <Select>
           <option value="korea">한국</option>
           <option value="china">중국</option>
           <option value="us">미국</option>
