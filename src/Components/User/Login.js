@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../Auth/AuthProvider";
 
 // 스타일드 컴포넌트 정의
 
@@ -18,20 +19,20 @@ const InputContainer = styled.div`
 const Input = styled.input`
   width: 90%;
   padding: 10px;
-  padding-left: 40px; 
+  padding-left: 40px;
   margin: 10px 0;
   border-radius: 5px;
   border: 1px solid #ddd;
   font-size: 16px;
-  background-color: #F4F5F5;
+  background-color: #f4f5f5;
 `;
 
 const InputImage = styled.img`
-  position: absolute; 
-  left: 10px; 
+  position: absolute;
+  left: 10px;
   top: 50%;
   transform: translateY(-50%);
-  width: 23px; 
+  width: 23px;
   height: auto;
 `;
 
@@ -41,9 +42,9 @@ const LoginButton = styled.button`
   padding: 10px;
   margin: 5px 0;
   border-radius: 5px;
-  margin-top: 15px; 
+  margin-top: 15px;
   border: none;
-  background-color: #182E3F;
+  background-color: #182e3f;
   color: white;
   font-size: 16px;
   cursor: pointer;
@@ -55,7 +56,7 @@ const LoginButton = styled.button`
 
 const OAuthButton = styled.button`
   width: 300px;
-  height: 40px; 
+  height: 40px;
   padding: 10px;
   margin: 5px 0;
   border-radius: 5px;
@@ -65,8 +66,8 @@ const OAuthButton = styled.button`
   color: white;
   display: flex;
   align-items: center;
-  justify-content: center; 
-  position: relative; 
+  justify-content: center;
+  position: relative;
 
   &.kakao {
     background-color: #fee500;
@@ -78,10 +79,10 @@ const OAuthButton = styled.button`
   }
 
   img {
-    position: absolute; 
+    position: absolute;
     left: 20px;
-    width: 14px; 
-    height: auto; 
+    width: 14px;
+    height: auto;
   }
 
   &:hover {
@@ -109,29 +110,52 @@ const LinkButton = styled(Link)`
 
 // 로그인 컴포넌트 정의
 function Login() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const { login } = useAuth(); // login 함수 가져오기
+  const navigate = useNavigate(); // 페이지 이동을 위한 useNavigate 훅
+
+  const handleLogin = () => {
+    // 로그인 처리
+    login(username, password);
+    navigate("/"); // 로그인 후 홈 페이지로 이동
+  };
+
   return (
     <>
-        <LoginText>LOGIN</LoginText>
-        <InputContainer>
-          <InputImage src="/아이디.svg" alt="ID Icon" />
-          <Input type="text" placeholder="아이디" />
-        </InputContainer>
-        <InputContainer>
-          <InputImage src="/비밀번호.svg " alt="pass Icon" />
-          <Input type="password" placeholder="비밀번호" />
-        </InputContainer>
-        <LoginButton>Login</LoginButton>
-        <OAuthButton className="kakao">
-          <img src="/카카오.png" alt="Ka Logo" />카카오톡 로그인
-        </OAuthButton>
-        <OAuthButton className="naver">
-          <img src="/네이버.png" alt="Naver Logo" />네이버 로그인
-        </OAuthButton>
-        <LinkContainer>
-          <LinkButton to="/user/findid">아이디 찾기</LinkButton>
-          <LinkButton to="/user/findpw">비밀번호 찾기</LinkButton>
-          <LinkButton to="/user/Signup">회원가입</LinkButton>
-        </LinkContainer>
+      <LoginText>LOGIN</LoginText>
+      <InputContainer>
+        <InputImage src="/아이디.svg" alt="ID Icon" />
+        <Input
+          type="text"
+          placeholder="아이디"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+      </InputContainer>
+      <InputContainer>
+        <InputImage src="/비밀번호.svg " alt="pass Icon" />
+        <Input
+          type="password"
+          placeholder="비밀번호"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </InputContainer>
+      <LoginButton onClick={handleLogin}>Login</LoginButton>
+      <OAuthButton className="kakao">
+        <img src="/카카오.png" alt="Ka Logo" />
+        카카오톡 로그인
+      </OAuthButton>
+      <OAuthButton className="naver">
+        <img src="/네이버.png" alt="Naver Logo" />
+        네이버 로그인
+      </OAuthButton>
+      <LinkContainer>
+        <LinkButton to="/login/findid">아이디 찾기</LinkButton>
+        <LinkButton to="/login/findpw">비밀번호 찾기</LinkButton>
+        <LinkButton to="/login/Signup">회원가입</LinkButton>
+      </LinkContainer>
     </>
   );
 }

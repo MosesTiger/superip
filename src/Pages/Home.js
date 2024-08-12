@@ -1,14 +1,47 @@
 import React from "react";
 import { FaChevronRight } from "react-icons/fa";
 import Header from "../Components/Header";
-import CreateStory from "../Components/Home/Card/CreateStory_Card";
-import PredictHit from "../Components/Home/Card/PredictHit_Card";
-import StoryArchive from "../Components/Home/Card/StoryArchive_Card";
-import Recommend from "../Components/Home/Card/Recommend_Card";
+import Card from "../Components/Home/Card";
 import Navbar from "../Components/Home/Navbar";
 import "../stylefile/Main.css";
 
-const Main = () => {
+function Home() {
+
+  const cardData = [
+    {
+      id: 1,
+      cardnum: "card1",
+      image: "/CreateStory_Image.jpg",
+      title: "Create Story",
+      description: "Get your stories created automatically and effortlessly",
+      redirectTo: "/createstory",
+    },
+    {
+      id: 2,
+      cardnum: "card2",
+      image: "/Recent_Image.jpg",
+      title: "Recent Story",
+      description: "Moving to the recently written scenario.",
+      redirectTo: "/createstory",
+    },
+    {
+      id: 3,
+      cardnum: "card3",
+      image: "/StoryArchive_Image.jpg",
+      title: "Story Archive",
+      description: "Your stories are securely stored for safekeeping.",
+      redirectTo: "/mypage",
+    },
+    {
+      id: 4,
+      cardnum: "card4",
+      image: "/Recommend_Image.jpg",
+      title: "Recommend",
+      description: "Showcasing our top successful creations",
+      redirectTo: "/recommend",
+    },
+  ];
+
   return (
     <div className="main-page">
       <Header />
@@ -21,13 +54,19 @@ const Main = () => {
         <FaChevronRight className="nav-arrow" />
       </div>
       <div className="card-container">
-        <CreateStory />
-        <PredictHit />
-        <StoryArchive />
-        <Recommend />
+        {cardData.map((card) => (
+          <Card
+            key={card.id}
+            cardnum={card.cardnum}
+            image={card.image}
+            title={card.title}
+            description={card.description}
+            redirectTo={card.redirectTo}
+          />
+        ))}
       </div>
     </div>
   );
-};
+}
 
-export default Main;
+export default Home;

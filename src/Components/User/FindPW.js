@@ -22,9 +22,8 @@ const Input = styled.input`
   border-radius: 5px;
   border: 1px solid #ddd;
   font-size: 16px;
-  background-color: #F4F5F5;
+  background-color: #f4f5f5;
 `;
-
 
 const LoginButton = styled.button`
   width: 300px;
@@ -34,7 +33,7 @@ const LoginButton = styled.button`
   border-radius: 5px;
   margin-top: 25px;
   border: none;
-  background-color: #182E3F;
+  background-color: #182e3f;
   color: white;
   font-size: 16px;
   cursor: pointer;
@@ -66,23 +65,23 @@ const LinkButton = styled(Link)`
 function FindPW() {
   return (
     <>
-        <LoginText>비밀번호 찾기</LoginText>
-        <InputContainer>
-          <Input type="text" placeholder="아이디" />
-        </InputContainer>
-        <InputContainer>
-          <Input type="text" placeholder="이름" />
-        </InputContainer>
-        <InputContainer>
-          <Input type="password" placeholder="E-mail" />
-        </InputContainer>
-        <Link to="/user/findpw/result">
-            <LoginButton>비밀번호 찾기</LoginButton>
-        </Link>
-        <LinkContainer>
-          <LinkButton to="/user/signup">회원가입</LinkButton>
-          <LinkButton to="/user/login">로그인</LinkButton>
-        </LinkContainer>
+      <LoginText>비밀번호 찾기</LoginText>
+      <InputContainer>
+        <Input type="text" placeholder="아이디" />
+      </InputContainer>
+      <InputContainer>
+        <Input type="text" placeholder="이름" />
+      </InputContainer>
+      <InputContainer>
+        <Input type="password" placeholder="E-mail" />
+      </InputContainer>
+      <Link to="/login/findpw/result">
+        <LoginButton>비밀번호 찾기</LoginButton>
+      </Link>
+      <LinkContainer>
+        <LinkButton to="/login/signup">회원가입</LinkButton>
+        <LinkButton to="/login">로그인</LinkButton>
+      </LinkContainer>
     </>
   );
 }
