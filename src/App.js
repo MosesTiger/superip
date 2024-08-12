@@ -34,7 +34,7 @@ function App() {
           <Route path="findpw/result" element={<FindPWRes />} />
         </Route>
         <Route
-          path="/createStory"
+          path="/create"
           element={
             <ProtectedRoute>
               <CreateStory />

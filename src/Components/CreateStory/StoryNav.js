@@ -64,20 +64,20 @@ function StoryNav() {
     <Nav>
       <NavLinkWrap>
       <NavLink
-        to="/createstory/select"
-        isActive={location.pathname === '/createstory/select'}
+        to="/create/select"
+        isActive={location.pathname === '/create/select'}
       >
         영화 정보
       </NavLink>
       <NavLink
-        to="/createstory/synopsis"
-        isActive={location.pathname === '/createstory/synopsis'}
+        to="/create/synopsis"
+        isActive={location.pathname === '/create/synopsis'}
       >
         시놉시스
       </NavLink>
       <NavLink
-        to="/createstory/script"
-        isActive={location.pathname === '/createstory/script'}
+        to="/create/script"
+        isActive={location.pathname === '/create/script'}
       >
         시나리오
       </NavLink>
