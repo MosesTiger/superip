@@ -4,35 +4,65 @@ import styled from 'styled-components';
 
 const Nav = styled.nav`
   display: flex;
-  justify-content: space-around;
-  padding: 0 10px;
-  background-color: #EDF6F6;
+  justify-content: space-between;
+  width: 95%;
+  margin:0 auto;
+  color:black;
 `;
 
 const NavLink = styled(Link)`
   text-decoration: none;
-  color: #333;
+  width:100px;
+  text-align : center;
+  color:black;
+  margin-right: 10px;
   padding: 10px 20px;
-  border-radius: 5px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
   transition: background-color 0.3s ease;
+  background-color:#4E6371;
 
   ${({ isActive }) =>
     isActive &&
     `
-    background-color: #182e3f;
-    color: white;
+    background-color: #EDF6F6;
   `}
   
   &:hover {
-    background-color: #ddd;
+    background-color: #95A4AD;
   }
 `;
+
+const SaveButton = styled.div`
+  background-color: #859AA5;
+  border-radius: 15px;
+  width:100px;
+  display:flex;
+  align-items:center;
+  justify-content: center;
+  margin-bottom:5px;
+  cursor:pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #EDF6F6;
+  }
+`
+
+const NavLinkWrap = styled.div`
+  margin:0;
+  padding:0;
+  display:flex;
+  justify-content: flex-start;
+
+`
 
 function StoryNav() {
   const location = useLocation();
 
   return (
     <Nav>
+      <NavLinkWrap>
       <NavLink
         to="/createstory/select"
         isActive={location.pathname === '/createstory/select'}
@@ -43,14 +73,18 @@ function StoryNav() {
         to="/createstory/synopsis"
         isActive={location.pathname === '/createstory/synopsis'}
       >
-        시놉시스 입력
+        시놉시스
       </NavLink>
       <NavLink
         to="/createstory/script"
         isActive={location.pathname === '/createstory/script'}
       >
-        시나리오 생성
+        시나리오
       </NavLink>
+      </NavLinkWrap>
+      <SaveButton>
+        저장
+      </SaveButton>
     </Nav>
   );
 }

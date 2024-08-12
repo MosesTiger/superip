@@ -25,13 +25,13 @@ const TitleInput = styled.input`
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 20px;
   min-width: 250px;
   z-index: 3;
-  margin: 15px 0; /* 마진 업데이트 */
+  margin: 10px 0; /* 마진 업데이트 */
 
   &::placeholder {
-    color: white; /* Placeholder 텍스트 색상 흰색 */
+    color: #53606A; /* Placeholder 텍스트 색상 흰색 */
   }
 `;
 
@@ -45,12 +45,11 @@ const GenreSelection = styled.div`
   border-radius: 4px;
   background-color: #859AA5; /* 배경 색상 */
   color: #000; /* 글자 색상 */
-  margin-bottom: 20px; /* 마진 업데이트 */
   margin-top: -5px;
 `;
 
 const GenreOption = styled.div`
-  margin: 12px;
+  margin: 8px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -65,7 +64,7 @@ const GenreOption = styled.div`
     color: #fff; /* 글자 색상 */
   }
   &:active {
-    background-color: #dc143c ;
+    background-color: #BE3232 ;
     color: #fff;
   }
 `;
@@ -87,25 +86,21 @@ const DurationSelection = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 268px;
-  height: 45px;
   border-radius: 4px;
   background-color: #859AA5; /* 색상 업데이트 */
   padding: 8px;
   gap: 5px; /* 간격 줄이기 */
   margin: 10px 0; /* 마진 업데이트 */
-  margin-bottom: 20px; /* 마진 업데이트 */
   margin-top: -5px;
 `;
 
 const DurationInput = styled.input`
   width: 100px;
-  height: 30px;
   border: none;
   background-color: #859AA5; /* 배경 색상 업데이트 */
   border-radius: 4px;
   padding: 5px;
-  font-size: 16px;
-  color: #fff; /* 텍스트 색상 흰색 */
+  font-size: 20px;
   text-align: center; /* 중앙 정렬 */
 `;
 
@@ -118,7 +113,6 @@ const Select = styled.select`
   font-size: 16px;
   color: #000; /* 글자 색상 */
   margin: 10px 0; /* 마진 업데이트 */
-  margin-bottom: 20px; /* 마진 업데이트 */
   margin-top: -5px;
   border: none;
 `;
@@ -129,7 +123,6 @@ const CheckboxContainer = styled.div`
   align-items: center;
   gap: 7px;
   margin: 10px 0; /* 마진 업데이트 */
-  border-bottom: 1px solid #ccc; /* 하단에 줄 추가 */
   padding-bottom: 10px; /* 하단 패딩 추가 */
   margin-bottom: 20px; /* 마진 업데이트 */
   margin-top: -5px;
@@ -146,32 +139,34 @@ const Actions = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content:flex-end;
   gap: 22px;
-  position: absolute;
   bottom: 20px;
-  right: 20px;
-  overflow: hidden;
-  margin-bottom: 10px;
+  margin: 15px 0;
 `;
 
 const ActionButton = styled(Link)`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 174px;
-  height: 74px;
-  border-radius: 4px;
+  width: 10%;
+  padding: 20px;
+  border-radius: 10px;
   background-color: #859AA5; /* 색상 업데이트 */
   text-decoration: none;
   color: #000; /* 글자 색상 */
-  font-weight: 500;
-  font-size: 16px;
+  font-weight: bold;
+  font-size: 20px;
   text-align: center;
 `;
 
 const PredictionButton = styled(ActionButton)`
   background-color: #E23A3A; /* 예측 버튼은 빨간색 */
-  color: #fff; /* 글자 색상 */
+  color: black; /* 글자 색상 */
+
+  &:hover {
+    background-color: #BE3232;
+  }
 `;
 
 const MovieDetails = styled.div`
@@ -179,20 +174,16 @@ const MovieDetails = styled.div`
   flex-direction: column;
   align-items: flex-start;
   gap: 20px;
+  border-bottom: 1px solid #ccc; /* 하단에 줄 추가 */
 `;
 
-const MovieTitleInput = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
 
 const PlusMinusButton = styled.button`
   width: 30px;
   height: 30px;
   border: none;
   background-color: #859AA5;
-  color: #fff;
+  color: #black;
   border-radius: 4px;
   cursor: pointer;
   font-size: 18px;
@@ -226,13 +217,13 @@ function CreateStory() {
 
   return (
     <Section>
-      <MovieDetails>
-        <MovieTitleInput>
-          <TitleInput placeholder="영화 제목을 입력하세요" type="text" />
-        </MovieTitleInput>
+      <MovieDetails>   
+          <Label>영화 제목을 입력하세요.
+            <TitleInput placeholder="Ex) 범죄도시5" type="text" />
+          </Label>
         <Label>장르를 선택하세요. (최대 3개)</Label>
         <GenreSelection>
-          {['액션', '스릴러', '범죄', '코미디', '드라마', '로맨스', 'SF', '호러', '판타지', '애니메이션'].map((genre) => (
+          {['드라마','액션','코메디','범죄','스릴러','미스터리','시대극/사극','전쟁','가족','멜로/로맨스','어드벤쳐','판타지','공포','스포츠','SF','느와르','반공/분단','첩보','인물','재난','전기','하이틴','역사','갱스터','사회물(경향)','뮤직','청춘','활극','동성애','뮤지컬','신파','무협'].map((genre) => (
             <GenreOption
               key={genre}
               selected={selectedGenres.includes(genre)}
@@ -254,6 +245,8 @@ function CreateStory() {
         </DurationSelection>
         <Label>관람 등급을 선택하세요.</Label>
         <Select>
+          <option value="all">전체 관람가</option>
+          <option value="12">12세 관람가</option>
           <option value="15">15세 관람가</option>
           <option value="19">19세 관람가</option>
         </Select>
@@ -292,7 +285,7 @@ function CreateStory() {
         </CheckboxContainer>
       </MovieDetails>
       <Actions>
-        <ActionButton to="/preview">미리보기</ActionButton>
+        <ActionButton to="/createstory/synopsis">다음 단계</ActionButton>
         <PredictionButton to="/predict">1차 흥행률 예측</PredictionButton>
       </Actions>
     </Section>

@@ -2,8 +2,22 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
+
+const Section = styled.section`
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  max-width: 100%;
+  margin : 0;
+  font-size: 16px;
+  color: #000; /* 글자 색상 */
+  font-family: 'Poppins', sans-serif;
+  position: relative; /* 액션 버튼을 하단에 위치시키기 위한 설정 */
+  padding-right: 35px;
+`;
+
 const TextArea = styled.textarea`
-  width: 80%;
+  width: 100%;
   height: 80px;
   margin-bottom: 15px;
   border-radius: 10px;
@@ -13,30 +27,22 @@ const TextArea = styled.textarea`
   color: #000;
   background-color: #859AA5;
   display: block;
-  margin-left: auto;
-  margin-right: auto;
-
-  ::placeholder {
-    color: #fff;
-  }
 `;
 
 const Label = styled.label`
   display: block;
   width: 80%;
-  margin: 0 auto 10px;
   font-size: 18px;
   color: #000;
   text-align: left;
-  margin-top: 5px;
-
+  margin: 10px 0;
 `;
 
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
-  width: 80%;
-  margin: 20px auto 0;
+  margin-top:20px;
+  width: 100%;
   gap: 10px;
 `;
 
@@ -74,7 +80,7 @@ function Synopsis() {
   };
 
   return (
-    <>
+    <Section>
       <Label>등장인물</Label>
       <TextArea
         placeholder="등장인물"
@@ -99,7 +105,7 @@ function Synopsis() {
           시나리오 제작
         </CreateScenarioButton>
       </ButtonContainer>
-    </>
+    </Section>
   );
 }
 

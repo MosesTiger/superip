@@ -20,7 +20,7 @@ const TitleInput = styled.input`
 
 function Script() {
   return (
-    <TitleInput placeholder="시나리오 작성" type="text" />
+    <TitleInput placeholder="시나리오 제공화면" type="text" />
   );
 }
 
