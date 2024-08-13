@@ -285,7 +285,7 @@ function CreateStory() {
         </CheckboxContainer>
       </MovieDetails>
       <Actions>
-        <ActionButton to="/createstory/synopsis">다음 단계</ActionButton>
+        <ActionButton to="/create/synopsis">다음 단계</ActionButton>
         <PredictionButton to="/predict">1차 흥행률 예측</PredictionButton>
       </Actions>
     </Section>
