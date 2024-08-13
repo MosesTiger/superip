@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import StoryNav from './StoryNav';
 
 const DashboardContainer = styled.div`
   display: grid;
@@ -70,8 +71,13 @@ function Show() {
   const toggleAnalysisPopup = () => setIsAnalysisPopupOpen(!isAnalysisPopupOpen);
   const toggleBoxofficePopup = () => setIsBoxofficePopupOpen(!isBoxofficePopupOpen);
 
+  // URL 경로를 확인하여 StoryNav를 숨길지 결정합니다.
+  const hideStoryNav = window.location.pathname === '/create/predict';
+
   return (
     <>
+      {/* hideStoryNav가 true일 경우 StoryNav를 렌더링하지 않음 */}
+      {!hideStoryNav && <StoryNav hideNav={true} />}
       <DashboardContainer>
         <DashboardSection className="title-section">
           <h2>제목: 범죄도시 5</h2>
