@@ -102,7 +102,7 @@ const CloseButton = styled.button`
 `;
 
 
-function Show() {
+function Predict() {
   const [isAnalysisPopupOpen, setIsAnalysisPopupOpen] = useState(false);
   const [isBoxofficePopupOpen, setIsBoxofficePopupOpen] = useState(false);
 
@@ -148,4 +148,4 @@ function Show() {
   );
 }
 
-export default Show;
+export default Predict;

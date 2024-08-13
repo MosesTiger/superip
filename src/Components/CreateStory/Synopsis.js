@@ -1,109 +1,112 @@
+// Synopsis.js
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-const DashboardContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 두 개의 열 */
-  grid-template-rows: repeat(2, 1fr); /* 두 개의 행 */
-  gap: 20px;
-  padding: 20px;
-  height: calc(100vh - 80px); /* 헤더 높이만큼 줄임 */
-  width: 100vw;
-  box-sizing: border-box;
-  background-color: #182E3F;
-`;
 
-const DashboardSection = styled.div`
+const Section = styled.section`
   display: flex;
   flex-direction: column;
-  padding: 15px;
-  border-radius: 8px;
-  background-color: #EDF6F6;
-  box-sizing: border-box;
-  position: relative;
-`;
-
-const MoreButton = styled.button`
-  margin-top: auto; /* 버튼을 하단으로 위치시킴 */
-  padding: 5px 10px;
-  font-size: 14px;
-  background-color: #0056b3; /* 어두운 파란색 */
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-`;
-
-const Popup = styled.div`
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 85vw;
-  height: 85vh;
-  background-color: white;
-  border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* 그림자 더 뚜렷하게 */
-  z-index: 1000;
-  overflow-y: auto;
-  border: none; /* 테두리 제거 */
+  max-width: 100%;
+  margin : 0;
+  font-size: 16px;
+  color: #000; /* 글자 색상 */
+  font-family: 'Poppins', sans-serif;
+  position: relative; /* 액션 버튼을 하단에 위치시키기 위한 설정 */
+  padding-right: 35px;
 `;
 
-const CloseButton = styled.button`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 5px 10px;
-  font-size: 14px;
-  background-color: #d9534f; /* 어두운 빨간색 */
-  color: white;
+const TextArea = styled.textarea`
+  width: 100%;
+  height: 80px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  padding: 20px 10px 10px; /* 위쪽 패딩을 20px로 조정하여 시작점을 낮춤 */
+  font-size: 16px;
+  color: #000;
+  background-color: #859AA5;
+  display: block;
+`;
+
+const Label = styled.label`
+  display: block;
+  width: 80%;
+  font-size: 18px;
+  color: #000;
+  text-align: left;
+  margin: 10px 0;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top:20px;
+  width: 100%;
+  gap: 10px;
+`;
+
+const Button = styled.button`
+  padding: 15px 30px;
+  font-size: 18px;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
   cursor: pointer;
 `;
 
-function Show() {
-  const [isAnalysisPopupOpen, setIsAnalysisPopupOpen] = useState(false);
-  const [isBoxofficePopupOpen, setIsBoxofficePopupOpen] = useState(false);
+const AutoFillButton = styled(Button)`
+  background-color: #75C96E;
+  color: #000;
+`;
 
-  const toggleAnalysisPopup = () => setIsAnalysisPopupOpen(!isAnalysisPopupOpen);
-  const toggleBoxofficePopup = () => setIsBoxofficePopupOpen(!isBoxofficePopupOpen);
+const CreateScenarioButton = styled(Button)`
+  background-color: #E23A3A;
+  color: #000;
+`;
+
+function Synopsis() {
+  const [characters, setCharacters] = useState('');
+  const [plot, setPlot] = useState('');
+  const [keywords, setKeywords] = useState('');
+
+  const handleAutoFill = () => {
+    setCharacters('홍길동(17세), 남, 아버지를 아버지라 부르지 못하는 주인공\n심청이(16세), 여, 홍길동을 좋아하는 후배');
+    setPlot('홍길동이 심청이의 도움으로 아버지와의 갈등을 극복하고 자신의 정체성을 찾아가는 이야기.');
+    setKeywords('#연애남 #순정남 #첫사랑 #옆집 #교환학생 여주');
+  };
+
+  const handleCreateScenario = () => {
+    alert('시나리오 제작 완료!');
+  };
 
   return (
-    <>
-      <DashboardContainer>
-        <DashboardSection className="title-section">
-          <h2>제목: 범죄도시 5</h2>
-        </DashboardSection>
-        <DashboardSection className="analysis-section">
-          <h2>시나리오 완성도 분석표</h2>
-          <MoreButton onClick={toggleAnalysisPopup}>더보기</MoreButton>
-        </DashboardSection>
-        <DashboardSection className="penalty-section">
-          <h2>예상 별점</h2>
-        </DashboardSection>
-        <DashboardSection className="boxoffice-section">
-          <h2>1차 흥행도 분석표</h2>
-          <MoreButton onClick={toggleBoxofficePopup}>더보기</MoreButton>
-        </DashboardSection>
-      </DashboardContainer>
-
-      {isAnalysisPopupOpen && (
-        <Popup>
-          <CloseButton onClick={toggleAnalysisPopup}>닫기</CloseButton>
-          <h2>시나리오 완성도 분석표 자세히 보기</h2>
-        </Popup>
-      )}
-
-      {isBoxofficePopupOpen && (
-        <Popup>
-          <CloseButton onClick={toggleBoxofficePopup}>닫기</CloseButton>
-          <h2>1차 흥행도 분석표 자세히 보기</h2>
-        </Popup>
-      )}
-    </>
+    <Section>
+      <Label>등장인물</Label>
+      <TextArea
+        placeholder="등장인물"
+        value={characters}
+        onChange={(e) => setCharacters(e.target.value)}
+      />
+      <Label>줄거리 (공백 포함 200자 이내로 작성)</Label>
+      <TextArea
+        placeholder="줄거리 (공백 포함 200자 이내로 작성)"
+        value={plot}
+        onChange={(e) => setPlot(e.target.value)}
+      />
+      <Label>키워드 태그</Label>
+      <TextArea
+        placeholder="키워드 태그"
+        value={keywords}
+        onChange={(e) => setKeywords(e.target.value)}
+      />
+      <ButtonContainer>
+        <AutoFillButton onClick={handleAutoFill}>GPT 자동입력</AutoFillButton>
+        <CreateScenarioButton onClick={handleCreateScenario}>
+          시나리오 제작
+        </CreateScenarioButton>
+      </ButtonContainer>
+    </Section>
   );
 }
 
-export default Show;
+export default Synopsis;

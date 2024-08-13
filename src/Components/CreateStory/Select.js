@@ -218,7 +218,9 @@ function CreateStory() {
   const decreaseDuration = () => {
     setDuration(prev => Math.max(prev - 1, 0));
   };
+
   const navigate = useNavigate();
+
   const handleSubmit = async () => {
    /* const movieData = {
       title,
