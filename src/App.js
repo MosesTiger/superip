@@ -19,11 +19,13 @@ import { AuthProvider, useAuth } from "./context/AuthProvider";
 import Select from './Components/CreateStory/Select';
 import Synopsis from './Components/CreateStory/Synopsis';
 import Script from './Components/CreateStory/Script';
+import Show from './Components/CreateStory/Show';
 
 function App() {
   return (
     <AuthProvider>
       <Routes>
+        
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<User />}>
           <Route path="" element={<Login />} />
@@ -43,6 +45,8 @@ function App() {
             <Route path="select" element={<Select />} />
             <Route path="synopsis" element={<Synopsis />} />
             <Route path="script" element={<Script />} />
+            <Route path="show" element={<Show />} />
+            <Route path="predict" element={<Show />} />
           </Route>
         <Route
           path="/mypage"
@@ -56,6 +60,7 @@ function App() {
         <Route path="/search" element={<Search />} />
         <Route path="/info" element={<Info />} />
         <Route path="*" element={<PageNotFound />} />
+        <Route path="predict" element={<Show />} />
       </Routes>
     </AuthProvider>
   );

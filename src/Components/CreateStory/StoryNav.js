@@ -59,7 +59,7 @@ const NavLinkWrap = styled.div`
 
 function StoryNav() {
   const location = useLocation();
-
+  
   return (
     <Nav>
       <NavLinkWrap>

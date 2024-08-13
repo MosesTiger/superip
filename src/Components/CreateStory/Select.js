@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
 const Section = styled.section`
   display: flex;
@@ -196,6 +197,9 @@ function CreateStory() {
   const [duration, setDuration] = useState(120);
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
+  const [title, setTitle] = useState("");  // 제목 입력 상태 추가
+  const [rating, setRating] = useState("all");  // 관람 등급 상태 추가
+  const [country, setCountry] = useState("korea");  // 영화 배경 국가 상태 추가
 
   const handleGenreClick = (genre) => {
     setSelectedGenres((prev) =>
@@ -214,12 +218,40 @@ function CreateStory() {
   const decreaseDuration = () => {
     setDuration(prev => Math.max(prev - 1, 0));
   };
-
+  const navigate = useNavigate();
+  const handleSubmit = async () => {
+   /* const movieData = {
+      title,
+      selectedGenres,
+      duration,
+      rating,
+      country,
+      isSeries: isCheckboxChecked,
+    };*/
+      
+    try {
+       /*//서버에 데이터를 전송하는 부분을 주석 처리
+      const response = await fetch("http://localhost:8000/api/movies", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(movieData),
+      });
+      const data = await response.json();*/// 비동기 작업이 완료된 후 페이지 이동
+       navigate('/create/synopsis'); // 비동기 작업이 완료된 후 페이지 이동
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  
   return (
     <Section>
       <MovieDetails>   
           <Label>영화 제목을 입력하세요.
-            <TitleInput placeholder="Ex) 범죄도시5" type="text" />
+            <TitleInput placeholder="Ex) 범죄도시5" type="text" value={title}  // 상태 값 바인딩
+            onChange={(e) => setTitle(e.target.value)}  // 상태 업데이트
+            />
           </Label>
         <Label>장르를 선택하세요. (최대 3개)</Label>
         <GenreSelection>
@@ -244,14 +276,16 @@ function CreateStory() {
           <PlusMinusButton onClick={increaseDuration}>+</PlusMinusButton>
         </DurationSelection>
         <Label>관람 등급을 선택하세요.</Label>
-        <Select>
+        <Select value={rating}  // 상태 값 바인딩
+          onChange={(e) => setRating(e.target.value)}>
           <option value="all">전체 관람가</option>
           <option value="12">12세 관람가</option>
           <option value="15">15세 관람가</option>
           <option value="19">19세 관람가</option>
         </Select>
         <Label>영화의 배경 국가를 선택하세요.</Label>
-        <Select>
+        <Select value={country}  // 상태 값 바인딩
+          onChange={(e) => setCountry(e.target.value)}>
           <option value="korea">한국</option>
           <option value="china">중국</option>
           <option value="us">미국</option>
@@ -285,8 +319,8 @@ function CreateStory() {
         </CheckboxContainer>
       </MovieDetails>
       <Actions>
-        <ActionButton to="/create/synopsis">다음 단계</ActionButton>
-        <PredictionButton to="/predict">1차 흥행률 예측</PredictionButton>
+        <ActionButton onClick={handleSubmit}>다음 단계</ActionButton>
+        <PredictionButton to="/create/predict">1차 흥행률 예측</PredictionButton>
       </Actions>
     </Section>
   );

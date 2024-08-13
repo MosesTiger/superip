@@ -3,14 +3,27 @@ import styled from 'styled-components';
 
 const DashboardContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 두 개의 열 */
-  grid-template-rows: repeat(2, 1fr); /* 두 개의 행 */
+  grid-template-columns: 1fr 2fr;
+  grid-template-rows: repeat(2, 1fr);
   gap: 20px;
   padding: 20px;
-  height: calc(100vh - 80px); /* 헤더 높이만큼 줄임 */
-  width: 100vw;
+  height: calc(100vh - 70px);
+  width: 95vw;
   box-sizing: border-box;
   background-color: #182E3F;
+  transform: translateX(-50px);
+  position: relative;
+`;
+
+const Overlay = styled.div`//뒤에 화면 어둡게하기위해서
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  transform: translateX(-20px);
 `;
 
 const DashboardSection = styled.div`
@@ -23,15 +36,40 @@ const DashboardSection = styled.div`
   position: relative;
 `;
 
+const TitleSection = styled(DashboardSection)`
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+`;
+
+const PenaltySection = styled(DashboardSection)`
+  grid-column: 1 / 2;
+  grid-row: 2 / 3;
+`;
+
+const AnalysisSection = styled(DashboardSection)`
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+`;
+
+const BoxofficeSection = styled(DashboardSection)`
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+`;
+
 const MoreButton = styled.button`
-  margin-top: auto; /* 버튼을 하단으로 위치시킴 */
+  margin-top: auto;
+  margin-left: auto;
   padding: 5px 10px;
   font-size: 14px;
-  background-color: #0056b3; /* 어두운 파란색 */
+  background-color: #0056b3;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  position: absolute;
+  top: 25px;
+  right: 20px;
+  width: 120px;
 `;
 
 const Popup = styled.div`
@@ -41,13 +79,13 @@ const Popup = styled.div`
   transform: translate(-50%, -50%);
   width: 85vw;
   height: 85vh;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 1);
   border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* 그림자 더 뚜렷하게 */
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
   z-index: 1000;
   overflow-y: auto;
-  border: none; /* 테두리 제거 */
+  border: none;
 `;
 
 const CloseButton = styled.button`
@@ -56,12 +94,13 @@ const CloseButton = styled.button`
   right: 10px;
   padding: 5px 10px;
   font-size: 14px;
-  background-color: #d9534f; /* 어두운 빨간색 */
+  background-color: #d9534f;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
 `;
+
 
 function Show() {
   const [isAnalysisPopupOpen, setIsAnalysisPopupOpen] = useState(false);
@@ -70,23 +109,26 @@ function Show() {
   const toggleAnalysisPopup = () => setIsAnalysisPopupOpen(!isAnalysisPopupOpen);
   const toggleBoxofficePopup = () => setIsBoxofficePopupOpen(!isBoxofficePopupOpen);
 
+  const isPopupOpen = isAnalysisPopupOpen || isBoxofficePopupOpen;
+
   return (
     <>
       <DashboardContainer>
-        <DashboardSection className="title-section">
-          <h2>제목: 범죄도시 5</h2>
-        </DashboardSection>
-        <DashboardSection className="analysis-section">
-          <h2>시나리오 완성도 분석표</h2>
+        {isPopupOpen && <Overlay onClick={() => { setIsAnalysisPopupOpen(false); setIsBoxofficePopupOpen(false); }} />}
+        <TitleSection className="title-section">
+          <h3>제목: 범죄도시 5</h3>
+        </TitleSection>
+        <AnalysisSection className="analysis-section">
+          <h3>시나리오 완성도 분석표</h3>
           <MoreButton onClick={toggleAnalysisPopup}>더보기</MoreButton>
-        </DashboardSection>
-        <DashboardSection className="penalty-section">
-          <h2>예상 별점</h2>
-        </DashboardSection>
-        <DashboardSection className="boxoffice-section">
-          <h2>1차 흥행도 분석표</h2>
+        </AnalysisSection>
+        <PenaltySection className="penalty-section">
+          <h3>예상 별점</h3>
+        </PenaltySection>
+        <BoxofficeSection className="boxoffice-section">
+          <h3>1차 흥행도 분석표</h3>
           <MoreButton onClick={toggleBoxofficePopup}>더보기</MoreButton>
-        </DashboardSection>
+        </BoxofficeSection>
       </DashboardContainer>
 
       {isAnalysisPopupOpen && (
