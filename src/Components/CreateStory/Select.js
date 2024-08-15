@@ -1,17 +1,16 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const Section = styled.section`
   display: flex;
   flex-direction: column;
   padding: 20px;
   max-width: 100%;
-  margin : 0;
+  margin: 0;
   font-size: 16px;
   color: #000; /* 글자 색상 */
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   position: relative; /* 액션 버튼을 하단에 위치시키기 위한 설정 */
   height: auto; /* 또는 적절한 고정 값으로 설정 */
 `;
@@ -19,12 +18,12 @@ const Section = styled.section`
 const TitleInput = styled.input`
   width: 100%;
   border: 0;
-  background-color: #859AA5;
+  background-color: #859aa5;
   height: 45px;
   border-radius: 4px;
   padding: 8px 16px;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-weight: 500;
   font-size: 20px;
   min-width: 250px;
@@ -32,7 +31,7 @@ const TitleInput = styled.input`
   margin: 10px 0; /* 마진 업데이트 */
 
   &::placeholder {
-    color: #53606A; /* Placeholder 텍스트 색상 흰색 */
+    color: #53606a; /* Placeholder 텍스트 색상 흰색 */
   }
 `;
 
@@ -44,7 +43,7 @@ const GenreSelection = styled.div`
   padding: 0;
   border: 1px solid #ccc;
   border-radius: 4px;
-  background-color: #859AA5; /* 배경 색상 */
+  background-color: #859aa5; /* 배경 색상 */
   color: #000; /* 글자 색상 */
   margin-top: -5px;
 `;
@@ -56,16 +55,19 @@ const GenreOption = styled.div`
   align-items: center;
   padding: 8px 10px;
   border-radius: 4px;
-  background-color: ${(props) => (props.selected ? "#E23A3A" : "#d3d3d3")}; /* 선택된 경우 빨간색, 그렇지 않으면 회색 */
+  background-color: ${(props) =>
+    props.selected
+      ? "#E23A3A"
+      : "#d3d3d3"}; /* 선택된 경우 빨간색, 그렇지 않으면 회색 */
   color: ${(props) => (props.selected ? "#fff" : "#000")}; /* 글자 색상 */
   cursor: pointer;
 
   &:hover {
-    background-color: #E23A3A ; /* 호버 시 빨간색 */
+    background-color: #e23a3a; /* 호버 시 빨간색 */
     color: #fff; /* 글자 색상 */
   }
   &:active {
-    background-color: #BE3232 ;
+    background-color: #be3232;
     color: #fff;
   }
 `;
@@ -88,7 +90,7 @@ const DurationSelection = styled.div`
   justify-content: space-between;
   width: 268px;
   border-radius: 4px;
-  background-color: #859AA5; /* 색상 업데이트 */
+  background-color: #859aa5; /* 색상 업데이트 */
   padding: 8px;
   gap: 5px; /* 간격 줄이기 */
   margin: 10px 0; /* 마진 업데이트 */
@@ -98,7 +100,7 @@ const DurationSelection = styled.div`
 const DurationInput = styled.input`
   width: 100px;
   border: none;
-  background-color: #859AA5; /* 배경 색상 업데이트 */
+  background-color: #859aa5; /* 배경 색상 업데이트 */
   border-radius: 4px;
   padding: 5px;
   font-size: 20px;
@@ -109,7 +111,7 @@ const Select = styled.select`
   width: 268px;
   height: 45px;
   border-radius: 4px;
-  background-color: #859AA5; /* 색상 업데이트 */
+  background-color: #859aa5; /* 색상 업데이트 */
   padding: 8px;
   font-size: 16px;
   color: #000; /* 글자 색상 */
@@ -133,40 +135,47 @@ const Checkbox = styled.input`
   width: 25px;
   height: 25px;
   margin: 0;
-  accent-color: ${(props) => (props.checked ? "#E23A3A" : "#859AA5")}; /* 체크된 경우 빨간색 */
+  accent-color: ${(props) =>
+    props.checked ? "#E23A3A" : "#859AA5"}; /* 체크된 경우 빨간색 */
 `;
 
 const Actions = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content:flex-end;
+  justify-content: flex-end;
   gap: 22px;
   bottom: 20px;
   margin: 15px 0;
 `;
 
-const ActionButton = styled(Link)`
+const ActionButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 10%;
+  width: 15%;
   padding: 20px;
+  border: none;
   border-radius: 10px;
-  background-color: #859AA5; /* 색상 업데이트 */
+  background-color: #859aa5; /* 색상 업데이트 */
   text-decoration: none;
   color: #000; /* 글자 색상 */
   font-weight: bold;
   font-size: 20px;
   text-align: center;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #697a82;
+  }
 `;
 
 const PredictionButton = styled(ActionButton)`
-  background-color: #E23A3A; /* 예측 버튼은 빨간색 */
+  background-color: #e23a3a; /* 예측 버튼은 빨간색 */
   color: black; /* 글자 색상 */
 
   &:hover {
-    background-color: #BE3232;
+    background-color: #be3232;
   }
 `;
 
@@ -178,12 +187,11 @@ const MovieDetails = styled.div`
   border-bottom: 1px solid #ccc; /* 하단에 줄 추가 */
 `;
 
-
 const PlusMinusButton = styled.button`
   width: 30px;
   height: 30px;
   border: none;
-  background-color: #859AA5;
+  background-color: #859aa5;
   color: #black;
   border-radius: 4px;
   cursor: pointer;
@@ -197,13 +205,15 @@ function CreateStory() {
   const [duration, setDuration] = useState(120);
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
-  const [title, setTitle] = useState("");  // 제목 입력 상태 추가
-  const [rating, setRating] = useState("all");  // 관람 등급 상태 추가
-  const [country, setCountry] = useState("korea");  // 영화 배경 국가 상태 추가
+  const [title, setTitle] = useState(""); // 제목 입력 상태 추가
+  const [rating, setRating] = useState("all"); // 관람 등급 상태 추가
+  const [country, setCountry] = useState("korea"); // 영화 배경 국가 상태 추가
 
   const handleGenreClick = (genre) => {
     setSelectedGenres((prev) =>
-      prev.includes(genre) ? prev.filter((g) => g !== genre) : [...prev, genre].slice(0, 3)
+      prev.includes(genre)
+        ? prev.filter((g) => g !== genre)
+        : [...prev, genre].slice(0, 3)
     );
   };
 
@@ -212,17 +222,17 @@ function CreateStory() {
   };
 
   const increaseDuration = () => {
-    setDuration(prev => prev + 1);
+    setDuration((prev) => prev + 1);
   };
 
   const decreaseDuration = () => {
-    setDuration(prev => Math.max(prev - 1, 0));
+    setDuration((prev) => Math.max(prev - 1, 0));
   };
 
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
-   /* const movieData = {
+    /* const movieData = {
       title,
       selectedGenres,
       duration,
@@ -230,9 +240,9 @@ function CreateStory() {
       country,
       isSeries: isCheckboxChecked,
     };*/
-      
+
     try {
-       /*//서버에 데이터를 전송하는 부분을 주석 처리
+      /*//서버에 데이터를 전송하는 부분을 주석 처리
       const response = await fetch("http://localhost:8000/api/movies", {
         method: "POST",
         headers: {
@@ -240,24 +250,87 @@ function CreateStory() {
         },
         body: JSON.stringify(movieData),
       });
-      const data = await response.json();*/// 비동기 작업이 완료된 후 페이지 이동
-       navigate('/create/synopsis'); // 비동기 작업이 완료된 후 페이지 이동
+      const data = await response.json();*/ // 비동기 작업이 완료된 후 페이지 이동
+      navigate("/create/synopsis"); // 비동기 작업이 완료된 후 페이지 이동
     } catch (error) {
       console.error("Error:", error);
     }
   };
-  
+
+  const handlePredictionClick = async () => {
+    /* const movieData = {
+      title,
+      selectedGenres,
+      duration,
+      rating,
+      country,
+      isSeries: isCheckboxChecked,
+    };*/
+
+    try {
+      /*//서버에 데이터를 전송하는 부분을 주석 처리
+      const response = await fetch("http://localhost:8000/api/movies", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(movieData),
+      });
+      const data = await response.json();*/ // 비동기 작업이 완료된 후 페이지 이동
+      navigate("/create/predict"); // 비동기 작업이 완료된 후 페이지 이동
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   return (
     <Section>
-      <MovieDetails>   
-          <Label>영화 제목을 입력하세요.
-            <TitleInput placeholder="Ex) 범죄도시5" type="text" value={title}  // 상태 값 바인딩
-            onChange={(e) => setTitle(e.target.value)}  // 상태 업데이트
-            />
-          </Label>
+      <MovieDetails>
+        <Label>
+          영화 제목을 입력하세요.
+          <TitleInput
+            placeholder="Ex) 범죄도시5"
+            type="text"
+            value={title} // 상태 값 바인딩
+            onChange={(e) => setTitle(e.target.value)} // 상태 업데이트
+          />
+        </Label>
         <Label>장르를 선택하세요. (최대 3개)</Label>
         <GenreSelection>
-          {['드라마','액션','코메디','범죄','스릴러','미스터리','시대극/사극','전쟁','가족','멜로/로맨스','어드벤쳐','판타지','공포','스포츠','SF','느와르','반공/분단','첩보','인물','재난','전기','하이틴','역사','갱스터','사회물(경향)','뮤직','청춘','활극','동성애','뮤지컬','신파','무협'].map((genre) => (
+          {[
+            "드라마",
+            "액션",
+            "코메디",
+            "범죄",
+            "스릴러",
+            "미스터리",
+            "시대극/사극",
+            "전쟁",
+            "가족",
+            "멜로/로맨스",
+            "어드벤쳐",
+            "판타지",
+            "공포",
+            "스포츠",
+            "SF",
+            "느와르",
+            "반공/분단",
+            "첩보",
+            "인물",
+            "재난",
+            "전기",
+            "하이틴",
+            "역사",
+            "갱스터",
+            "사회물(경향)",
+            "뮤직",
+            "청춘",
+            "활극",
+            "동성애",
+            "뮤지컬",
+            "신파",
+            "무협",
+          ].map((genre) => (
             <GenreOption
               key={genre}
               selected={selectedGenres.includes(genre)}
@@ -278,16 +351,20 @@ function CreateStory() {
           <PlusMinusButton onClick={increaseDuration}>+</PlusMinusButton>
         </DurationSelection>
         <Label>관람 등급을 선택하세요.</Label>
-        <Select value={rating}  // 상태 값 바인딩
-          onChange={(e) => setRating(e.target.value)}>
+        <Select
+          value={rating} // 상태 값 바인딩
+          onChange={(e) => setRating(e.target.value)}
+        >
           <option value="all">전체 관람가</option>
           <option value="12">12세 관람가</option>
           <option value="15">15세 관람가</option>
           <option value="19">19세 관람가</option>
         </Select>
         <Label>영화의 배경 국가를 선택하세요.</Label>
-        <Select value={country}  // 상태 값 바인딩
-          onChange={(e) => setCountry(e.target.value)}>
+        <Select
+          value={country} // 상태 값 바인딩
+          onChange={(e) => setCountry(e.target.value)}
+        >
           <option value="korea">한국</option>
           <option value="china">중국</option>
           <option value="us">미국</option>
@@ -322,7 +399,9 @@ function CreateStory() {
       </MovieDetails>
       <Actions>
         <ActionButton onClick={handleSubmit}>다음 단계</ActionButton>
-        <PredictionButton to="/create/predict">1차 흥행률 예측</PredictionButton>
+        <PredictionButton onClick={handlePredictionClick}>
+          1차 흥행률 예측
+        </PredictionButton>
       </Actions>
     </Section>
   );
