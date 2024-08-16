@@ -20,12 +20,12 @@ import Select from './Components/CreateStory/Select';
 import Synopsis from './Components/CreateStory/Synopsis';
 import Script from './Components/CreateStory/Script';
 import Show from './Components/CreateStory/Show';
+import MypageDetail from './Pages/MypageDetail';
 
 function App() {
   return (
     <AuthProvider>
       <Routes>
-        
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<User />}>
           <Route path="" element={<Login />} />
@@ -54,13 +54,17 @@ function App() {
             <ProtectedRoute>
               <Mypage />
             </ProtectedRoute>
-          }/>
-        <Route path="/Recommend" element={<Recommend />} />
+          }>
+            <Route path="profile" element={<MypageDetail selectedMenu="profile" />} />
+            <Route path="scenario" element={<MypageDetail selectedMenu="scenario" />} />
+            <Route path="settings" element={<MypageDetail selectedMenu="settings" />} />
+            <Route path="help" element={<MypageDetail selectedMenu="help" />} />
+        </Route>
+        <Route path="/recommend" element={<Recommend />} />
         <Route path="/detail" element={<Detail />} />
         <Route path="/search" element={<Search />} />
         <Route path="/info" element={<Info />} />
         <Route path="*" element={<PageNotFound />} />
-        <Route path="predict" element={<Show />} />
       </Routes>
     </AuthProvider>
   );
