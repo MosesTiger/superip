@@ -115,10 +115,41 @@ function Login() {
   const { login } = useAuth(); // login 함수 가져오기
   const navigate = useNavigate(); // 페이지 이동을 위한 useNavigate 훅
 
-  const handleLogin = () => {
-    // 로그인 처리
-    login(username, password);
-    navigate("/"); // 로그인 후 홈 페이지로 이동
+  const handleLogin = async () => {
+    try {
+      // 백엔드 요청 주석 처리
+      /*
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: username, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error('로그인 실패: 이메일 또는 비밀번호가 일치하지 않습니다.');
+      }
+
+      const data = await response.json();
+      */
+      //----------------------------------------------------
+      // 주석 처리된 부분을 로컬 스토리지와 비교하는 부분으로 대체
+      const savedUser = JSON.parse(localStorage.getItem('user'));
+
+      console.log("Saved user:", savedUser);
+
+      if (savedUser && savedUser.email === username && savedUser.password === password) {
+        login(username, password); // 인증 상태 변경 및 사용자 정보 저장
+        navigate("/"); // 로그인 후 홈 페이지로 이동
+      } else {
+        throw new Error('로그인 실패: 이메일 또는 비밀번호가 일치하지 않습니다.');
+      }
+      //----------------------------------------------------
+    } catch (error) {
+      console.error('로그인 중 오류 발생:', error);
+      alert('로그인 중 오류가 발생했습니다.');
+    }
   };
 
   return (

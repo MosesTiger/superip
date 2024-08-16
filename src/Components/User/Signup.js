@@ -188,25 +188,64 @@ function Signup() {
     setShowPassword(prevState => !prevState);
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     if (!allInputsFilled) {
       alert('모든 필드를 입력해 주세요.');
       return;
     }
-
+  
     if (!allRequiredChecked) {
       alert('필수 약관에 동의해 주세요.');
       return;
     }
-
+  
     if (!isPasswordMatch) {
       alert('비밀번호가 일치하지 않습니다.');
       return;
     }
+  
+    try {
+      // 백엔드로 데이터 전송 주석 처리
+      /*
+      const response = await fetch('/api/signup', { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          name,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('회원가입 실패');
+      }
+  
+      const data = await response.json();
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      */
+      
+      //-----------------------------------------------
+      // 임시로 로컬 스토리지에 사용자 정보 저장
+      const userData = { email, name, password }; // 비밀번호도 저장
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('isAuthenticated', 'true');
 
-    // 모든 조건이 충족되면 로그인 페이지로 이동
-    navigate('/login');
+      console.log("User data saved:", userData);
+      //-----------------------------------------------
+  
+      alert('회원가입이 완료되었습니다.');
+      navigate('/login'); // 로그인 페이지로 이동
+    } catch (error) {
+      console.error('회원가입 중 오류 발생:', error);
+      alert('회원가입 중 오류가 발생했습니다.');
+    }
   };
+
+  
 
   return (
     <>

@@ -107,7 +107,7 @@ const DurationInput = styled.input`
   text-align: center; /* 중앙 정렬 */
 `;
 
-const Select = styled.select`
+const Select1 = styled.select`
   width: 268px;
   height: 45px;
   border-radius: 4px;
@@ -201,7 +201,7 @@ const PlusMinusButton = styled.button`
   justify-content: center;
 `;
 
-function CreateStory() {
+function Select() {
   const [duration, setDuration] = useState(120);
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
@@ -351,7 +351,7 @@ function CreateStory() {
           <PlusMinusButton onClick={increaseDuration}>+</PlusMinusButton>
         </DurationSelection>
         <Label>관람 등급을 선택하세요.</Label>
-        <Select
+        <Select1
           value={rating} // 상태 값 바인딩
           onChange={(e) => setRating(e.target.value)}
         >
@@ -359,9 +359,9 @@ function CreateStory() {
           <option value="12">12세 관람가</option>
           <option value="15">15세 관람가</option>
           <option value="19">19세 관람가</option>
-        </Select>
+        </Select1>
         <Label>영화의 배경 국가를 선택하세요.</Label>
-        <Select
+        <Select1
           value={country} // 상태 값 바인딩
           onChange={(e) => setCountry(e.target.value)}
         >
@@ -387,7 +387,7 @@ function CreateStory() {
           <option value="switzerland">스위스</option>
           <option value="poland">폴란드</option>
           <option value="portugal">포르투갈</option>
-        </Select>
+        </Select1>
         <CheckboxContainer>
           <Checkbox
             type="checkbox"
@@ -407,4 +407,4 @@ function CreateStory() {
   );
 }
 
-export default CreateStory;
+export default Select;

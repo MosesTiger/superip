@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import Header from '../Components/Header';
-import { Outlet, useNavigate } from 'react-router-dom';
+import Profile from '../Components/Mypage/Profile';
+import Scenario from '../Components/Mypage/Scenario';
+import Settings from '../Components/Mypage/Settings';
+import Help from '../Components/Mypage/Help';
 import '../stylefile/Main.css';
 
 const Container = styled.div`
@@ -11,47 +14,92 @@ const Container = styled.div`
 `;
 
 const Sidebar = styled.div`
-  width: 220px; /* 사이드바 너비를 늘려서 왼쪽 여백을 더 많이 확보 */
+  width: 220px;
   background-color: #EDF6F6;
   display: flex;
   flex-direction: column;
-  padding: 20px; /* 사이드바 내 여백 조정 */
+  padding: 20px;
   color: black;
   border-radius: 15px;
   margin: 50px;
 `;
 
 const MenuItem = styled.div`
-  margin: 10px 0; /* 위아래 여백 조정 */
+  margin: 10px 0;
   cursor: pointer;
   background-color: ${(props) => (props.active ? '#182E3F' : 'transparent')};
   color: ${(props) => (props.active ? 'white' : 'black')};
-  padding: 20px; /* 패딩을 늘려서 세로 폭을 증가 */
-  width: 100%; /* 사이드바 너비에 맞추기 */
+  padding: 20px;
+  width: 100%;
   border-radius: 5px;
-  box-sizing: border-box; /* 패딩을 너비에 포함시킴 */
+  box-sizing: border-box;
   display: flex;
   align-items: center;
 
   &:hover {
     background-color: #95A4AD;
     color: white;
+
+    & img {
+      content: url(${(props) => `/mypage${props.menu}_select.png`}); /* hover 이미지 변경 */
+    }
   }
 
   & img {
     width: 24px;
     height: 24px;
     margin-right: 10px;
+    content: url(${(props) =>
+      props.active
+        ? `/mypage${props.menu}_select.png` /* 클릭 시 활성화 이미지 */
+        : `/mypage${props.menu}.png`}); /* 기본 이미지 */
   }
+`;
+
+const Item = styled.div`
+  flex: 1;
+  padding: 20px 50px;
+  margin: 50px;
+  margin-left: -10px;
+  border-radius: 15px;
+  background-color: #EDF6F6;
+`
+
+const Title = styled.h1`
+  color: black;
 `;
 
 export default function MyPage() {
   const [selectedMenu, setSelectedMenu] = useState('profile');
-  const navigate = useNavigate();
 
-  const handleMenuClick = (menu) => {
-    setSelectedMenu(menu);
-    navigate(`/mypage/${menu}`); // 클릭 시 해당 경로로 이동
+  const getTitle = () => {
+    switch (selectedMenu) {
+      case 'profile':
+        return '나의 정보';
+      case 'scenario':
+        return '시나리오 보관함';
+      case 'settings':
+        return '설정';
+      case 'help':
+        return '고객센터';
+      default:
+        return '';
+    }
+  };
+
+  const renderContent = () => {
+    switch (selectedMenu) {
+      case 'profile':
+        return <Profile />;
+      case 'scenario':
+        return <Scenario />;
+      case 'settings':
+        return <Settings />;
+      case 'help':
+        return <Help />;
+      default:
+        return null;
+    }
   };
 
   return (
@@ -61,36 +109,41 @@ export default function MyPage() {
         <Sidebar>
           <MenuItem
             active={selectedMenu === 'profile'}
-            onClick={() => handleMenuClick('profile')}
+            onClick={() => setSelectedMenu('profile')}
+            menu="profile"
           >
-            <img src="/mypage0.png" alt="Profile" />
+            <img alt="Profile" />
             프로필
           </MenuItem>
           <MenuItem
             active={selectedMenu === 'scenario'}
-            onClick={() => handleMenuClick('scenario')}
+            onClick={() => setSelectedMenu('scenario')}
+            menu="scenario"
           >
-            <img src="/mypage2.png" alt="Scenario" />
+            <img alt="Scenario" />
             시나리오 보관함
           </MenuItem>
           <MenuItem
             active={selectedMenu === 'settings'}
-            onClick={() => handleMenuClick('settings')}
+            onClick={() => setSelectedMenu('settings')}
+            menu="settings"
           >
-            <img src="/mypage3.png" alt="Settings" />
+            <img alt="Settings" />
             설정
           </MenuItem>
           <MenuItem
             active={selectedMenu === 'help'}
-            onClick={() => handleMenuClick('help')}
+            onClick={() => setSelectedMenu('help')}
+            menu="help"
           >
-            <img src="/mypage4.png" alt="Help" />
+            <img alt="Help" />
             고객센터
           </MenuItem>
         </Sidebar>
-        <div style={{ flex: 1, padding: '20px', margin: '50px', marginLeft: '-10px', borderRadius: '15px', backgroundColor: '#ECF0F1' }}>
-          <Outlet />
-        </div>
+        <Item>
+          <Title>{getTitle()}</Title>
+          {renderContent()}
+        </Item>
       </Container>
     </div>
   );
