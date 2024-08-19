@@ -1,18 +1,17 @@
-// Synopsis.js
-import React, { useState } from 'react';
-import styled from 'styled-components';
-
+import React, { useState } from "react";
+import styled from "styled-components";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Section = styled.section`
   display: flex;
   flex-direction: column;
   padding: 20px;
   max-width: 100%;
-  margin : 0;
+  margin: 0;
   font-size: 16px;
-  color: #000; /* 글자 색상 */
-  font-family: 'Poppins', sans-serif;
-  position: relative; /* 액션 버튼을 하단에 위치시키기 위한 설정 */
+  color: #000;
+  font-family: "Poppins", sans-serif;
+  position: relative;
   padding-right: 35px;
 `;
 
@@ -22,10 +21,10 @@ const TextArea = styled.textarea`
   margin-bottom: 15px;
   border-radius: 10px;
   border: 1px solid #ccc;
-  padding: 20px 10px 10px; /* 위쪽 패딩을 20px로 조정하여 시작점을 낮춤 */
+  padding: 20px 10px 10px;
   font-size: 16px;
   color: #000;
-  background-color: #859AA5;
+  background-color: #859aa5;
   display: block;
 `;
 
@@ -41,7 +40,7 @@ const Label = styled.label`
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
-  margin-top:20px;
+  margin-top: 20px;
   width: 100%;
   gap: 10px;
 `;
@@ -55,28 +54,80 @@ const Button = styled.button`
 `;
 
 const AutoFillButton = styled(Button)`
-  background-color: #75C96E;
+  background-color: #75c96e;
   color: #000;
 `;
 
 const CreateScenarioButton = styled(Button)`
-  background-color: #E23A3A;
+  background-color: #e23a3a;
   color: #000;
 `;
 
 function Synopsis() {
-  const [characters, setCharacters] = useState('');
-  const [plot, setPlot] = useState('');
-  const [keywords, setKeywords] = useState('');
+  const [characters, setCharacters] = useState("");
+  const [plot, setPlot] = useState("");
+  const [keywords, setKeywords] = useState("");
 
-  const handleAutoFill = () => {
-    setCharacters('홍길동(17세), 남, 아버지를 아버지라 부르지 못하는 주인공\n심청이(16세), 여, 홍길동을 좋아하는 후배');
-    setPlot('홍길동이 심청이의 도움으로 아버지와의 갈등을 극복하고 자신의 정체성을 찾아가는 이야기.');
-    setKeywords('#연애남 #순정남 #첫사랑 #옆집 #교환학생 여주');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const movieData = location.state;
+  const scenarioData = {
+    characters,
+    plot,
+    keywords,
   };
 
-  const handleCreateScenario = () => {
-    alert('시나리오 제작 완료!');
+  const handleAutoFill = () => {
+    // GPT 자동 입력을 위한 데이터가 있다고 가정
+    if (movieData) {
+      // 아래 부분은 GPT와의 연동이 구현된 경우 사용할 로직입니다.
+      /*
+      const gptResponse = await fetchGPTSuggestion(movieData); 
+      setCharacters(gptResponse.characters);
+      setPlot(gptResponse.plot);
+      setKeywords(gptResponse.keywords);
+      */
+
+      // 임시 데이터로 필드 채우기 (주석 처리된 부분을 사용하려면 백엔드/GPT가 구현되어야 합니다)
+      setCharacters(`Example Character based on: ${movieData.title}`);
+      setPlot(
+        `Example Plot for a movie with genres: ${movieData.selectedGenres.join(
+          ", "
+        )}`
+      );
+      setKeywords(
+        `#ExampleKeyword1 #ExampleKeyword2 based on: ${movieData.country}`
+      );
+    } else {
+      alert("이전 페이지에서 데이터가 전달되지 않았습니다.");
+    }
+  };
+
+  const handleCreateScenario = async () => {
+    try {
+      // 백엔드로 시나리오 데이터를 전송하는 부분
+      /*
+      const response = await fetch('http://localhost:8000/api/create-scenario', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(scenarioData),
+      });
+
+      if (!response.ok) {
+        throw new Error('시나리오 생성 실패');
+      }
+
+      const scriptData = await response.json();
+      */
+
+      // 시나리오 페이지로 이동하며 생성된 시나리오 데이터를 전달
+      navigate("/create/script", { state: { scenarioData } });
+    } catch (error) {
+      console.error("시나리오 생성 중 오류 발생:", error);
+      alert("시나리오 생성 중 오류가 발생했습니다.");
+    }
   };
 
   return (

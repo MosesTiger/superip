@@ -209,6 +209,15 @@ function Select() {
   const [rating, setRating] = useState("all"); // 관람 등급 상태 추가
   const [country, setCountry] = useState("korea"); // 영화 배경 국가 상태 추가
 
+  const movieData = {
+    title,
+    selectedGenres,
+    duration,
+    rating,
+    country,
+    isSeries: isCheckboxChecked,
+  };
+
   const handleGenreClick = (genre) => {
     setSelectedGenres((prev) =>
       prev.includes(genre)
@@ -232,15 +241,6 @@ function Select() {
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
-    /* const movieData = {
-      title,
-      selectedGenres,
-      duration,
-      rating,
-      country,
-      isSeries: isCheckboxChecked,
-    };*/
-
     try {
       /*//서버에 데이터를 전송하는 부분을 주석 처리
       const response = await fetch("http://localhost:8000/api/movies", {
@@ -251,22 +251,13 @@ function Select() {
         body: JSON.stringify(movieData),
       });
       const data = await response.json();*/ // 비동기 작업이 완료된 후 페이지 이동
-      navigate("/create/synopsis"); // 비동기 작업이 완료된 후 페이지 이동
+      navigate("/create/synopsis", { state: movieData }); // 비동기 작업이 완료된 후 페이지 이동
     } catch (error) {
       console.error("Error:", error);
     }
   };
 
   const handlePredictionClick = async () => {
-    /* const movieData = {
-      title,
-      selectedGenres,
-      duration,
-      rating,
-      country,
-      isSeries: isCheckboxChecked,
-    };*/
-
     try {
       /*//서버에 데이터를 전송하는 부분을 주석 처리
       const response = await fetch("http://localhost:8000/api/movies", {
@@ -277,7 +268,7 @@ function Select() {
         body: JSON.stringify(movieData),
       });
       const data = await response.json();*/ // 비동기 작업이 완료된 후 페이지 이동
-      navigate("/create/predict"); // 비동기 작업이 완료된 후 페이지 이동
+      navigate("/create/synopsis", { state: movieData }); // 비동기 작업이 완료된 후 페이지 이동
     } catch (error) {
       console.error("Error:", error);
     }
