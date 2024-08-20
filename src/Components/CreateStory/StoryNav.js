@@ -29,22 +29,6 @@ const NavLink = styled(Link).withConfig({
   }
 `;
 
-const SaveButton = styled.div`
-  background-color: #859aa5;
-  border-radius: 15px;
-  width: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: #edf6f6;
-  }
-`;
-
 const NavLinkWrap = styled.div`
   margin: 0;
   padding: 0;
@@ -77,7 +61,6 @@ function StoryNav() {
           시나리오
         </NavLink>
       </NavLinkWrap>
-      <SaveButton>저장</SaveButton>
     </Nav>
   );
 }
