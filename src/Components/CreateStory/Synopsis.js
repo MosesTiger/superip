@@ -17,15 +17,28 @@ const Section = styled.section`
 
 const TextArea = styled.textarea`
   width: 100%;
-  height: 80px;
+  height: 120px;
   margin-bottom: 15px;
   border-radius: 10px;
   border: 1px solid #ccc;
-  padding: 20px 10px 10px;
+  padding: 15px;
   font-size: 16px;
   color: #000;
   background-color: #859aa5;
   display: block;
+  resize: vertical;
+  line-height: 1.5;
+  font-family: 'Arial', sans-serif;
+
+  &:focus {
+    outline: none;
+    border-color: #75c96e;
+    box-shadow: 0 0 5px rgba(117, 201, 110, 0.5);
+  }
+
+  &::placeholder {
+    color: rgba(0, 0, 0, 0.5);
+  }
 `;
 
 const Label = styled.label`
@@ -71,33 +84,34 @@ function Synopsis() {
   const navigate = useNavigate();
   const location = useLocation();
   const movieData = location.state;
-  const scenarioData = {
-    characters,
-    plot,
-    keywords,
-  };
 
-  const handleAutoFill = () => {
-    // GPT 자동 입력을 위한 데이터가 있다고 가정
+  const handleAutoFill = async () => {
     if (movieData) {
-      // 아래 부분은 GPT와의 연동이 구현된 경우 사용할 로직입니다.
-      /*
-      const gptResponse = await fetchGPTSuggestion(movieData); 
-      setCharacters(gptResponse.characters);
-      setPlot(gptResponse.plot);
-      setKeywords(gptResponse.keywords);
-      */
+      try {
+        const response = await fetch("http://localhost:8000/api/v1/synopsis/generate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            keyword: movieData.title,
+            genre: movieData.selectedGenres.join(", "),
+            theme: movieData.country
+          }),
+        });
 
-      // 임시 데이터로 필드 채우기 (주석 처리된 부분을 사용하려면 백엔드/GPT가 구현되어야 합니다)
-      setCharacters(`Example Character based on: ${movieData.title}`);
-      setPlot(
-        `Example Plot for a movie with genres: ${movieData.selectedGenres.join(
-          ", "
-        )}`
-      );
-      setKeywords(
-        `#ExampleKeyword1 #ExampleKeyword2 based on: ${movieData.country}`
-      );
+        if (!response.ok) {
+          throw new Error('시놉시스 생성 실패');
+        }
+
+        const data = await response.json();
+        setCharacters(data.main_characters.join(", "));
+        setPlot(data.storyline);
+        setKeywords(data.keyword);
+      } catch (error) {
+        console.error("Error:", error);
+        alert('시놉시스 생성 중 오류가 발생했습니다.');
+      }
     } else {
       alert("이전 페이지에서 데이터가 전달되지 않았습니다.");
     }
@@ -105,24 +119,13 @@ function Synopsis() {
 
   const handleCreateScenario = async () => {
     try {
-      // 백엔드로 시나리오 데이터를 전송하는 부분
-      /*
-      const response = await fetch('http://localhost:8000/api/create-scenario', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(scenarioData),
-      });
+      const scenarioData = {
+        ...movieData,
+        characters,
+        plot,
+        keywords
+      };
 
-      if (!response.ok) {
-        throw new Error('시나리오 생성 실패');
-      }
-
-      const scriptData = await response.json();
-      */
-
-      // 시나리오 페이지로 이동하며 생성된 시나리오 데이터를 전달
       navigate("/create/script", { state: { scenarioData } });
     } catch (error) {
       console.error("시나리오 생성 중 오류 발생:", error);
@@ -138,7 +141,7 @@ function Synopsis() {
         value={characters}
         onChange={(e) => setCharacters(e.target.value)}
       />
-      <Label>줄거리 (공백 포함 200자 이내로 작성)</Label>
+      <Label>시놉시스 (공백 포함 200자 이내로 작성 혹은 gpt 자동생성)</Label>
       <TextArea
         placeholder="줄거리 (공백 포함 200자 이내로 작성)"
         value={plot}
@@ -151,7 +154,7 @@ function Synopsis() {
         onChange={(e) => setKeywords(e.target.value)}
       />
       <ButtonContainer>
-        <AutoFillButton onClick={handleAutoFill}>GPT 자동입력</AutoFillButton>
+        <AutoFillButton onClick={handleAutoFill}>시놉시스 생성</AutoFillButton>
         <CreateScenarioButton onClick={handleCreateScenario}>
           시나리오 제작
         </CreateScenarioButton>
