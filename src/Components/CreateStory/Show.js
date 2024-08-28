@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
 
 const DashboardContainer = styled.div`
   display: grid;
@@ -15,7 +16,7 @@ const DashboardContainer = styled.div`
   position: relative;
 `;
 
-const Overlay = styled.div`//뒤에 화면 어둡게하기위해서
+const Overlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
@@ -101,10 +102,30 @@ const CloseButton = styled.button`
   cursor: pointer;
 `;
 
-
-function Predict() {
+function predict() {
   const [isAnalysisPopupOpen, setIsAnalysisPopupOpen] = useState(false);
   const [isBoxofficePopupOpen, setIsBoxofficePopupOpen] = useState(false);
+  const [predictionData, setPredictionData] = useState(null);
+
+  useEffect(() => {
+    fetchPredictionData();
+  }, []);
+
+  const fetchPredictionData = async () => {
+    try {
+      const response = await axios.post('http://localhost:8000/api/v1/success-rate/first_predict', {
+        keyword: "범죄도시 5",
+        genre: "액션",
+        runtime: 120,
+        gender: "남성",
+        rating: "15세 이상",
+        theme: "범죄"
+      });
+      setPredictionData(response.data.evaluation);
+    } catch (error) {
+      console.error("Error fetching prediction data:", error);
+    }
+  };
 
   const toggleAnalysisPopup = () => setIsAnalysisPopupOpen(!isAnalysisPopupOpen);
   const toggleBoxofficePopup = () => setIsBoxofficePopupOpen(!isBoxofficePopupOpen);
@@ -124,6 +145,7 @@ function Predict() {
         </AnalysisSection>
         <PenaltySection className="penalty-section">
           <h3>예상 별점</h3>
+          {predictionData && <p>{predictionData['최종 흥행도'].average_score.toFixed(1)}</p>}
         </PenaltySection>
         <BoxofficeSection className="boxoffice-section">
           <h3>1차 흥행도 분석표</h3>
@@ -135,6 +157,7 @@ function Predict() {
         <Popup>
           <CloseButton onClick={toggleAnalysisPopup}>닫기</CloseButton>
           <h2>시나리오 완성도 분석표 자세히 보기</h2>
+          {/* Add detailed analysis content here */}
         </Popup>
       )}
 
@@ -142,10 +165,11 @@ function Predict() {
         <Popup>
           <CloseButton onClick={toggleBoxofficePopup}>닫기</CloseButton>
           <h2>1차 흥행도 분석표 자세히 보기</h2>
+          {/* Add detailed boxoffice analysis content here */}
         </Popup>
       )}
     </>
   );
 }
 
-export default Predict;
+export default predict;

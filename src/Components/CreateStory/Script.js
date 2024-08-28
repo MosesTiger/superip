@@ -86,17 +86,17 @@ function Script() {
   const [scenarioId, setScenarioId] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
-  const { scenarioData } = location.state || {};
 
   useEffect(() => {
-    if (scenarioData) {
-      generateScenario(scenarioData);
+    if (location.state?.scenarioData && location.state?.autoStart) {
+      generateScenario(location.state.scenarioData);
     }
-  }, [scenarioData]);
+  }, [location.state]);
 
   const generateScenario = async (data) => {
     setIsGenerating(true);
+    setScenarioContent("시나리오 생성 중...");
+    
     const eventSource = new EventSource(`http://localhost:8000/api/v1/scenario/generate?${new URLSearchParams({
       title: data.title,
       genre: data.genre,

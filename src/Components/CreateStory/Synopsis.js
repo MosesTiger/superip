@@ -74,6 +74,10 @@ function Synopsis() {
   const location = useLocation();
   const movieData = location.state;
 
+  useEffect(() => {
+    console.log("Current location:", location.pathname);
+  }, [location]);
+
   const handleAutoFill = async () => {
     if (movieData && characters && keywords) {
       setIsGenerating(true);
@@ -115,21 +119,30 @@ function Synopsis() {
     }
   };
 
-  const handleCreateScenario = async () => {
-    try {
-      const scenarioData = {
-        keyword: movieData.title,
-        genre: movieData.selectedGenres.join(", "),
-        theme: movieData.counrtry,
-        characters: characters,
-        keywords: keywords, 
-        synopsis: plot
-      };
-      navigate("/create/script", { state: { scenarioData } });
-    } catch (error) {
-      console.error("시나리오 생성 중 오류 발생:", error);
-      alert("시나리오 생성 중 오류가 발생했습니다.");
+  const handleCreateScenario = () => {
+    if (!plot){
+      alert("시놉시스를 먼저 생성해주세요.");
+      return;
     }
+    const scenarioData = {
+      title: movieData.title,
+      genre: movieData.selectedGenres.join(", "),
+      theme: movieData.country,
+      characters: characters,
+      keywords: keywords,
+      synopsis: plot
+    };
+    console.log("Attempting to navigate to Script component with data:", scenarioData);
+    try{
+      navigate("/create/script", { 
+        state: { scenarioData, autoStart: true },
+        replace: true
+      });
+      console.log("이동 성공적으로 이뤄짐")
+    } catch (error){
+      console.error("Navigation error:", error);
+    }
+    
   };
 
   return (
@@ -159,7 +172,7 @@ function Synopsis() {
           {isGenerating ? "생성 중..." : "시놉시스 생성"}
         </AutoFillButton>
         <CreateScenarioButton onClick={handleCreateScenario} disabled={isGenerating || !plot}>
-          시나리오 제작
+          시나리오 생성
         </CreateScenarioButton>
       </ButtonContainer>
     </Section>

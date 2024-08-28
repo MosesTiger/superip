@@ -205,6 +205,7 @@ function Select() {
   const [title, setTitle] = useState("");
   const [rating, setRating] = useState("all");
   const [country, setCountry] = useState("korea");
+  const [mainCharacterGender, setMainCharacterGender] = useState("male");
 
   const handleGenreClick = (genre) => {
     setSelectedGenres((prev) =>
@@ -243,6 +244,7 @@ function Select() {
           rating,
           country,
           isSeries: isCheckboxChecked,
+          mainCharacterGender,
         }
       });
     } catch (error) {
@@ -265,6 +267,7 @@ function Select() {
           rating,
           country,
           isSeries: isCheckboxChecked,
+          mainCharacterGender,
         }),
       });
       if (!response.ok) {
@@ -359,6 +362,15 @@ function Select() {
           <option value="switzerland">스위스</option>
           <option value="poland">폴란드</option>
           <option value="portugal">포르투갈</option>
+        </Select1>
+        <Label>메인 주인공의 성별을 선택하세요.</Label>
+        <Select1
+          value={mainCharacterGender}
+          onChange={(e) => setMainCharacterGender(e.target.value)}
+        >
+          <option value="male">남성</option>
+          <option value="female">여성</option>
+          <option value="mixed">혼성</option>
         </Select1>
         <CheckboxContainer>
           <Checkbox
