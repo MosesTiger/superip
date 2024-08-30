@@ -102,7 +102,7 @@ const CloseButton = styled.button`
   cursor: pointer;
 `;
 
-function predict() {
+function Show() {  // 대문자로 시작하도록 수정
   const [isAnalysisPopupOpen, setIsAnalysisPopupOpen] = useState(false);
   const [isBoxofficePopupOpen, setIsBoxofficePopupOpen] = useState(false);
   const [predictionData, setPredictionData] = useState(null);
@@ -172,4 +172,4 @@ function predict() {
   );
 }
 
-export default predict;
+export default Show;

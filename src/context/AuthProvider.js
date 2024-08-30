@@ -12,8 +12,7 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    const savedAuth = localStorage.getItem('isAuthenticated');
-    return savedAuth === 'true';
+    return localStorage.getItem('isAuthenticated') === 'true';
   });
 
   const [user, setUser] = useState(() => {
@@ -21,9 +20,13 @@ export function AuthProvider({ children }) {
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
+  const [token, setToken] = useState(() => {
+    return localStorage.getItem('token') || '';
+  });
+
   const login = (email, password) => {
-    console.log("Login attempt:", email, password); // 로그인 시도 로깅
-    console.log("Current environment:", process.env.NODE_ENV); // 현재 환경 로깅
+    console.log("Login attempt:", email, password);
+    console.log("Current environment:", process.env.NODE_ENV);
 
     try {
       if (process.env.NODE_ENV === 'development') {
@@ -31,12 +34,14 @@ export function AuthProvider({ children }) {
         if (email === DEV_EMAIL && password === DEV_PASSWORD) {
           console.log("Login successful in dev mode");
           const devUser = { id: 1, email: DEV_EMAIL, name: "한이음 사용자" };
+          const devToken = btoa(`${email}:${password}`); // 간단한 토큰 생성
           setIsAuthenticated(true);
           setUser(devUser);
+          setToken(devToken);
           localStorage.setItem('isAuthenticated', 'true');
           localStorage.setItem('user', JSON.stringify(devUser));
+          localStorage.setItem('token', devToken);
         } else {
-          console.log("Login failed in dev mode: incorrect credentials");
           throw new Error('로그인 실패: 잘못된 이메일 또는 비밀번호입니다.');
         }
       } else {
@@ -45,11 +50,13 @@ export function AuthProvider({ children }) {
         const savedUser = JSON.parse(localStorage.getItem('user'));
         if (savedUser && savedUser.email === email) {
           console.log("Login successful in production mode");
+          const prodToken = btoa(`${email}:${Date.now()}`); // 프로덕션용 간단한 토큰
           setIsAuthenticated(true);
           setUser(savedUser);
+          setToken(prodToken);
           localStorage.setItem('isAuthenticated', 'true');
+          localStorage.setItem('token', prodToken);
         } else {
-          console.log("Login failed in production mode: user not found");
           throw new Error('로그인 실패: 사용자 정보를 찾을 수 없습니다.');
         }
       }
@@ -60,19 +67,21 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
     setIsAuthenticated(false);
     setUser(null);
+    setToken('');
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, token, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 }
+
 // 백엔드 요청 관련 함수는 주석 처리
 /*
 async function fetchUserData(token) {

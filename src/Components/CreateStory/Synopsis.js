@@ -17,7 +17,7 @@ const Section = styled.section`
 
 const TextArea = styled.textarea`
   width: 100%;
-  height: ${props => props.height || "120px"};
+  height: ${(props) => props.height || "120px"};
   margin-bottom: 15px;
   border-radius: 10px;
   border: 1px solid #ccc;
@@ -67,7 +67,7 @@ const CreateScenarioButton = styled(Button)`
 function Synopsis() {
   const [characters, setCharacters] = useState("");
   const [plot, setPlot] = useState("");
-  const [keywords, setKeywords] = useState("");
+  const [keyword, setKeyword] = useState("");  // keyword로 필드명 변경
   const [isGenerating, setIsGenerating] = useState(false);
 
   const navigate = useNavigate();
@@ -79,22 +79,23 @@ function Synopsis() {
   }, [location]);
 
   const handleAutoFill = async () => {
-    if (movieData && characters && keywords) {
+    if (movieData && characters && keyword) {  // keyword로 체크
       setIsGenerating(true);
       setPlot(""); // Reset plot before generating new one
 
-      const eventSource = new EventSource(`http://localhost:8000/api/v1/synopsis/generate?${new URLSearchParams({
-        keyword: movieData.title,
-        genre: movieData.selectedGenres.join(", "),
-        theme: movieData.country,
-        characters: characters,
-        keywords: keywords
-      })}`);
-      
+      const eventSource = new EventSource(
+        `http://localhost:8000/api/v1/synopsis/generate?${new URLSearchParams({
+          keyword: keyword,  // keyword 사용
+          genre: movieData.selectedGenres.join(", "),
+          theme: movieData.country,
+          characters: characters,
+        })}`
+      );
+
       eventSource.onmessage = (event) => {
         if (event.data === "[DONE]") {
           eventSource.close();
-          setIsGenerating(true);
+          setIsGenerating(false);
         } else {
           try {
             const data = JSON.parse(event.data);
@@ -103,46 +104,48 @@ function Synopsis() {
             }
           } catch (error) {
             // If it's not a JSON, it's a part of the storyline
-            setPlot(prevPlot => prevPlot + event.data);
+            setPlot((prevPlot) => prevPlot + event.data);
           }
         }
       };
-      
+
       eventSource.onerror = (error) => {
         console.error("Error:", error);
         eventSource.close();
         setIsGenerating(false);
-        alert('시놉시스 생성 중 오류가 발생했습니다.');
+        alert("시놉시스 생성 중 오류가 발생했습니다.");
       };
     } else {
       alert("영화 정보, 등장인물, 키워드를 모두 입력해주세요.");
     }
   };
 
-  const handleCreateScenario = () => {
-    if (!plot){
+  const handleCreateScenario = (e) => {
+    e.stopPropagation();
+    if (!plot) {
       alert("시놉시스를 먼저 생성해주세요.");
       return;
     }
+
     const scenarioData = {
       title: movieData.title,
       genre: movieData.selectedGenres.join(", "),
       theme: movieData.country,
       characters: characters,
-      keywords: keywords,
-      synopsis: plot
+      keyword: keyword,  // keyword 필드만 사용
+      synopsis: plot,
     };
+
     console.log("Attempting to navigate to Script component with data:", scenarioData);
-    try{
-      navigate("/create/script", { 
+    try {
+      navigate("/create/script", {
         state: { scenarioData, autoStart: true },
-        replace: true
+        replace: true,
       });
-      console.log("이동 성공적으로 이뤄짐")
-    } catch (error){
+      console.log("이동 성공적으로 이뤄짐");
+    } catch (error) {
       console.error("Navigation error:", error);
     }
-    
   };
 
   return (
@@ -156,8 +159,8 @@ function Synopsis() {
       <Label>키워드 태그 (콤마로 구분)</Label>
       <TextArea
         placeholder="예: 모험, 우정, 성장"
-        value={keywords}
-        onChange={(e) => setKeywords(e.target.value)}
+        value={keyword}  // 단일 키워드 필드로 설정
+        onChange={(e) => setKeyword(e.target.value)}
       />
       <Label>시놉시스</Label>
       <TextArea
@@ -171,7 +174,10 @@ function Synopsis() {
         <AutoFillButton onClick={handleAutoFill} disabled={isGenerating}>
           {isGenerating ? "생성 중..." : "시놉시스 생성"}
         </AutoFillButton>
-        <CreateScenarioButton onClick={handleCreateScenario} disabled={isGenerating || !plot}>
+        <CreateScenarioButton
+          onClick={handleCreateScenario}
+          disabled={isGenerating || !plot}
+        >
           시나리오 생성
         </CreateScenarioButton>
       </ButtonContainer>

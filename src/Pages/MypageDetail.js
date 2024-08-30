@@ -109,6 +109,17 @@ const ScenarioItem = styled.div`
   font-size: 16px;
   height: 200px;
   margin: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ScenarioImage = styled.img`
+  width: 100px;  /* 이미지의 너비를 설정 */
+  height: 100px;  /* 이미지의 높이를 설정 */
+  border-radius: 10px; /* 이미지의 모서리를 둥글게 설정 */
+  margin-bottom: 10px; /* 이미지와 텍스트 사이의 간격 설정 */
 `;
 
 const Heading = styled.h1`
@@ -119,7 +130,7 @@ const Heading = styled.h1`
 
 // ProfileDetail 컴포넌트
 const ProfileDetail = () => (
-    <div>
+  <div>
     <Heading>나의 정보</Heading>
     <ProfileCard>
       <ProfileImageSection>
@@ -138,6 +149,21 @@ const ProfileDetail = () => (
   </div>
 );
 
+// ScenarioGrid 컴포넌트
+const ScenarioGridComponent = () => (
+  <ScenarioGrid>
+    <ScenarioItem>
+      <ScenarioImage src="/baseball.jpg" alt="Scenario 2" />
+      시나리오 5
+    </ScenarioItem>
+    <ScenarioItem>시나리오 2</ScenarioItem>
+    <ScenarioItem>시나리오 3</ScenarioItem>
+    <ScenarioItem>시나리오 4</ScenarioItem>
+    <ScenarioItem>시나리오 5</ScenarioItem>
+    <ScenarioItem>시나리오 6</ScenarioItem>
+  </ScenarioGrid>
+);
+
 // MyPageDetail 컴포넌트
 export default function MypageDetail({ selectedMenu }) {
   const renderContent = () => {
@@ -146,16 +172,7 @@ export default function MypageDetail({ selectedMenu }) {
         return <ProfileDetail />; // ProfileDetail 컴포넌트를 렌더링
 
       case 'scenario':
-        return (
-          <ScenarioGrid>
-            <ScenarioItem>시나리오 1</ScenarioItem>
-            <ScenarioItem>시나리오 2</ScenarioItem>
-            <ScenarioItem>시나리오 3</ScenarioItem>
-            <ScenarioItem>시나리오 4</ScenarioItem>
-            <ScenarioItem>시나리오 5</ScenarioItem>
-            <ScenarioItem>시나리오 6</ScenarioItem>
-          </ScenarioGrid>
-        );
+        return <ScenarioGridComponent />;
 
       case 'settings':
         return (

@@ -1,83 +1,109 @@
 import React, { useState, useEffect } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthProvider';
+
+const PageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #f0f0f0;
+  position: relative; /* To position the loading message at the bottom */
+`;
+
+const ScenarioContainer = styled.div`
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  padding: 20px;
+  overflow: hidden;
+`;
+
+const ChapterTitle = styled.h2`
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+`;
+
+const ScenarioText = styled.pre`
+  flex-grow: 1;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 16px;
+  line-height: 1.6;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  display: ${props => (props.isGenerating ? 'none' : 'block')};
+`;
 
 const Input = styled.textarea`
   width: 100%;
-  border: 0;
-  background-color: #EDF6F6;
-  height: 70vh;
-  border-radius: 8px;
-  padding: 8px 16px;
-  box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
-  font-weight: 500;
-  font-size: 16px;
-  min-width: 250px;
-  z-index: 3;
+  height: 100px;
+  padding: 10px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  resize: vertical;
   margin-bottom: 20px;
-  resize: none;
-  overflow-Y: scroll;
 `;
 
-const PaginationContainer = styled.div`
+const Button = styled.button`
+  padding: 10px 20px;
+  background-color: #ff4136;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-right: 10px;
+
+  &:disabled {
+    background-color: #ffcccb;
+    cursor: not-allowed;
+  }
+`;
+
+const ButtonContainer = styled.div`
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  background-color: #EDF6F6;
-  margin-top: 15px;
-  border-radius: 8px;
-  position: relative;
+  justify-content: flex-start;
 `;
 
-const PageInfo = styled.span`
-  font-size: 16px;
-  font-weight: bold;
-  color: #000;
-  margin: 0 10px;
+// 로딩 스피너 애니메이션
+const spin = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 `;
 
-const SaveButton = styled.button`
-  position: fixed;
-  bottom: 100px;
-  right: 100px;
-  padding: 10px 20px;
-  background-color: #859aa5;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  z-index: 1000;
-
-  &:hover {
-    background-color: #697A82;
-  }
-
-  &:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-  }
+const Spinner = styled.div`
+  border: 16px solid #f3f3f3;
+  border-top: 16px solid #3498db;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: ${spin} 2s linear infinite;
+  display: ${props => (props.isGenerating ? 'block' : 'none')};
+  margin: auto;
 `;
 
-const ActionButton = styled.button`
-  padding: 10px 20px;
-  background-color: #75c96e;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+const LoadingMessage = styled.div`
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
   font-size: 16px;
-  margin-top: 10px;
-
-  &:hover {
-    background-color: #5faa59;
-  }
-
-  &:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-  }
+  color: #333;
+  display: ${props => (props.isGenerating ? 'block' : 'none')};
 `;
 
 function Script() {
@@ -85,76 +111,127 @@ function Script() {
   const [currentChapter, setCurrentChapter] = useState(1);
   const [scenarioId, setScenarioId] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [userInput, setUserInput] = useState("");
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuthenticated, token } = useAuth();
 
   useEffect(() => {
-    if (location.state?.scenarioData && location.state?.autoStart) {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    if (location.state?.scenarioData) {
       generateScenario(location.state.scenarioData);
     }
-  }, [location.state]);
+  }, [isAuthenticated, location.state, navigate]);
 
   const generateScenario = async (data) => {
     setIsGenerating(true);
-    setScenarioContent("시나리오 생성 중...");
-    
-    const eventSource = new EventSource(`http://localhost:8000/api/v1/scenario/generate?${new URLSearchParams({
+    setScenarioContent("");
+
+    const url = `http://localhost:8000/api/v1/scenario/generate`;
+
+    // Ensure characters is an array
+    const charactersArray = Array.isArray(data.characters)
+        ? data.characters
+        : data.characters
+        ? data.characters.split(',').map(char => char.trim())
+        : [];
+
+    const requestData = {
       title: data.title,
+      keyword: data.keyword,
       genre: data.genre,
       theme: data.theme,
-      characters: data.characters,
-      synopsis: data.synopsis,
-      keywords: data.keywords
-    })}`);
+      characters: charactersArray,
+      scenario_content: data.scenario_content || ""
+    };
 
-    let fullContent = "";
+    console.log("Sending data to server:", requestData);
 
-    eventSource.onmessage = (event) => {
-      try {
-        const jsonData = JSON.parse(event.data);
-        if (jsonData.id) {
-          setScenarioId(jsonData.id);
-          eventSource.close();
-          setIsGenerating(false);
-        } else {
-          fullContent += event.data;
-          setScenarioContent(fullContent);
-        }
-      } catch (error) {
-        fullContent += event.data;
-        setScenarioContent(fullContent);
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
-    };
 
-    eventSource.onerror = (error) => {
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+
+      let content = "";
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const rawContent = line.slice(5).trim();
+            if (rawContent === "[DONE]") {
+              // Stop the generation process once "[DONE]" is received
+              setIsGenerating(false);
+              break;
+            }
+            try {
+              const jsonData = JSON.parse(rawContent);
+              if (jsonData.type === 'content') {
+                content += jsonData.content;
+              } else if (jsonData.type === 'id') {
+                setScenarioId(jsonData.id);
+              } else if (jsonData.type === 'error') {
+                throw new Error(jsonData.error);
+              }
+            } catch (e) {
+              console.error("Failed to parse JSON:", rawContent);
+            }
+          }
+        }
+      }
+      setScenarioContent(content);
+    } catch (error) {
       console.error("Error:", error);
-      eventSource.close();
-      setIsGenerating(false);
-      alert('시나리오 생성 중 오류가 발생했습니다.');
-    };
+      setIsGenerating(false); // If error, ensure isGenerating is set to false
+    }
   };
 
   const handleContinueChapter = async () => {
     setIsGenerating(true);
-    const eventSource = new EventSource(`http://localhost:8000/api/v1/scenario/${scenarioId}/continue?user_input=${encodeURIComponent(scenarioContent)}`);
+    try {
+      const response = await fetch(`http://localhost:8000/api/v1/scenario/${scenarioId}/continue`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ user_input: userInput })
+      });
 
-    let newContent = "";
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-    eventSource.onmessage = (event) => {
-      newContent += event.data;
-      setScenarioContent(prevContent => prevContent + event.data);
-    };
-
-    eventSource.onerror = (error) => {
+      const result = await response.json();
+      setScenarioContent(prev => prev + '\n\n' + result.content);
+      setCurrentChapter(prev => prev + 1);
+      setUserInput("");
+    } catch (error) {
       console.error("Error:", error);
-      eventSource.close();
+    } finally {
       setIsGenerating(false);
-      alert('챕터 계속 작성 중 오류가 발생했습니다.');
-    };
-
-    eventSource.onclose = () => {
-      setCurrentChapter(prevChapter => prevChapter + 1);
-      setIsGenerating(false);
-    };
+    }
   };
 
   const handleSave = async () => {
@@ -162,42 +239,44 @@ function Script() {
       const response = await fetch(`http://localhost:8000/api/v1/scenario/${scenarioId}/revise`, {
         method: "POST",
         headers: {
+          'Authorization': `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ feedback: "사용자 편집", user_input: scenarioContent }),
+        body: JSON.stringify({ feedback: "User edited", user_input: scenarioContent }),
       });
 
       if (!response.ok) {
-        throw new Error('시나리오 저장 실패');
+        throw new Error('Failed to save the scenario');
       }
 
-      const result = await response.json();
-      if (result.error) {
-        throw new Error(result.error);
-      }
-
-      alert('시나리오가 성공적으로 저장되었습니다.');
+      alert('Scenario saved successfully.');
     } catch (error) {
       console.error("Error:", error);
-      alert(`시나리오 저장 중 오류가 발생했습니다: ${error.message}`);
     }
   };
 
   return (
-    <>
-      <SaveButton onClick={handleSave} disabled={isGenerating || !scenarioId}>저장</SaveButton>
-      <PaginationContainer>
-        <PageInfo>Chapter {currentChapter}</PageInfo>
-      </PaginationContainer>
-      <Input 
-        value={scenarioContent}
-        onChange={(e) => setScenarioContent(e.target.value)}
-        readOnly={isGenerating}
-      />
-      <ActionButton onClick={handleContinueChapter} disabled={isGenerating || !scenarioId}>
-        {isGenerating ? "생성 중..." : "다음 챕터 작성"}
-      </ActionButton>
-    </>
+    <PageContainer>
+      <ScenarioContainer>
+        <ChapterTitle>Chapter {currentChapter}</ChapterTitle>
+        <Spinner isGenerating={isGenerating} />
+        <ScenarioText isGenerating={isGenerating}>{scenarioContent}</ScenarioText>
+        <Input
+          value={userInput}
+          onChange={(e) => setUserInput(e.target.value)}
+          placeholder="다음 챕터에 대한 의견이나 조언을 주세요"
+        />
+        <ButtonContainer>
+          <Button onClick={handleContinueChapter} disabled={isGenerating || !scenarioId}>
+            {isGenerating ? "생성 중..." : "다음 챕터 작성"}
+          </Button>
+          <Button onClick={handleSave} disabled={isGenerating || !scenarioId}>
+            Save
+          </Button>
+        </ButtonContainer>
+        <LoadingMessage isGenerating={isGenerating}>시나리오 생성 중입니다!</LoadingMessage>
+      </ScenarioContainer>
+    </PageContainer>
   );
 }
 
