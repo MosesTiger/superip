@@ -1,18 +1,18 @@
 import { useState, useEffect, useContext, createContext } from "react";
 
-// AuthContext 생성
 const AuthContext = createContext();
 
-// useAuth 훅 정의
+// 개발 환경용 테스트 계정
+const DEV_EMAIL = "pms797@naver.com";
+const DEV_PASSWORD = "qkrahtp";
+
 export function useAuth() {
   return useContext(AuthContext);
 }
 
-// AuthProvider 컴포넌트 정의
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    const savedAuth = localStorage.getItem('isAuthenticated');
-    return savedAuth === 'true';
+    return localStorage.getItem('isAuthenticated') === 'true';
   });
 
   const [user, setUser] = useState(() => {
@@ -20,75 +20,63 @@ export function AuthProvider({ children }) {
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
-  useEffect(() => {
-    // 이 부분은 주석 처리해 두세요.
-    /*
-    const token = localStorage.getItem('token');
-    if (token) {
-      fetchUserData(token).then((userData) => {
-        setUser(userData);
-        setIsAuthenticated(true);
-      }).catch(() => {
-        logout();
-      });
-    }
-    */
-  }, []);
+  const [token, setToken] = useState(() => {
+    return localStorage.getItem('token') || '';
+  });
 
   const login = (email, password) => {
+    console.log("Login attempt:", email, password);
+    console.log("Current environment:", process.env.NODE_ENV);
+
     try {
-      // 이 부분도 주석 처리해 두세요.
-      /*
-      const response = await fetch('/api/login', { 
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        throw new Error('로그인 실패');
-      }
-
-      const data = await response.json();
-
-      // 백엔드에서 받은 토큰과 사용자 정보를 저장
-      localStorage.setItem('token', data.token);
-      setUser(data.user);
-      setIsAuthenticated(true);
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('user', JSON.stringify(data.user));
-      */
-      
-      //-----------------------------------------------
-      //프론트 연결위해 임시 구현
-      const savedUser = JSON.parse(localStorage.getItem('user'));
-      if (savedUser && savedUser.email === email) {
-        setIsAuthenticated(true);
-        setUser(savedUser);
-        localStorage.setItem('isAuthenticated', 'true');
+      if (process.env.NODE_ENV === 'development') {
+        console.log("Development mode login");
+        if (email === DEV_EMAIL && password === DEV_PASSWORD) {
+          console.log("Login successful in dev mode");
+          const devUser = { id: 1, email: DEV_EMAIL, name: "한이음 사용자" };
+          const devToken = btoa(`${email}:${password}`); // 간단한 토큰 생성
+          setIsAuthenticated(true);
+          setUser(devUser);
+          setToken(devToken);
+          localStorage.setItem('isAuthenticated', 'true');
+          localStorage.setItem('user', JSON.stringify(devUser));
+          localStorage.setItem('token', devToken);
+        } else {
+          throw new Error('로그인 실패: 잘못된 이메일 또는 비밀번호입니다.');
+        }
       } else {
-        throw new Error('로그인 실패: 사용자 정보를 찾을 수 없습니다.');
+        console.log("Production mode login");
+        // 프로덕션 환경에서의 로그인 로직
+        const savedUser = JSON.parse(localStorage.getItem('user'));
+        if (savedUser && savedUser.email === email) {
+          console.log("Login successful in production mode");
+          const prodToken = btoa(`${email}:${Date.now()}`); // 프로덕션용 간단한 토큰
+          setIsAuthenticated(true);
+          setUser(savedUser);
+          setToken(prodToken);
+          localStorage.setItem('isAuthenticated', 'true');
+          localStorage.setItem('token', prodToken);
+        } else {
+          throw new Error('로그인 실패: 사용자 정보를 찾을 수 없습니다.');
+        }
       }
-      //-----------------------------------------------
-
     } catch (error) {
       console.error('로그인 중 오류 발생:', error);
-      alert('로그인 중 오류가 발생했습니다.');
+      alert(error.message);
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
     setIsAuthenticated(false);
     setUser(null);
+    setToken('');
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, token, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
