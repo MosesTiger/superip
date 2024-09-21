@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import axios from "axios";
 
 const DashboardContainer = styled.div`
   display: grid;
@@ -11,7 +11,7 @@ const DashboardContainer = styled.div`
   height: calc(100vh - 70px);
   width: 95vw;
   box-sizing: border-box;
-  background-color: #182E3F;
+  background-color: #182e3f;
   transform: translateX(-50px);
   position: relative;
 `;
@@ -32,7 +32,7 @@ const DashboardSection = styled.div`
   flex-direction: column;
   padding: 15px;
   border-radius: 8px;
-  background-color: #EDF6F6;
+  background-color: #edf6f6;
   box-sizing: border-box;
   position: relative;
 `;
@@ -102,7 +102,8 @@ const CloseButton = styled.button`
   cursor: pointer;
 `;
 
-function Show() {  // 대문자로 시작하도록 수정
+function Show() {
+  // 대문자로 시작하도록 수정
   const [isAnalysisPopupOpen, setIsAnalysisPopupOpen] = useState(false);
   const [isBoxofficePopupOpen, setIsBoxofficePopupOpen] = useState(false);
   const [predictionData, setPredictionData] = useState(null);
@@ -113,31 +114,43 @@ function Show() {  // 대문자로 시작하도록 수정
 
   const fetchPredictionData = async () => {
     try {
-      const response = await axios.post('http://localhost:8000/api/v1/success-rate/first_predict', {
-        keyword: "범죄도시 5",
-        genre: "액션",
-        runtime: 120,
-        gender: "남성",
-        rating: "15세 이상",
-        theme: "범죄"
-      });
+      const response = await axios.post(
+        "http://localhost:8000/api/v1/success-rate/first_predict",
+        {
+          keyword: "범죄도시 5",
+          genre: "액션",
+          runtime: 120,
+          gender: "남성",
+          rating: "15세 이상",
+          theme: "범죄",
+        }
+      );
       setPredictionData(response.data.evaluation);
     } catch (error) {
       console.error("Error fetching prediction data:", error);
     }
   };
 
-  const toggleAnalysisPopup = () => setIsAnalysisPopupOpen(!isAnalysisPopupOpen);
-  const toggleBoxofficePopup = () => setIsBoxofficePopupOpen(!isBoxofficePopupOpen);
+  const toggleAnalysisPopup = () =>
+    setIsAnalysisPopupOpen(!isAnalysisPopupOpen);
+  const toggleBoxofficePopup = () =>
+    setIsBoxofficePopupOpen(!isBoxofficePopupOpen);
 
   const isPopupOpen = isAnalysisPopupOpen || isBoxofficePopupOpen;
 
   return (
     <>
       <DashboardContainer>
-        {isPopupOpen && <Overlay onClick={() => { setIsAnalysisPopupOpen(false); setIsBoxofficePopupOpen(false); }} />}
+        {isPopupOpen && (
+          <Overlay
+            onClick={() => {
+              setIsAnalysisPopupOpen(false);
+              setIsBoxofficePopupOpen(false);
+            }}
+          />
+        )}
         <TitleSection className="title-section">
-          <h3>제목: 범죄도시 5</h3>
+          <h3>제목: 범죄도시 5dkjdkj</h3>
         </TitleSection>
         <AnalysisSection className="analysis-section">
           <h3>시나리오 완성도 분석표</h3>
@@ -145,7 +158,9 @@ function Show() {  // 대문자로 시작하도록 수정
         </AnalysisSection>
         <PenaltySection className="penalty-section">
           <h3>예상 별점</h3>
-          {predictionData && <p>{predictionData['최종 흥행도'].average_score.toFixed(1)}</p>}
+          {predictionData && (
+            <p>{predictionData["최종 흥행도"].average_score.toFixed(1)}</p>
+          )}
         </PenaltySection>
         <BoxofficeSection className="boxoffice-section">
           <h3>1차 흥행도 분석표</h3>
