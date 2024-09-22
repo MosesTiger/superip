@@ -382,7 +382,7 @@ function Select() {
         </CheckboxContainer>
       </MovieDetails>
       <Actions>
-        <ActionButton onClick={handleSubmit}>다음 단계</ActionButton>
+        <ActionButton onClick={handleSubmit}>예상 흥행 등급 : </ActionButton>
         <PredictionButton onClick={handlePredictionClick}>
           1차 흥행률 예측
         </PredictionButton>

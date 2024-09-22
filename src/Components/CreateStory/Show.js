@@ -404,7 +404,7 @@ function Show() {
           </Div2>
           <Div3>
             <Divtitle>1차 흥행도 예측</Divtitle>
-            <DivContent content="first">80%</DivContent>
+            <DivContent content="first">A</DivContent>
           </Div3>
           <Div4>
             <Divtitle>시나리오 완성도</Divtitle>
