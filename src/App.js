@@ -16,11 +16,11 @@ import FindPW from "./Components/User/FindPW";
 import FindPWRes from "./Components/User/FindPWRes";
 import PageNotFound from "./Pages/PageNotFound";
 import { AuthProvider, useAuth } from "./context/AuthProvider";
-import Select from './Components/CreateStory/Select';
-import Synopsis from './Components/CreateStory/Synopsis';
-import Script from './Components/CreateStory/Script';
-import Show from './Components/CreateStory/Show';
-import MypageDetail from './Pages/MypageDetail';
+import Select from "./Components/CreateStory/Select";
+import Synopsis from "./Components/CreateStory/Synopsis";
+import Script from "./Components/CreateStory/Script";
+import Show from "./Components/CreateStory/Show";
+import MypageDetail from "./Pages/MypageDetail";
 
 function App() {
   return (
@@ -41,24 +41,35 @@ function App() {
             <ProtectedRoute>
               <CreateStory />
             </ProtectedRoute>
-          }>
-            <Route path="select" element={<Select />} />
-            <Route path="synopsis" element={<Synopsis />} />
-            <Route path="script" element={<Script />} />
-            <Route path="show" element={<Show />} />
-            <Route path="predict" element={<Show />} />
-          </Route>
+          }
+        >
+          <Route path="select" element={<Select />} />
+          <Route path="synopsis" element={<Synopsis />} />
+          <Route path="script" element={<Script />} />
+          <Route path="show" element={<Show />} />
+          <Route path="predict" element={<Show />} />
+        </Route>
         <Route
           path="/mypage"
           element={
             <ProtectedRoute>
               <Mypage />
             </ProtectedRoute>
-          }>
-            <Route path="profile" element={<MypageDetail selectedMenu="profile" />} />
-            <Route path="scenario" element={<MypageDetail selectedMenu="scenario" />} />
-            <Route path="settings" element={<MypageDetail selectedMenu="settings" />} />
-            <Route path="help" element={<MypageDetail selectedMenu="help" />} />
+          }
+        >
+          <Route
+            path="profile"
+            element={<MypageDetail selectedMenu="profile" />}
+          />
+          <Route
+            path="scenario"
+            element={<MypageDetail selectedMenu="scenario" />}
+          />
+          <Route
+            path="settings"
+            element={<MypageDetail selectedMenu="settings" />}
+          />
+          <Route path="help" element={<MypageDetail selectedMenu="help" />} />
         </Route>
         <Route path="/recommend" element={<Recommend />} />
         <Route path="/detail" element={<Detail />} />
@@ -73,7 +84,7 @@ function App() {
 //이 함수가 로그인 여부 확인 함수
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth();
-  return isAuthenticated ? children : <Navigate to="/login" />;    
+  return isAuthenticated ? children : <Navigate to="/login" />;
 }
 
 export default App;
