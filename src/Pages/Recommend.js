@@ -5,6 +5,7 @@ import Header from "../Components/Header";
 import "../stylefile/Main.css";
 import IconRe from "../Components/Recommend/IconRe";
 import ListRe from "../Components/Recommend/ListRe";
+import axios from "axios";
 
 const ViewToggleContainer = styled.div`
   display: flex;
@@ -98,9 +99,90 @@ const Top100 = styled.div`
   align-items: flex-end;
 `;
 
+const SortContainer = styled.div`
+  display: ${({ isVisible }) => (isVisible ? "flex" : "none")};
+  justify-content: flex-end;
+  margin-right: 40px;
+  margin-bottom: 10px;
+`;
+
+const SortSelect = styled.select`
+  padding: 5px;
+  border-radius: 5px;
+  margin-left: 10px;
+`;
+
+const Label = styled.label`
+  font-size: 16px;
+  margin-right: 10px;
+`;
+
+const ApplyButton = styled.button`
+  padding: 10px 20px;
+  margin-top: 10px;
+  background-color: #0056b3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: #004080;
+  }
+`;
+
+const movies = [
+  { poster: "poster1.jpg", title: "영화 1", director: "감독 1" },
+  { poster: "poster2.jpg", title: "영화 2", director: "감독 2" },
+  { poster: "poster1.jpg", title: "영화 1", director: "감독 1" },
+  { poster: "poster2.jpg", title: "영화 2", director: "감독 2" },
+  { poster: "poster1.jpg", title: "영화 1", director: "감독 1" },
+  { poster: "poster2.jpg", title: "영화 2", director: "감독 2" },
+  { poster: "poster1.jpg", title: "영화 1", director: "감독 1" },
+  { poster: "poster2.jpg", title: "영화 2", director: "감독 2" },
+  { poster: "poster1.jpg", title: "영화 1", director: "감독 1" },
+  { poster: "poster2.jpg", title: "영화 2", director: "감독 2" },
+  { poster: "poster1.jpg", title: "영화 1", director: "감독 1" },
+  { poster: "poster2.jpg", title: "영화 2", director: "감독 2" },
+  { poster: "poster1.jpg", title: "영화 1", director: "감독 1" },
+  { poster: "poster2.jpg", title: "영화 2", director: "감독 2" },
+  { poster: "poster1.jpg", title: "영화 1", director: "감독 1" },
+  { poster: "poster2.jpg", title: "영화 2", director: "감독 2" },
+  { poster: "poster1.jpg", title: "영화 1", director: "감독 1" },
+  { poster: "poster2.jpg", title: "영화 2", director: "감독 2" },
+  { poster: "poster1.jpg", title: "영화 1", director: "감독 1" },
+  { poster: "poster2.jpg", title: "영화 2", director: "감독 2" },
+  { poster: "poster1.jpg", title: "영화 1", director: "감독 1" },
+  { poster: "poster2.jpg", title: "영화 2", director: "감독 2" },
+  { poster: "poster1.jpg", title: "영화 1", director: "감독 1" },
+  { poster: "poster2.jpg", title: "영화 2", director: "감독 2" },
+  { poster: "poster1.jpg", title: "영화 1", director: "감독 1" },
+  { poster: "poster2.jpg", title: "영화 2", director: "감독 2" },
+  { poster: "poster1.jpg", title: "영화 1", director: "감독 1" },
+  { poster: "poster2.jpg", title: "영화 2", director: "감독 2" },
+  { poster: "poster1.jpg", title: "영화 1", director: "감독 1" },
+  { poster: "poster2.jpg", title: "영화 2", director: "감독 2" },
+  { poster: "poster1.jpg", title: "영화 1", director: "감독 1" },
+  { poster: "poster2.jpg", title: "영화 2", director: "감독 2" },
+  { poster: "poster1.jpg", title: "영화 1", director: "감독 1" },
+  { poster: "poster2.jpg", title: "영화 2", director: "감독 2" },
+  { poster: "poster1.jpg", title: "영화 1", director: "감독 1" },
+  { poster: "poster2.jpg", title: "영화 2", director: "감독 2" },
+  { poster: "poster1.jpg", title: "영화 1", director: "감독 1" },
+  { poster: "poster2.jpg", title: "영화 2", director: "감독 2" },
+  // 더 많은 영화 데이터
+];
+
 export default function Recommend() {
   const [viewMode, setViewMode] = useState("icon");
   const [openFilter, setOpenFilter] = useState("rank");
+  const [sortOption, setSortOption] = useState("titleAsc");
+
+  const handleSortChange = (e) => {
+    setSortOption(e.target.value);
+  };
+
+  // "장르별" 또는 "관람등급"일 때만 정렬 옵션이 보이게 함
+  const isSortVisible = openFilter === "genre" || openFilter === "rating";
 
   const toggleFilter = (filterType) => {
     setOpenFilter(filterType); // 항상 하나의 필터만 선택되도록 설정
@@ -118,7 +200,7 @@ export default function Recommend() {
           <FilterContainer>
             <FilterButton
               onClick={() => toggleFilter("rank")}
-              selected={openFilter === "rank"} // 선택된 버튼 스타일
+              selected={openFilter === "rank"}
             >
               흥행순위
             </FilterButton>
@@ -143,10 +225,12 @@ export default function Recommend() {
           <CheckboxContainer isOpen={openFilter === "genre"}>
             <CheckboxWrapper>
               <CheckboxLabel>
-                <input type="checkbox" /> 드라마
+                <input type="checkbox" />
+                드라마
               </CheckboxLabel>
               <CheckboxLabel>
-                <input type="checkbox" /> 액션
+                <input type="checkbox" />
+                액션
               </CheckboxLabel>
               <CheckboxLabel>
                 <input type="checkbox" /> 코메디
@@ -244,7 +328,8 @@ export default function Recommend() {
           <CheckboxContainer isOpen={openFilter === "rating"}>
             <CheckboxWrapper>
               <CheckboxLabel>
-                <input type="checkbox" /> 전체 이용가
+                <input type="checkbox" />
+                전체 이용가
               </CheckboxLabel>
               <CheckboxLabel>
                 <input type="checkbox" /> 12세 이용가
@@ -258,6 +343,17 @@ export default function Recommend() {
             </CheckboxWrapper>
           </CheckboxContainer>
         </SelectContainer>
+        <ApplyButton>적용</ApplyButton>
+        <SortContainer isVisible={isSortVisible}>
+          <Label>정렬:</Label>
+          <SortSelect value={sortOption} onChange={handleSortChange}>
+            <option value="titleAsc">제목순 (오름차순)</option>
+            <option value="titleDesc">제목순 (내림차순)</option>
+            <option value="yearAsc">제작년도순 (오름차순)</option>
+            <option value="yearDesc">제작년도순 (내림차순)</option>
+          </SortSelect>
+        </SortContainer>
+
         <ViewToggleContainer>
           <ToggleButton
             src={viewMode === "icon" ? "/Icon정렬선택.svg" : "/Icon정렬.svg"}
@@ -272,7 +368,19 @@ export default function Recommend() {
         </ViewToggleContainer>
       </TopContainer>
       <Divider /> {/* 가로줄 추가 */}
-      {viewMode === "icon" ? <IconRe /> : <ListRe />}
+      {viewMode === "icon" ? (
+        <IconRe
+          movies={movies}
+          filterType={openFilter}
+          sortOption={sortOption}
+        />
+      ) : (
+        <ListRe
+          movies={movies}
+          filterType={openFilter}
+          sortOption={sortOption}
+        />
+      )}
     </div>
   );
 }
