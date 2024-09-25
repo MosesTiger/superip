@@ -3,7 +3,7 @@ import { useState, useEffect, useContext, createContext } from "react";
 const AuthContext = createContext();
 
 // 개발 환경용 테스트 계정
-const DEV_EMAIL = "pms797@naver.com";
+const DEV_EMAIL = "test";
 const DEV_PASSWORD = "qkrahtp";
 
 export function useAuth() {

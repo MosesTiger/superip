@@ -1,0 +1,41 @@
+name: Deploy React App to S3
+
+on:
+  push:
+    branches:
+      - main  # 메인 브랜치에 푸시될 때 실행
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v2
+      
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'  # 사용하는 Node.js 버전에 맞게 조정
+        
+    - name: Install dependencies
+      run: npm install
+        
+    - name: Build React app
+      run: npm run build
+      
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1  # 사용하는 AWS 리전으로 변경
+        
+    - name: Deploy to S3
+      run: |
+        aws s3 sync build/ s3://your-bucket-name --delete
+        
+    - name: Invalidate CloudFront Distribution (Optional)
+      run: |
+        aws cloudfront create-invalidation --distribution-id YOUR_DISTRIBUTION_ID --paths "/*"
+      if: success()
