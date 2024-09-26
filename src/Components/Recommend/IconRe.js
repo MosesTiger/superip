@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
 const IconGrid = styled.div`
   display: grid;
@@ -24,9 +25,16 @@ const IconItem = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #f0f0f0;
+  background-color: none;
+  border: 1px solid white;
   padding: 10px;
-  border-radius: 8px;
+  cursor: pointer; /* 클릭 가능하도록 설정 */
+  transition: background-color 0.3s, transform 0.3s; /* hover 효과 추가 */
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.1); /* hover 시 배경색 변경 */
+    transform: scale(1.05); /* hover 시 살짝 확대 */
+  }
 `;
 
 const Poster = styled.img`
@@ -36,15 +44,35 @@ const Poster = styled.img`
   border-radius: 4px;
 `;
 
+const Section = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  color: white;
+`;
+
 const Title = styled.h3`
   margin: 10px 0 5px;
   font-size: 18px;
-  text-align: center;
+  text-align: flex-start;
+  width: 300px;
+  white-space: nowrap; /* 한 줄로 고정 */
+  overflow: hidden; /* 넘치는 텍스트를 숨김 */
+  text-overflow: ellipsis; /* 넘치는 부분은 ...으로 표시 */
+  transition: all 0.3s ease; /* 부드러운 전환 효과 */
+
+  ${IconItem}:hover & {
+    white-space: normal; /* hover 시 제목이 줄바꿈되게 함 */
+    overflow: visible; /* hover 시 제목을 모두 보이게 */
+    text-overflow: unset; /* ellipsis 해제 */
+  }
 `;
 
 const Director = styled.p`
   font-size: 14px;
-  color: #666;
+  color: white;
   text-align: center;
 `;
 
@@ -71,6 +99,7 @@ const PageButton = styled.button`
 const IconRe = ({ movies, filterType, sortOption }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 16;
+  const navigate = useNavigate();
 
   const totalPages = Math.ceil(movies.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -80,14 +109,21 @@ const IconRe = ({ movies, filterType, sortOption }) => {
     setCurrentPage(page);
   };
 
+  // IconItem 클릭 시 영화 세부 정보로 이동하는 함수
+  const handleMovieClick = (movieId) => {
+    navigate(`/movie/${movieId}`); // 해당 영화의 정보 페이지로 이동
+  };
+
   return (
     <>
       <IconGrid>
         {selectedMovies.map((movie, index) => (
-          <IconItem key={index}>
+          <IconItem key={index} onClick={() => handleMovieClick(movie.id)}>
             <Poster src={movie.poster} alt={`${movie.title} poster`} />
-            <Title>{movie.title}</Title>
-            <Director>감독: {movie.director}</Director>
+            <Section>
+              <Title>{movie.title}</Title>
+              <Director>감독: {movie.director}</Director>
+            </Section>
           </IconItem>
         ))}
       </IconGrid>

@@ -54,12 +54,12 @@ const Button = styled.button`
   cursor: pointer;
 `;
 
-const AutoFillButton = styled(Button)`
+const ExpectButton = styled(Button)`
   background-color: #75c96e;
   color: #000;
 `;
 
-const CreateScenarioButton = styled(Button)`
+const CombinedButton = styled(Button)`
   background-color: #e23a3a;
   color: #000;
 `;
@@ -67,8 +67,9 @@ const CreateScenarioButton = styled(Button)`
 function Synopsis() {
   const [characters, setCharacters] = useState("");
   const [plot, setPlot] = useState("");
-  const [keyword, setKeyword] = useState("");  // keyword로 필드명 변경
+  const [keyword, setKeyword] = useState(""); // keyword로 필드명 변경
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSynopsisComplete, setIsSynopsisComplete] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -78,45 +79,57 @@ function Synopsis() {
     console.log("Current location:", location.pathname);
   }, [location]);
 
-  const handleAutoFill = async () => {
-    if (movieData && characters && keyword) {  // keyword로 체크
-      setIsGenerating(true);
-      setPlot(""); // Reset plot before generating new one
+  const handleButtonClick = () => {
+    if (!isGenerating && !isSynopsisComplete) {
+      if (movieData && characters && keyword) {
+        // keyword로 체크
+        setIsGenerating(true);
+        setPlot(""); // Reset plot before generating new one
 
-      const eventSource = new EventSource(
-        `http://localhost:8000/api/v1/synopsis/generate?${new URLSearchParams({
-          keyword: keyword,  // keyword 사용
-          genre: movieData.selectedGenres.join(", "),
-          theme: movieData.country,
-          characters: characters,
-        })}`
-      );
+        const eventSource = new EventSource(
+          `http://localhost:8000/api/v1/synopsis/generate?${new URLSearchParams(
+            {
+              keyword: keyword, // keyword 사용
+              genre: movieData.selectedGenres.join(", "),
+              theme: movieData.country,
+              characters: characters,
+            }
+          )}`
+        );
 
-      eventSource.onmessage = (event) => {
-        if (event.data === "[DONE]") {
+        eventSource.onmessage = (event) => {
+          if (event.data === "[DONE]") {
+            eventSource.close();
+            setIsGenerating(false);
+          } else {
+            try {
+              const data = JSON.parse(event.data);
+              if (data.storyline) {
+                setPlot(data.storyline);
+              }
+            } catch (error) {
+              // If it's not a JSON, it's a part of the storyline
+              setPlot((prevPlot) => prevPlot + event.data);
+            }
+          }
+        };
+        setIsGenerating(true);
+        setTimeout(() => {
+          setIsSynopsisComplete(true);
+        }, 1000);
+
+        eventSource.onerror = (error) => {
+          console.error("Error:", error);
           eventSource.close();
           setIsGenerating(false);
-        } else {
-          try {
-            const data = JSON.parse(event.data);
-            if (data.storyline) {
-              setPlot(data.storyline);
-            }
-          } catch (error) {
-            // If it's not a JSON, it's a part of the storyline
-            setPlot((prevPlot) => prevPlot + event.data);
-          }
-        }
-      };
-
-      eventSource.onerror = (error) => {
-        console.error("Error:", error);
-        eventSource.close();
-        setIsGenerating(false);
-        alert("시놉시스 생성 중 오류가 발생했습니다.");
-      };
-    } else {
-      alert("영화 정보, 등장인물, 키워드를 모두 입력해주세요.");
+          alert("시놉시스 생성 중 오류가 발생했습니다.");
+        };
+      } else {
+        alert("영화 정보, 등장인물, 키워드를 모두 입력해주세요.");
+      }
+    } else if (isSynopsisComplete) {
+      // 시나리오 생성 함수 호출
+      handleCreateScenario();
     }
   };
 
@@ -132,11 +145,15 @@ function Synopsis() {
       genre: movieData.selectedGenres.join(", "),
       theme: movieData.country,
       characters: characters,
-      keyword: keyword,  // keyword 필드만 사용
+      keyword: keyword, // keyword 필드만 사용
       synopsis: plot,
+      duration: movieData.duration, // duration 값을 포함
     };
 
-    console.log("Attempting to navigate to Script component with data:", scenarioData);
+    console.log(
+      "Attempting to navigate to Script component with data:",
+      scenarioData
+    );
     try {
       navigate("/create/script", {
         state: { scenarioData, autoStart: true },
@@ -145,6 +162,48 @@ function Synopsis() {
       console.log("이동 성공적으로 이뤄짐");
     } catch (error) {
       console.error("Navigation error:", error);
+    }
+  };
+
+  const handlePredictionClick = async () => {
+    try {
+      const {
+        title,
+        selectedGenres,
+        duration,
+        rating,
+        country,
+        isSeries,
+        mainCharacterGender,
+      } = movieData;
+
+      const response = await fetch(
+        "http://localhost:8000/api/v1/success-rate/predict",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title,
+            genres: selectedGenres,
+            duration,
+            rating,
+            country,
+            isSeries, // isSeries는 movieData의 isCheckboxChecked를 받아온 값입니다.
+            mainCharacterGender,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("흥행률 예측 실패");
+      }
+      const data = await response.json();
+      alert(`예상 흥행률: ${data.success_rate}%`);
+    } catch (error) {
+      console.error("Error:", error);
+      alert("흥행률 예측 중 오류가 발생했습니다.");
     }
   };
 
@@ -159,7 +218,7 @@ function Synopsis() {
       <Label>키워드 태그 (콤마로 구분)</Label>
       <TextArea
         placeholder="예: 모험, 우정, 성장"
-        value={keyword}  // 단일 키워드 필드로 설정
+        value={keyword} // 단일 키워드 필드로 설정
         onChange={(e) => setKeyword(e.target.value)}
       />
       <Label>시놉시스</Label>
@@ -170,16 +229,24 @@ function Synopsis() {
         height="300px"
         readOnly={isGenerating}
       />
+      <Label>수정 요청사항</Label>
+      <TextArea
+        placeholder="GPT에게 수정을 요청할 사항을 적어주세요."
+        value={plot}
+        onChange={(e) => setPlot(e.target.value)}
+        height="300px"
+      />
       <ButtonContainer>
-        <AutoFillButton onClick={handleAutoFill} disabled={isGenerating}>
-          {isGenerating ? "생성 중..." : "시놉시스 생성"}
-        </AutoFillButton>
-        <CreateScenarioButton
-          onClick={handleCreateScenario}
-          disabled={isGenerating || !plot}
-        >
-          시나리오 생성
-        </CreateScenarioButton>
+        <ExpectButton onclick={handlePredictionClick}>
+          흥행도 예측 버튼
+        </ExpectButton>
+        <CombinedButton onClick={handleButtonClick} disabled={isGenerating}>
+          {isGenerating
+            ? "생성 중..."
+            : isSynopsisComplete
+            ? "시나리오 생성"
+            : "시놉시스 생성"}
+        </CombinedButton>
       </ButtonContainer>
     </Section>
   );

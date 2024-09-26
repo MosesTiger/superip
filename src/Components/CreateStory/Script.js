@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthProvider';
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthProvider";
+
+const spin = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+`;
 
 const PageContainer = styled.div`
   display: flex;
@@ -19,7 +24,7 @@ const ScenarioContainer = styled.div`
   flex-direction: column;
   background-color: white;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   padding: 20px;
   overflow: hidden;
 `;
@@ -34,7 +39,7 @@ const ScenarioText = styled.pre`
   flex-grow: 1;
   white-space: pre-wrap;
   word-wrap: break-word;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: "Courier New", Courier, monospace;
   font-size: 16px;
   line-height: 1.6;
   padding: 20px;
@@ -43,14 +48,14 @@ const ScenarioText = styled.pre`
   border-radius: 5px;
   overflow-y: auto;
   margin-bottom: 20px;
-  display: ${props => (props.isGenerating ? 'none' : 'block')};
+  display: ${(props) => (props.isGenerating ? "none" : "block")};
 `;
 
 const Input = styled.textarea`
   width: 100%;
   height: 100px;
   padding: 10px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
   font-size: 14px;
   border: 1px solid #ddd;
   border-radius: 5px;
@@ -79,10 +84,8 @@ const ButtonContainer = styled.div`
   justify-content: flex-start;
 `;
 
-// 로딩 스피너 애니메이션
-const spin = keyframes`
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+const PredictionButton = styled(Button)`
+  background-color: #75c96e;
 `;
 
 const Spinner = styled.div`
@@ -92,7 +95,7 @@ const Spinner = styled.div`
   width: 120px;
   height: 120px;
   animation: ${spin} 2s linear infinite;
-  display: ${props => (props.isGenerating ? 'block' : 'none')};
+  display: ${(props) => (props.isGenerating ? "block" : "none")};
   margin: auto;
 `;
 
@@ -103,7 +106,7 @@ const LoadingMessage = styled.div`
   text-align: center;
   font-size: 16px;
   color: #333;
-  display: ${props => (props.isGenerating ? 'block' : 'none')};
+  display: ${(props) => (props.isGenerating ? "block" : "none")};
 `;
 
 function Script() {
@@ -116,9 +119,11 @@ function Script() {
   const navigate = useNavigate();
   const { isAuthenticated, token } = useAuth();
 
+  const totalChapters = Math.ceil(location.state?.scenarioData.duration / 10); // 10분당 1챕터
+
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
 
@@ -133,12 +138,11 @@ function Script() {
 
     const url = `http://localhost:8000/api/v1/scenario/generate`;
 
-    // Ensure characters is an array
     const charactersArray = Array.isArray(data.characters)
-        ? data.characters
-        : data.characters
-        ? data.characters.split(',').map(char => char.trim())
-        : [];
+      ? data.characters
+      : data.characters
+      ? data.characters.split(",").map((char) => char.trim())
+      : [];
 
     const requestData = {
       title: data.title,
@@ -146,53 +150,43 @@ function Script() {
       genre: data.genre,
       theme: data.theme,
       characters: charactersArray,
-      scenario_content: data.scenario_content || ""
+      scenario_content: data.scenario_content || "",
     };
-
-    console.log("Sending data to server:", requestData);
 
     try {
       const response = await fetch(url, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(requestData)
+        body: JSON.stringify(requestData),
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-      }
-
       const reader = response.body.getReader();
-      const decoder = new TextDecoder('utf-8');
-
+      const decoder = new TextDecoder("utf-8");
       let content = "";
+
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
 
         const chunk = decoder.decode(value);
-        const lines = chunk.split('\n\n');
+        const lines = chunk.split("\n\n");
 
         for (const line of lines) {
-          if (line.startsWith('data: ')) {
+          if (line.startsWith("data: ")) {
             const rawContent = line.slice(5).trim();
             if (rawContent === "[DONE]") {
-              // Stop the generation process once "[DONE]" is received
               setIsGenerating(false);
               break;
             }
             try {
               const jsonData = JSON.parse(rawContent);
-              if (jsonData.type === 'content') {
+              if (jsonData.type === "content") {
                 content += jsonData.content;
-              } else if (jsonData.type === 'id') {
+              } else if (jsonData.type === "id") {
                 setScenarioId(jsonData.id);
-              } else if (jsonData.type === 'error') {
-                throw new Error(jsonData.error);
               }
             } catch (e) {
               console.error("Failed to parse JSON:", rawContent);
@@ -203,29 +197,28 @@ function Script() {
       setScenarioContent(content);
     } catch (error) {
       console.error("Error:", error);
-      setIsGenerating(false); // If error, ensure isGenerating is set to false
+      setIsGenerating(false);
     }
   };
 
   const handleContinueChapter = async () => {
     setIsGenerating(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/scenario/${scenarioId}/continue`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ user_input: userInput })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      const response = await fetch(
+        `http://localhost:8000/api/v1/scenario/${scenarioId}/continue`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ user_input: userInput }),
+        }
+      );
 
       const result = await response.json();
-      setScenarioContent(prev => prev + '\n\n' + result.content);
-      setCurrentChapter(prev => prev + 1);
+      setScenarioContent((prev) => prev + "\n\n" + result.content);
+      setCurrentChapter((prev) => prev + 1);
       setUserInput("");
     } catch (error) {
       console.error("Error:", error);
@@ -236,20 +229,26 @@ function Script() {
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/scenario/${scenarioId}/revise`, {
-        method: "POST",
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ feedback: "User edited", user_input: scenarioContent }),
-      });
+      const response = await fetch(
+        `http://localhost:8000/api/v1/scenario/${scenarioId}/revise`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            feedback: "User edited",
+            user_input: scenarioContent,
+          }),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to save the scenario');
+        throw new Error("Failed to save the scenario");
       }
 
-      alert('Scenario saved successfully.');
+      alert("Scenario saved successfully.");
     } catch (error) {
       console.error("Error:", error);
     }
@@ -258,23 +257,38 @@ function Script() {
   return (
     <PageContainer>
       <ScenarioContainer>
-        <ChapterTitle>Chapter {currentChapter}</ChapterTitle>
+        <ChapterTitle>
+          Chapter {currentChapter} / {totalChapters}
+        </ChapterTitle>
         <Spinner isGenerating={isGenerating} />
-        <ScenarioText isGenerating={isGenerating}>{scenarioContent}</ScenarioText>
+        <ScenarioText isGenerating={isGenerating}>
+          {scenarioContent}
+        </ScenarioText>
         <Input
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
           placeholder="다음 챕터에 대한 의견이나 조언을 주세요"
         />
         <ButtonContainer>
-          <Button onClick={handleContinueChapter} disabled={isGenerating || !scenarioId}>
-            {isGenerating ? "생성 중..." : "다음 챕터 작성"}
-          </Button>
+          {currentChapter < totalChapters ? (
+            <Button
+              onClick={handleContinueChapter}
+              disabled={isGenerating || !scenarioId}
+            >
+              {isGenerating ? "생성 중..." : "다음 챕터 작성"}
+            </Button>
+          ) : (
+            <PredictionButton onClick={() => alert("최종 흥행도 예측")}>
+              최종 흥행도 예측
+            </PredictionButton>
+          )}
           <Button onClick={handleSave} disabled={isGenerating || !scenarioId}>
             Save
           </Button>
         </ButtonContainer>
-        <LoadingMessage isGenerating={isGenerating}>시나리오 생성 중입니다!</LoadingMessage>
+        <LoadingMessage isGenerating={isGenerating}>
+          시나리오 생성 중입니다!
+        </LoadingMessage>
       </ScenarioContainer>
     </PageContainer>
   );
