@@ -55,8 +55,7 @@ const GenreOption = styled.div`
   align-items: center;
   padding: 8px 10px;
   border-radius: 4px;
-  background-color: ${(props) =>
-    props.selected ? "#E23A3A" : "#d3d3d3"};
+  background-color: ${(props) => (props.selected ? "#E23A3A" : "#d3d3d3")};
   color: ${(props) => (props.selected ? "#fff" : "#000")};
   cursor: pointer;
 
@@ -146,7 +145,7 @@ const Actions = styled.div`
   margin: 15px 0;
 `;
 
-const ActionButton = styled.button`
+const PredictionButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -154,22 +153,13 @@ const ActionButton = styled.button`
   padding: 20px;
   border: none;
   border-radius: 10px;
-  background-color: #859aa5;
+  background-color: #e23a3a;
   text-decoration: none;
-  color: #000;
+  color: black;
   font-weight: bold;
   font-size: 20px;
   text-align: center;
   cursor: pointer;
-
-  &:hover {
-    background-color: #697a82;
-  }
-`;
-
-const PredictionButton = styled(ActionButton)`
-  background-color: #e23a3a;
-  color: black;
 
   &:hover {
     background-color: #be3232;
@@ -220,23 +210,23 @@ function Select() {
   };
 
   const increaseDuration = () => {
-    setDuration((prev) => prev + 1);
+    setDuration((prev) => Math.min(prev + 10, 180)); // 10분씩 증가, 최대 180분
   };
 
   const decreaseDuration = () => {
-    setDuration((prev) => Math.max(prev - 1, 0));
+    setDuration((prev) => Math.max(prev - 10, 10)); // 10분씩 감소, 최소 10분
   };
 
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
     if (!title || selectedGenres.length === 0) {
-      alert('제목과 최소 한 개의 장르를 선택해주세요.');
+      alert("제목과 최소 한 개의 장르를 선택해주세요.");
       return;
     }
 
     try {
-      navigate("/create/synopsis", { 
+      navigate("/create/synopsis", {
         state: {
           title,
           selectedGenres,
@@ -245,39 +235,11 @@ function Select() {
           country,
           isSeries: isCheckboxChecked,
           mainCharacterGender,
-        }
-      });
-    } catch (error) {
-      console.error("Error:", error);
-      alert('다음 단계로 이동 중 오류가 발생했습니다.');
-    }
-  };
-
-  const handlePredictionClick = async () => {
-    try {
-      const response = await fetch("http://localhost:8000/api/v1/success-rate/predict", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          title,
-          genres: selectedGenres,
-          duration,
-          rating,
-          country,
-          isSeries: isCheckboxChecked,
-          mainCharacterGender,
-        }),
       });
-      if (!response.ok) {
-        throw new Error('흥행률 예측 실패');
-      }
-      const data = await response.json();
-      alert(`예상 흥행률: ${data.success_rate}%`);
     } catch (error) {
       console.error("Error:", error);
-      alert('흥행률 예측 중 오류가 발생했습니다.');
+      alert("다음 단계로 이동 중 오류가 발생했습니다.");
     }
   };
 
@@ -296,12 +258,38 @@ function Select() {
         <Label>장르를 선택하세요. (최대 3개)</Label>
         <GenreSelection>
           {[
-            "드라마", "액션", "코메디", "범죄", "스릴러", "미스터리",
-            "시대극/사극", "전쟁", "가족", "멜로/로맨스", "어드벤쳐",
-            "판타지", "공포", "스포츠", "SF", "느와르", "반공/분단",
-            "첩보", "인물", "재난", "전기", "하이틴", "역사", "갱스터",
-            "사회물(경향)", "뮤직", "청춘", "활극", "동성애", "뮤지컬",
-            "신파", "무협",
+            "드라마",
+            "액션",
+            "코메디",
+            "범죄",
+            "스릴러",
+            "미스터리",
+            "시대극/사극",
+            "전쟁",
+            "가족",
+            "멜로/로맨스",
+            "어드벤쳐",
+            "판타지",
+            "공포",
+            "스포츠",
+            "SF",
+            "느와르",
+            "반공/분단",
+            "첩보",
+            "인물",
+            "재난",
+            "전기",
+            "하이틴",
+            "역사",
+            "갱스터",
+            "사회물(경향)",
+            "뮤직",
+            "청춘",
+            "활극",
+            "동성애",
+            "뮤지컬",
+            "신파",
+            "무협",
           ].map((genre) => (
             <GenreOption
               key={genre}
@@ -312,8 +300,10 @@ function Select() {
             </GenreOption>
           ))}
         </GenreSelection>
-        <small style={{color: 'red'}}>
-          {selectedGenres.length >= 3 ? '최대 3개의 장르까지 선택할 수 있습니다.' : ''}
+        <small style={{ color: "red" }}>
+          {selectedGenres.length >= 3
+            ? "최대 3개의 장르까지 선택할 수 있습니다."
+            : ""}
         </small>
         <Label>상영 시간을 입력하세요.</Label>
         <DurationSelection>
@@ -321,25 +311,19 @@ function Select() {
           <DurationInput
             type="number"
             value={duration}
-            onChange={(e) => setDuration(parseInt(e.target.value, 10) || 0)}
+            readOnly // 읽기 전용으로 설정하여 사용자가 직접 수정할 수 없게 함
           />
           <PlusMinusButton onClick={increaseDuration}>+</PlusMinusButton>
         </DurationSelection>
         <Label>관람 등급을 선택하세요.</Label>
-        <Select1
-          value={rating}
-          onChange={(e) => setRating(e.target.value)}
-        >
+        <Select1 value={rating} onChange={(e) => setRating(e.target.value)}>
           <option value="all">전체 관람가</option>
           <option value="12">12세 관람가</option>
           <option value="15">15세 관람가</option>
           <option value="19">19세 관람가</option>
         </Select1>
         <Label>영화의 배경 국가를 선택하세요.</Label>
-        <Select1
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
-        >
+        <Select1 value={country} onChange={(e) => setCountry(e.target.value)}>
           <option value="korea">한국</option>
           <option value="china">중국</option>
           <option value="us">미국</option>
@@ -382,10 +366,7 @@ function Select() {
         </CheckboxContainer>
       </MovieDetails>
       <Actions>
-        <ActionButton onClick={handleSubmit}>다음 단계</ActionButton>
-        <PredictionButton onClick={handlePredictionClick}>
-          1차 흥행률 예측
-        </PredictionButton>
+        <PredictionButton onClick={handleSubmit}>다음 단계</PredictionButton>
       </Actions>
     </Section>
   );
