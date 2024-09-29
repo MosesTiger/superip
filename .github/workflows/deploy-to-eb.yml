@@ -55,7 +55,7 @@ jobs:
     - name: Deploy to EC2
       run: |
         aws deploy create-deployment \
-          --application-name front_deploy \
+          --application-name front-deploy \
           --deployment-config-name CodeDeployDefault.AllAtOnce \
           --deployment-group-name front_deploy \
           --s3-location bucket=${{ secrets.S3_BUCKET_NAME }},key=dist.zip,bundleType=zip
