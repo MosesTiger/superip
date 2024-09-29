@@ -254,6 +254,10 @@ function Script() {
     }
   };
 
+  const handlePredictionClick = () => {
+    navigate("/create/show");
+  };
+
   return (
     <PageContainer>
       <ScenarioContainer>
@@ -278,7 +282,7 @@ function Script() {
               {isGenerating ? "생성 중..." : "다음 챕터 작성"}
             </Button>
           ) : (
-            <PredictionButton onClick={() => alert("최종 흥행도 예측")}>
+            <PredictionButton onClick={handlePredictionClick}>
               최종 흥행도 예측
             </PredictionButton>
           )}
