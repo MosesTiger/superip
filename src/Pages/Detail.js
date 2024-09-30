@@ -80,13 +80,12 @@ export default function Detail() {
         <MoviePoster src="https://example.com/monster.jpg" alt="괴물 포스터" />
         <MovieMeta>12세 관람가, 대한민국, 119분</MovieMeta>
         <MovieMeta>2006-07-27</MovieMeta>
-        <MovieMeta>감독 | 봉준호</MovieMeta>
+        <MovieMeta>감독  |  봉준호</MovieMeta>
         <PlotWrapper>
           <PlotTitle>Plot</PlotTitle>
           <PlotText>
-            한강 둔d치에서 아버지(변희봉)와 햄버거를 먹고 돌아오는
-            강두(송강호)는 둔치 옆에서 무언가 꿈틀대는 물체를 본다. 공포의
-            정체가 드러나고...
+            한강 둔치에서 아버지(변희봉)와 햄버거를 먹고 돌아오는 강두(송강호)는 둔치 옆에서 
+            무언가 꿈틀대는 물체를 본다. 공포의 정체가 드러나고...
           </PlotText>
         </PlotWrapper>
       </MovieInfo>
