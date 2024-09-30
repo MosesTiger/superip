@@ -133,7 +133,7 @@ export default function Search() {
         </SelectContainer>
         {sortedResults.map((result, index) => (
           <ResultCard key={index} onClick={() => handleTitleClick(result, index)}>
-            <ResultImage src={result.image} alt={result.title} />
+            <ResultImage src={result.poster} alt={result.title} />
             <ResultDetails>
               <h2>{result.title}</h2>
               <p>{result.year}, {result.rating}</p>

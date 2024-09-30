@@ -34,8 +34,26 @@ const Divider = styled.hr`
   width: 100%;
 `;
 
+const Container = styled.div`
+  display: flex; 
+  padding: 0px 10px;
+  gap: 30px;
+`
+
+const Section = styled.div`
+  display: flex;
+  flex-direction:column;
+  justify-content:space-between;
+`
+
+const MetaContainer = styled.div`
+  display: flex;
+  flex-direction:column;
+  gap:5px;
+`
+
 const MovieMeta = styled.p`
-  margin: 5px 0;
+  margin: 0;
   font-size: 14px;
   color: #c4c4c4;
 `;
@@ -57,7 +75,7 @@ const PlotWrapper = styled.div`
 `;
 
 const PlotTitle = styled.h2`
-  font-size: 18px;
+  font-size: 20px;
 `;
 
 const PlotText = styled.p`
@@ -93,15 +111,21 @@ export default function Detail() {
       <MovieInfo>
         <BackButton onClick={handleBackClick}>이전</BackButton>
         <MovieTitle>{movie.title}</MovieTitle>
-        <Divider />
-        <MoviePoster src={movie.poster} alt={`${movie.title} 포스터`} />
-        <MovieMeta>{movie.rating}, {movie.country}, {movie.runtime}분</MovieMeta>
-        <MovieMeta>{movie.year}</MovieMeta>
-        <MovieMeta>감독  |  {movie.director}</MovieMeta>
-        <PlotWrapper>
-          <PlotTitle>Plot</PlotTitle>
-          <PlotText>{movie.plot}</PlotText>
-        </PlotWrapper>
+          <Divider />
+        <Container>
+            <Section>
+              <MetaContainer>
+                <MovieMeta>{movie.rating}, {movie.runtime}분, {movie.nation}</MovieMeta>
+                <MovieMeta>{movie.year}</MovieMeta>
+                <MovieMeta>감독   |   {movie.director}</MovieMeta>
+              </MetaContainer>
+              <PlotWrapper>
+                <PlotTitle>Plot</PlotTitle>
+                <PlotText>{movie.plot}</PlotText>
+              </PlotWrapper>
+            </Section>
+            <MoviePoster src={movie.poster} alt={`${movie.title} 포스터`} />
+        </Container>
       </MovieInfo>
     </div>
   );
