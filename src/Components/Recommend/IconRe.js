@@ -1,23 +1,23 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 
 const IconGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 가로로 최대 4개 */
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
   padding: 20px;
 
   @media (max-width: 1200px) {
-    grid-template-columns: repeat(3, 1fr); /* 화면 크기가 줄어들면 3개 */
+    grid-template-columns: repeat(3, 1fr);
   }
 
   @media (max-width: 900px) {
-    grid-template-columns: repeat(2, 1fr); /* 더 줄어들면 2개 */
+    grid-template-columns: repeat(2, 1fr);
   }
 
   @media (max-width: 600px) {
-    grid-template-columns: 1fr; /* 더 줄어들면 1개 */
+    grid-template-columns: 1fr;
   }
 `;
 
@@ -25,21 +25,19 @@ const IconItem = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: none;
   border: 1px solid white;
   padding: 10px;
-  cursor: pointer; /* 클릭 가능하도록 설정 */
-  transition: background-color 0.3s, transform 0.3s; /* hover 효과 추가 */
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.1); /* hover 시 배경색 변경 */
-    transform: scale(1.05); /* hover 시 살짝 확대 */
+    background-color: rgba(0, 0, 0, 0.1);
+    transform: scale(1.05);
   }
 `;
 
 const Poster = styled.img`
   width: 100%;
-  height: auto;
   max-width: 150px;
   border-radius: 4px;
 `;
@@ -58,16 +56,9 @@ const Title = styled.h3`
   font-size: 18px;
   text-align: flex-start;
   width: 300px;
-  white-space: nowrap; /* 한 줄로 고정 */
-  overflow: hidden; /* 넘치는 텍스트를 숨김 */
-  text-overflow: ellipsis; /* 넘치는 부분은 ...으로 표시 */
-  transition: all 0.3s ease; /* 부드러운 전환 효과 */
-
-  ${IconItem}:hover & {
-    white-space: normal; /* hover 시 제목이 줄바꿈되게 함 */
-    overflow: visible; /* hover 시 제목을 모두 보이게 */
-    text-overflow: unset; /* ellipsis 해제 */
-  }
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const Director = styled.p`
@@ -80,10 +71,10 @@ const PaginationContainer = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 20px;
+  gap: 10px;
 `;
 
 const PageButton = styled.button`
-  margin: 0 5px;
   padding: 5px 10px;
   background-color: ${({ selected }) => (selected ? "#0056b3" : "#f0f0f0")};
   color: ${({ selected }) => (selected ? "white" : "black")};
@@ -94,10 +85,14 @@ const PageButton = styled.button`
   &:hover {
     background-color: #ddd;
   }
+
+  &:disabled {
+    background-color: #e0e0e0;
+    cursor: not-allowed;
+  }
 `;
 
-const IconRe = ({ movies, filterType, sortOption }) => {
-  const [currentPage, setCurrentPage] = useState(1);
+const IconRe = ({ movies, filterType, currentPage, setCurrentPage }) => {
   const itemsPerPage = 16;
   const navigate = useNavigate();
 
@@ -109,9 +104,8 @@ const IconRe = ({ movies, filterType, sortOption }) => {
     setCurrentPage(page);
   };
 
-  // IconItem 클릭 시 영화 세부 정보로 이동하는 함수
   const handleMovieClick = (movieId) => {
-    navigate(`/movie/${movieId}`); // 해당 영화의 정보 페이지로 이동
+    navigate(`/movie/${movieId}`);
   };
 
   return (
@@ -127,16 +121,23 @@ const IconRe = ({ movies, filterType, sortOption }) => {
           </IconItem>
         ))}
       </IconGrid>
+
       <PaginationContainer>
-        {Array.from({ length: totalPages }, (_, i) => (
-          <PageButton
-            key={i}
-            selected={i + 1 === currentPage}
-            onClick={() => handlePageChange(i + 1)}
-          >
-            {i + 1}
-          </PageButton>
-        ))}
+        <PageButton
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          이전
+        </PageButton>
+        <span>
+          {currentPage} / {totalPages}
+        </span>
+        <PageButton
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          다음
+        </PageButton>
       </PaginationContainer>
     </>
   );

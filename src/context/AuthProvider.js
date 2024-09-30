@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, createContext } from "react";
+import { useState, useContext, createContext } from "react";
 
 const AuthContext = createContext();
 
@@ -12,16 +12,16 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('isAuthenticated') === 'true';
+    return localStorage.getItem("isAuthenticated") === "true";
   });
 
   const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem('user');
+    const savedUser = localStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
   const [token, setToken] = useState(() => {
-    return localStorage.getItem('token') || '';
+    return localStorage.getItem("token") || "";
   });
 
   const login = (email, password) => {
@@ -29,7 +29,7 @@ export function AuthProvider({ children }) {
     console.log("Current environment:", process.env.NODE_ENV);
 
     try {
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === "development") {
         console.log("Development mode login");
         if (email === DEV_EMAIL && password === DEV_PASSWORD) {
           console.log("Login successful in dev mode");
@@ -38,30 +38,30 @@ export function AuthProvider({ children }) {
           setIsAuthenticated(true);
           setUser(devUser);
           setToken(devToken);
-          localStorage.setItem('isAuthenticated', 'true');
-          localStorage.setItem('user', JSON.stringify(devUser));
-          localStorage.setItem('token', devToken);
+          localStorage.setItem("isAuthenticated", "true");
+          localStorage.setItem("user", JSON.stringify(devUser));
+          localStorage.setItem("token", devToken);
         } else {
-          throw new Error('로그인 실패: 잘못된 이메일 또는 비밀번호입니다.');
+          throw new Error("로그인 실패: 잘못된 이메일 또는 비밀번호입니다.");
         }
       } else {
         console.log("Production mode login");
         // 프로덕션 환경에서의 로그인 로직
-        const savedUser = JSON.parse(localStorage.getItem('user'));
+        const savedUser = JSON.parse(localStorage.getItem("user"));
         if (savedUser && savedUser.email === email) {
           console.log("Login successful in production mode");
           const prodToken = btoa(`${email}:${Date.now()}`); // 프로덕션용 간단한 토큰
           setIsAuthenticated(true);
           setUser(savedUser);
           setToken(prodToken);
-          localStorage.setItem('isAuthenticated', 'true');
-          localStorage.setItem('token', prodToken);
+          localStorage.setItem("isAuthenticated", "true");
+          localStorage.setItem("token", prodToken);
         } else {
-          throw new Error('로그인 실패: 사용자 정보를 찾을 수 없습니다.');
+          throw new Error("로그인 실패: 사용자 정보를 찾을 수 없습니다.");
         }
       }
     } catch (error) {
-      console.error('로그인 중 오류 발생:', error);
+      console.error("로그인 중 오류 발생:", error);
       alert(error.message);
     }
   };
@@ -69,14 +69,16 @@ export function AuthProvider({ children }) {
   const logout = () => {
     setIsAuthenticated(false);
     setUser(null);
-    setToken('');
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    setToken("");
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, token, login, logout }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, user, token, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

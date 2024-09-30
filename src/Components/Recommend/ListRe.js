@@ -1,15 +1,6 @@
-import React, { useState } from "react";
-import styled, { keyframes } from "styled-components";
+import React from "react";
+import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-
-const slideLeft = keyframes`
-  0% {
-    transform: translateX(100%); /* 오른쪽에서 시작 */
-  }
-  100% {
-    transform: translateX(0); /* 원래 위치로 이동 */
-  }
-`;
 
 const ListContainer = styled.div`
   display: flex;
@@ -118,8 +109,7 @@ const PageButton = styled.button`
   }
 `;
 
-const ListRe = ({ movies, filterType, sortOption }) => {
-  const [currentPage, setCurrentPage] = useState(1);
+const ListRe = ({ movies, filterType, currentPage, setCurrentPage }) => {
   const itemsPerPage = 10;
   const navigate = useNavigate();
 
@@ -156,15 +146,21 @@ const ListRe = ({ movies, filterType, sortOption }) => {
       </ListContainer>
 
       <PaginationContainer>
-        {Array.from({ length: totalPages }, (_, i) => (
-          <PageButton
-            key={i}
-            selected={i + 1 === currentPage}
-            onClick={() => handlePageChange(i + 1)}
-          >
-            {i + 1}
-          </PageButton>
-        ))}
+        <PageButton
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          이전
+        </PageButton>
+        <span>
+          {currentPage} / {totalPages}
+        </span>
+        <PageButton
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          다음
+        </PageButton>
       </PaginationContainer>
     </>
   );
