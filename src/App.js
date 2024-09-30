@@ -21,6 +21,7 @@ import Synopsis from "./Components/CreateStory/Synopsis";
 import Script from "./Components/CreateStory/Script";
 import Show from "./Components/CreateStory/Show";
 import MypageDetail from "./Pages/MypageDetail";
+import KakaoLogin from "./Pages/Login";
 
 function App() {
   return (

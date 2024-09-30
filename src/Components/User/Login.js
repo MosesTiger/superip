@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
+import axios from 'axios'
 
 // 스타일드 컴포넌트 정의
 const LoginText = styled.div`
@@ -124,6 +125,14 @@ function Login() {
       alert(error.message || '로그인 중 오류가 발생했습니다.');
     }
   };
+  const Rest_api_key = 'f93329802bc8360700626106ac09c655'; 
+  const redirect_uri = 'https: //createstory.co.kr'; 
+  
+  const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${Rest_api_key}&redirect_uri=${redirect_uri}&response_type=code`;
+  
+  const handleKakaoLogin = () => {
+    window.location.href = kakaoURL;
+  };
 
   return (
     <>
@@ -147,7 +156,7 @@ function Login() {
         />
       </InputContainer>
       <LoginButton onClick={handleLogin}>Login</LoginButton>
-      <OAuthButton className="kakao">
+      <OAuthButton className="kakao" onClick={handleKakaoLogin}>
         <img src="/카카오.png" alt="Ka Logo" />
         카카오톡 로그인
       </OAuthButton>
