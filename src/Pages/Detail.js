@@ -96,6 +96,19 @@ export default function Detail() {
 
     fetchMovie();
   }, [id]);
+  
+  const getGenderText = (gender) => {
+    switch (gender) {
+      case 0:
+        return "남성";
+      case 1:
+        return "여성";
+      case 2:
+        return "혼성";
+      default:
+        return "정보 없음";
+    }
+  };
 
   const handleBackClick = () => {
     navigate("/search");
@@ -117,7 +130,7 @@ export default function Detail() {
               <MetaContainer>
                 <MovieMeta>{movie.genre}</MovieMeta>
                 <MovieMeta>[ {movie.year} ]</MovieMeta>
-                <MovieMeta>{movie.rating},  {movie.runtime}분,  {movie.nation}</MovieMeta>
+                <MovieMeta>{movie.rating},  {movie.runtime}분,  {movie.nation}, {getGenderText(movie.gender)}</MovieMeta>
                 <MovieMeta>감독   |   {movie.director}</MovieMeta>
               </MetaContainer>
               <PlotWrapper>
