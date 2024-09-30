@@ -115,8 +115,9 @@ export default function Detail() {
         <Container>
             <Section>
               <MetaContainer>
-                <MovieMeta>{movie.rating}, {movie.runtime}분, {movie.nation}</MovieMeta>
-                <MovieMeta>{movie.year}</MovieMeta>
+                <MovieMeta>{movie.genre}</MovieMeta>
+                <MovieMeta>[ {movie.year} ]</MovieMeta>
+                <MovieMeta>{movie.rating},  {movie.runtime}분,  {movie.nation}</MovieMeta>
                 <MovieMeta>감독   |   {movie.director}</MovieMeta>
               </MetaContainer>
               <PlotWrapper>
