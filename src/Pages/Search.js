@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Header from "../Components/Header";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../stylefile/Main.css";
 
 const ResultsSection = styled.div`
@@ -66,7 +66,7 @@ const Select = styled.select`
   border-radius: 5px;
   color: white;
   cursor: pointer;
-  background: transparent;
+  background: #192F40;
   font-size: 16px;
 
   &:focus {
@@ -90,15 +90,33 @@ const Title = styled.h1`
 
 export default function Search() {
   const navigate = useNavigate();
-  const results = [
-    { id: 1, title: "괴물", year: 2006, director: "봉준호", rating: "12세 이용가", image: "https://example.com/monster.jpg" },
-    { id: 2, title: "마더", year: 2009, director: "봉준호", rating: "청소년 관람불가", image: "https://example.com/mother.jpg" },
-    { id: 3, title: "기생충", year: 2019, director: "봉준호", rating: "15세 이용가", image: "https://example.com/parasite.jpg" }
-  ];
+  const location = useLocation();
+  const { results = [] } = location.state || { results: [] };
 
-  const handleTitleClick = (id) => {
-    navigate(`/detail/${id}`); 
+  const [sortOption, setSortOption] = useState("newest");
+  const [sortedResults, setSortedResults] = useState([...results]);
+
+  useEffect(() => {
+    let sortedArray = [...results];
+    if (sortOption === "newest") {
+      sortedArray.sort((a, b) => new Date(b.year) - new Date(a.year));
+    } else if (sortOption === "ascending") {
+      sortedArray.sort((a, b) => a.title.localeCompare(b.title));
+    } else if (sortOption === "descending") {
+      sortedArray.sort((a, b) => b.title.localeCompare(a.title));
+    }
+    setSortedResults(sortedArray);
+  }, [sortOption, results]);
+
+  const handleSortChange = (e) => {
+    setSortOption(e.target.value);
   };
+
+  const handleTitleClick = (movie, index) => {
+    const movieId = movie.id || index;  // 영화에 id가 없을 경우 index 사용
+    navigate(`/detail/${movieId}`, { state: { movie } });
+  };
+  
 
   return (
     <div className="page">
@@ -107,17 +125,17 @@ export default function Search() {
         <Title>검색결과</Title>
         <Divider />
         <SelectContainer>
-          <Select defaultValue="newest">
+          <Select value={sortOption} onChange={handleSortChange}>
             <option value="newest">제작년도순</option>
-            <option value="ascending">오름차순</option>
-            <option value="descending">내림차순</option>
+            <option value="ascending">제목순 (오름차순)</option>
+            <option value="descending">제목순 (내림차순)</option>
           </Select>
         </SelectContainer>
-        {results.map((result) => (
-          <ResultCard key={result.id} onClick={() => handleTitleClick(result.id)}>
+        {sortedResults.map((result, index) => (
+          <ResultCard key={index} onClick={() => handleTitleClick(result, index)}>
             <ResultImage src={result.image} alt={result.title} />
             <ResultDetails>
-              <h2 onClick={() => handleTitleClick(result.id)}>{result.title}</h2>
+              <h2>{result.title}</h2>
               <p>{result.year}, {result.rating}</p>
               <p>감독: {result.director}</p>
             </ResultDetails>

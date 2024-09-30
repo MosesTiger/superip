@@ -105,7 +105,7 @@ const IconRe = ({ movies, filterType, currentPage, setCurrentPage }) => {
   };
 
   const handleMovieClick = (movieId) => {
-    navigate(`/movie/${movieId}`);
+    navigate(`/detail/${movieId}`); // 상세 페이지로 이동
   };
 
   return (

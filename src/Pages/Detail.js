@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Header from "../Components/Header";
+import { readXlsxFile } from "../context/xlsxReader"; // xlsxReader 불러오기
 
 const MovieInfo = styled.div`
   font-family: Arial, sans-serif;
@@ -64,29 +65,42 @@ const PlotText = styled.p`
 `;
 
 export default function Detail() {
+  const { id } = useParams(); // URL에서 영화의 id를 가져옴
+  const [movie, setMovie] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchMovie = async () => {
+      const data = await readXlsxFile(); // XLSX 파일에서 영화 데이터를 가져옴
+      const movieData = data.find((movie) => movie.id === id); // ID로 해당 영화 검색
+      setMovie(movieData); // 영화 데이터 설정
+    };
+
+    fetchMovie();
+  }, [id]);
 
   const handleBackClick = () => {
     navigate("/search");
   };
+
+  if (!movie) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="page">
       <Header />
       <MovieInfo>
         <BackButton onClick={handleBackClick}>이전</BackButton>
-        <MovieTitle>괴물</MovieTitle>
+        <MovieTitle>{movie.title}</MovieTitle>
         <Divider />
-        <MoviePoster src="https://example.com/monster.jpg" alt="괴물 포스터" />
-        <MovieMeta>12세 관람가, 대한민국, 119분</MovieMeta>
-        <MovieMeta>2006-07-27</MovieMeta>
-        <MovieMeta>감독  |  봉준호</MovieMeta>
+        <MoviePoster src={movie.poster} alt={`${movie.title} 포스터`} />
+        <MovieMeta>{movie.rating}, {movie.country}, {movie.runtime}분</MovieMeta>
+        <MovieMeta>{movie.year}</MovieMeta>
+        <MovieMeta>감독  |  {movie.director}</MovieMeta>
         <PlotWrapper>
           <PlotTitle>Plot</PlotTitle>
-          <PlotText>
-            한강 둔치에서 아버지(변희봉)와 햄버거를 먹고 돌아오는 강두(송강호)는 둔치 옆에서 
-            무언가 꿈틀대는 물체를 본다. 공포의 정체가 드러나고...
-          </PlotText>
+          <PlotText>{movie.plot}</PlotText>
         </PlotWrapper>
       </MovieInfo>
     </div>
