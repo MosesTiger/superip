@@ -25,9 +25,9 @@ function Navbar() {
 
   return (
     <nav className="nav-bar">
-      <LinkButton to="/How">How</LinkButton>
-      <LinkButton to="/QnA">QnA</LinkButton>
-      <LinkButton to="/FAQ">FAQ</LinkButton>
+      <LinkButton to="/info/How">How</LinkButton>
+      <LinkButton to="/info/QnA">QnA</LinkButton>
+      <LinkButton to="/info/FAQ">FAQ</LinkButton>
       <LinkButton as="div" onClick={handleSettingsClick}>
         Setting
       </LinkButton>

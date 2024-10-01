@@ -21,6 +21,11 @@ import Synopsis from "./Components/CreateStory/Synopsis";
 import Script from "./Components/CreateStory/Script";
 import Show from "./Components/CreateStory/Show";
 import MypageDetail from "./Pages/MypageDetail";
+import How from "./Components/Info/How";
+import FAQ from "./Components/Info/FAQ";
+import QnA from "./Components/Info/QnA";
+import Inquiry from "./Components/Info/Inquiry";
+import InquiryDetail from "./Components/Info/InquiryDetail";
 
 function App() {
   return (
@@ -74,7 +79,13 @@ function App() {
         <Route path="/recommend" element={<Recommend />} />
         <Route path="/detail" element={<Detail />} />
         <Route path="/search" element={<Search />} />
-        <Route path="/info" element={<Info />} />
+        <Route path="/info" element={<Info />}>
+          <Route path="How" element={<How />} />
+          <Route path="FAQ" element={<FAQ />} />
+          <Route path="QnA" element={<QnA />} />
+          <Route path="Inquiry" element={<Inquiry />} />
+          <Route path="Inquiry/:id" element={<InquiryDetail />} />
+        </Route>
         <Route path="/search" element={<Search />} />
         <Route path="/detail/:id" element={<Detail />} />
         <Route path="*" element={<PageNotFound />} />
