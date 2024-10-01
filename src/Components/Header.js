@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { FaBell, FaSearch } from "react-icons/fa";
 import "../stylefile/Header.css";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from '../context/AuthProvider';
-import { readXlsxFile } from '../context/xlsxReader'; // xlsxReader 가져오기
+import { useAuth } from "../context/AuthProvider";
+import { readXlsxFile } from "../context/xlsxReader"; // xlsxReader 가져오기
 import styled from "styled-components";
 
 // AutoComplete 스타일 정의
@@ -55,7 +55,8 @@ const Header = () => {
     if (query.length > 0) {
       const filteredSuggestions = movies.filter((movie) => {
         const title = typeof movie.title === "string" ? movie.title : "";
-        const director = typeof movie.director === "string" ? movie.director : "";
+        const director =
+          typeof movie.director === "string" ? movie.director : "";
         return title.includes(query) || director.includes(query);
       });
       setSuggestions(filteredSuggestions);
@@ -123,7 +124,9 @@ const Header = () => {
             src="/프로필 사진.png"
             alt="Profile"
             className="profile-pic"
-            onClick={() => navigate("/mypage")}
+            onClick={() =>
+              navigate("/mypage", { state: { selectedMenu: "profile" } })
+            }
           />
           <div className="profile-info">
             <span className="profile-name">{user?.name || "User"}</span>

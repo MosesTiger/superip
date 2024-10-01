@@ -1,21 +1,22 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import Header from '../Components/Header';
-import Profile from '../Components/Mypage/Profile';
-import Scenario from '../Components/Mypage/Scenario';
-import Settings from '../Components/Mypage/Settings';
-import Help from '../Components/Mypage/Help';
-import '../stylefile/Main.css';
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import styled from "styled-components";
+import Header from "../Components/Header";
+import Profile from "../Components/Mypage/Profile";
+import Scenario from "../Components/Mypage/Scenario";
+import Settings from "../Components/Mypage/Settings";
+import Help from "../Components/Mypage/Help";
+import "../stylefile/Main.css";
 
 const Container = styled.div`
   display: flex;
   height: 100vh;
-  background-color: #182E3F;
+  background-color: #182e3f;
 `;
 
 const Sidebar = styled.div`
   width: 220px;
-  background-color: #EDF6F6;
+  background-color: #edf6f6;
   display: flex;
   flex-direction: column;
   padding: 20px;
@@ -27,8 +28,8 @@ const Sidebar = styled.div`
 const MenuItem = styled.div`
   margin: 10px 0;
   cursor: pointer;
-  background-color: ${(props) => (props.active ? '#182E3F' : 'transparent')};
-  color: ${(props) => (props.active ? 'white' : 'black')};
+  background-color: ${(props) => (props.active ? "#182E3F" : "transparent")};
+  color: ${(props) => (props.active ? "white" : "black")};
   padding: 20px;
   width: 100%;
   border-radius: 5px;
@@ -37,11 +38,12 @@ const MenuItem = styled.div`
   align-items: center;
 
   &:hover {
-    background-color: #95A4AD;
+    background-color: #95a4ad;
     color: white;
 
     & img {
-      content: url(${(props) => `/mypage${props.menu}_select.png`}); /* hover 이미지 변경 */
+      content: url(${(props) =>
+        `/mypage${props.menu}_select.png`}); /* hover 이미지 변경 */
     }
   }
 
@@ -62,40 +64,47 @@ const Item = styled.div`
   margin: 50px;
   margin-left: -10px;
   border-radius: 15px;
-  background-color: #EDF6F6;
-`
+  background-color: #edf6f6;
+`;
 
 const Title = styled.h1`
   color: black;
 `;
 
 export default function MyPage() {
-  const [selectedMenu, setSelectedMenu] = useState('profile');
+  const location = useLocation();
+  const [selectedMenu, setSelectedMenu] = useState("profile");
+
+  useEffect(() => {
+    if (location.state && location.state.selectedMenu) {
+      setSelectedMenu(location.state.selectedMenu);
+    }
+  }, [location.state]);
 
   const getTitle = () => {
     switch (selectedMenu) {
-      case 'profile':
-        return '나의 정보';
-      case 'scenario':
-        return '시나리오 보관함';
-      case 'settings':
-        return '설정';
-      case 'help':
-        return '고객센터';
+      case "profile":
+        return "나의 정보";
+      case "scenario":
+        return "시나리오 보관함";
+      case "settings":
+        return "설정";
+      case "help":
+        return "고객센터";
       default:
-        return '';
+        return "";
     }
   };
 
   const renderContent = () => {
     switch (selectedMenu) {
-      case 'profile':
+      case "profile":
         return <Profile />;
-      case 'scenario':
+      case "scenario":
         return <Scenario />;
-      case 'settings':
+      case "settings":
         return <Settings />;
-      case 'help':
+      case "help":
         return <Help />;
       default:
         return null;
@@ -108,32 +117,32 @@ export default function MyPage() {
       <Container>
         <Sidebar>
           <MenuItem
-            active={selectedMenu === 'profile'}
-            onClick={() => setSelectedMenu('profile')}
+            active={selectedMenu === "profile"}
+            onClick={() => setSelectedMenu("profile")}
             menu="profile"
           >
             <img alt="Profile" />
             프로필
           </MenuItem>
           <MenuItem
-            active={selectedMenu === 'scenario'}
-            onClick={() => setSelectedMenu('scenario')}
+            active={selectedMenu === "scenario"}
+            onClick={() => setSelectedMenu("scenario")}
             menu="scenario"
           >
             <img alt="Scenario" />
             시나리오 보관함
           </MenuItem>
           <MenuItem
-            active={selectedMenu === 'settings'}
-            onClick={() => setSelectedMenu('settings')}
+            active={selectedMenu === "settings"}
+            onClick={() => setSelectedMenu("settings")}
             menu="settings"
           >
             <img alt="Settings" />
             설정
           </MenuItem>
           <MenuItem
-            active={selectedMenu === 'help'}
-            onClick={() => setSelectedMenu('help')}
+            active={selectedMenu === "help"}
+            onClick={() => setSelectedMenu("help")}
             menu="help"
           >
             <img alt="Help" />

@@ -75,9 +75,9 @@ function App() {
         <Route path="/detail" element={<Detail />} />
         <Route path="/search" element={<Search />} />
         <Route path="/info" element={<Info />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/detail/:id" element={<Detail />} />
         <Route path="*" element={<PageNotFound />} />
-        <Route path="/search" element={<Search />} /> 
-        <Route path="/detail/:id" element={<Detail />} /> 
       </Routes>
     </AuthProvider>
   );

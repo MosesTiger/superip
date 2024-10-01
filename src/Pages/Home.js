@@ -6,7 +6,6 @@ import Navbar from "../Components/Home/Navbar";
 import "../stylefile/Main.css";
 
 function Home() {
-
   const cardData = [
     {
       id: 1,
@@ -31,6 +30,7 @@ function Home() {
       title: "Story Archive",
       description: "Your stories are securely stored for safekeeping.",
       redirectTo: "/mypage",
+      selectedMenu: "scenario", // Story Archive에서는 scenario 메뉴 선택
     },
     {
       id: 4,
@@ -48,7 +48,7 @@ function Home() {
       <div className="title-wrapper">
         <div className="circle-icon"></div>
         <div className="title">
-          <h1>Create Story</h1>
+          <h1 style={{ cursor: "default" }}>Create Story</h1>
           <Navbar />
         </div>
         <FaChevronRight className="nav-arrow" />
@@ -62,6 +62,7 @@ function Home() {
             title={card.title}
             description={card.description}
             redirectTo={card.redirectTo}
+            selectedMenu={card.selectedMenu} // selectedMenu 전달
           />
         ))}
       </div>
