@@ -4,7 +4,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
 import axios from 'axios'
 
-// 스타일드 컴포넌트 정의
 const LoginText = styled.div`
   font-size: 40px;
   font-weight: bold;
@@ -116,7 +115,7 @@ function Login() {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    console.log("Login attempt:", username, password); // 디버깅을 위한 로그
+    console.log("Login attempt:", username, password); 
     try {
       await login(username, password);
       navigate("/");
@@ -125,8 +124,8 @@ function Login() {
       alert(error.message || '로그인 중 오류가 발생했습니다.');
     }
   };
-  const API_KEY = ef4d2c1b32a4cf80c070cc3e4487e3db;
-  const redirect_uri = https://createstory.co.kr/oauth/callback;
+  const API_KEY = process.env.REACT_APP_API_KEY;
+  const redirect_uri = process.env.REACT_APP_REDIRECT_URI;
   
   const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${API_KEY}&redirect_uri=${redirect_uri}&response_type=code`;
   const handleKakaoLogin = () => {
