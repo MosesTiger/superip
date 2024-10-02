@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
+import axios from 'axios';
 
 // 스타일드 컴포넌트 정의
 const LoginText = styled.div`
@@ -109,20 +110,47 @@ const LinkButton = styled(Link)`
 
 // 로그인 컴포넌트 정의
 function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState(""); // username을 email로 변경
   const [password, setPassword] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    console.log("Login attempt:", username, password); // 디버깅을 위한 로그
     try {
-      await login(username, password);
-      navigate("/");
+      const response = await axios.post('http://43.200.200.147/api/token', {
+        username: email, // FastAPI의 OAuth2PasswordRequestForm은 'username' 필드를 사용합니다
+        password: password
+      }, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
+
+      if (response.status === 200) {
+        const { access_token } = response.data;
+        await login(access_token); // AuthContext의 login 함수를 호출하여 토큰 저장
+        navigate("/");
+      } else {
+        throw new Error('로그인에 실패했습니다.');
+      }
     } catch (error) {
       console.error('로그인 중 오류 발생:', error);
-      alert(error.message || '로그인 중 오류가 발생했습니다.');
+      if (error.response) {
+        // 서버가 응답을 반환한 경우
+        alert(`로그인 실패: ${error.response.data.detail}`);
+      } else if (error.request) {
+        // 요청이 전송되었지만 응답을 받지 못한 경우
+        alert('서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.');
+      } else {
+        // 요청 설정 중에 문제가 발생한 경우
+        alert('로그인 요청 중 오류가 발생했습니다.');
+      }
     }
+  };
+
+  const handleOAuthLogin = (provider) => {
+    // OAuth 로그인 처리
+    window.location.href = `http://43.200.200.147/api/auth/${provider}`;
   };
 
   return (
@@ -131,10 +159,10 @@ function Login() {
       <InputContainer>
         <InputImage src="/아이디.svg" alt="ID Icon" />
         <Input
-          type="text"
-          placeholder="아이디"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          type="email"
+          placeholder="이메일"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
       </InputContainer>
       <InputContainer>
@@ -147,11 +175,11 @@ function Login() {
         />
       </InputContainer>
       <LoginButton onClick={handleLogin}>Login</LoginButton>
-      <OAuthButton className="kakao">
+      <OAuthButton className="kakao" onClick={() => handleOAuthLogin('kakao')}>
         <img src="/카카오.png" alt="Ka Logo" />
         카카오톡 로그인
       </OAuthButton>
-      <OAuthButton className="naver">
+      <OAuthButton className="naver" onClick={() => handleOAuthLogin('naver')}>
         <img src="/네이버.png" alt="Naver Logo" />
         네이버 로그인
       </OAuthButton>
