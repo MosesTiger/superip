@@ -125,11 +125,10 @@ function Login() {
       alert(error.message || '로그인 중 오류가 발생했습니다.');
     }
   };
-  const Rest_api_key = 'f93329802bc8360700626106ac09c655'; 
-  const redirect_uri = 'https: //createstory.co.kr'; 
+  const API_KEY = ef4d2c1b32a4cf80c070cc3e4487e3db;
+  const redirect_uri = https://createstory.co.kr/oauth/callback;
   
-  const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${Rest_api_key}&redirect_uri=${redirect_uri}&response_type=code`;
-  
+  const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${API_KEY}&redirect_uri=${redirect_uri}&response_type=code`;
   const handleKakaoLogin = () => {
     window.location.href = kakaoURL;
   };
