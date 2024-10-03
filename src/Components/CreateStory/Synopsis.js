@@ -87,7 +87,7 @@ function Synopsis() {
         setPlot(""); // Reset plot before generating new one
 
         const eventSource = new EventSource(
-          `http://localhost:8000/api/v1/synopsis/generate?${new URLSearchParams(
+          `http://43.200.200.147/api/v1/synopsis/generate?${new URLSearchParams(
             {
               keyword: keyword, // keyword 사용
               genre: movieData.selectedGenres.join(", "),
@@ -178,7 +178,7 @@ function Synopsis() {
       } = movieData;
 
       const response = await fetch(
-        "http://localhost:8000/api/v1/success-rate/predict",
+        "http://43.200.200.147/api/v1/success-rate/predict",
         {
           method: "POST",
           headers: {
