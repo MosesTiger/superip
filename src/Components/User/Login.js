@@ -110,46 +110,28 @@ const LinkButton = styled(Link)`
 
 // 로그인 컴포넌트 정의
 function Login() {
-  const [email, setEmail] = useState(""); // username을 email로 변경
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://43.200.200.147/api/token', {
-        username: email, // FastAPI의 OAuth2PasswordRequestForm은 'username' 필드를 사용합니다
-        password: password
-      }, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      });
-
-      if (response.status === 200) {
-        const { access_token } = response.data;
-        await login(access_token); // AuthContext의 login 함수를 호출하여 토큰 저장
-        navigate("/");
-      } else {
-        throw new Error('로그인에 실패했습니다.');
-      }
+      await login(email, password);
+      navigate("/");
     } catch (error) {
       console.error('로그인 중 오류 발생:', error);
       if (error.response) {
-        // 서버가 응답을 반환한 경우
         alert(`로그인 실패: ${error.response.data.detail}`);
       } else if (error.request) {
-        // 요청이 전송되었지만 응답을 받지 못한 경우
         alert('서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.');
       } else {
-        // 요청 설정 중에 문제가 발생한 경우
         alert('로그인 요청 중 오류가 발생했습니다.');
       }
     }
   };
 
   const handleOAuthLogin = (provider) => {
-    // OAuth 로그인 처리
     window.location.href = `http://43.200.200.147/api/auth/${provider}`;
   };
 
