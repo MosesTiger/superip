@@ -195,8 +195,8 @@ function Signup() {
     }
   
     try {
-      const response = await axios.post('http://43.200.200.147/api/register', {
-        email,
+      const response = await axios.post('http://43.200.200.147/api/v1/register', {
+        email: email,
         password,
         full_name: name,
         username: email, // username을 email로 설정
