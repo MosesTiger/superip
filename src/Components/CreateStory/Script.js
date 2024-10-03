@@ -136,8 +136,6 @@ function Script() {
     setIsGenerating(true);
     setScenarioContent("");
 
-    const url = `http://localhost:8000/api/v1/scenario/generate`;
-
     const charactersArray = Array.isArray(data.characters)
       ? data.characters
       : data.characters
@@ -154,10 +152,10 @@ function Script() {
     };
 
     try {
-      const response = await fetch(url, {
+      const response = await fetch('http://43.200.200.147/api/v1/scenario/generate', {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
+          'Authorization': `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(requestData),
@@ -185,6 +183,7 @@ function Script() {
               const jsonData = JSON.parse(rawContent);
               if (jsonData.type === "content") {
                 content += jsonData.content;
+                setScenarioContent(content);
               } else if (jsonData.type === "id") {
                 setScenarioId(jsonData.id);
               }
@@ -194,7 +193,6 @@ function Script() {
           }
         }
       }
-      setScenarioContent(content);
     } catch (error) {
       console.error("Error:", error);
       setIsGenerating(false);
@@ -205,11 +203,11 @@ function Script() {
     setIsGenerating(true);
     try {
       const response = await fetch(
-        `http://localhost:8000/api/v1/scenario/${scenarioId}/continue`,
+        `http://43.200.200.147/api/v1/scenario/${scenarioId}/continue`,
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${token}`,
+            'Authorization': `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ user_input: userInput }),
@@ -230,7 +228,7 @@ function Script() {
   const handleSave = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8000/api/v1/scenario/${scenarioId}/revise`,
+        `http://43.200.200.147/api/v1/scenario/api/v1/scenario/${scenarioId}/revise`,
         {
           method: "POST",
           headers: {
@@ -251,6 +249,7 @@ function Script() {
       alert("Scenario saved successfully.");
     } catch (error) {
       console.error("Error:", error);
+      alert("Failed to save the scenario");
     }
   };
 
