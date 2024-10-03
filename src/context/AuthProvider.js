@@ -55,7 +55,7 @@ export function AuthProvider({ children }) {
 
     } catch (error) {
       console.error("로그인 중 오류 발생:", error);
-      if (error.response) {
+      if (error.response && error.response.data) {
         throw new Error(`로그인 실패: ${error.response.data.detail || error.response.statusText}`);
       } else if (error.request) {
         throw new Error('서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.');
