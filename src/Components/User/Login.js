@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
-import axios from 'axios';
 
 // 스타일드 컴포넌트 정의
 const LoginText = styled.div`
@@ -108,7 +107,6 @@ const LinkButton = styled(Link)`
   }
 `;
 
-// 로그인 컴포넌트 정의
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -121,13 +119,7 @@ function Login() {
       navigate("/");
     } catch (error) {
       console.error('로그인 중 오류 발생:', error);
-      if (error.response) {
-        alert(`로그인 실패: ${error.response.data.detail}`);
-      } else if (error.request) {
-        alert('서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.');
-      } else {
-        alert('로그인 요청 중 오류가 발생했습니다.');
-      }
+      alert(error.message);  // 에러 메시지 표시
     }
   };
 
