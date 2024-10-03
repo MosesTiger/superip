@@ -14,7 +14,7 @@ const PageContainer = styled.div`
   height: 100vh;
   padding: 20px;
   box-sizing: border-box;
-  background-color: #f0f0f0;
+  background-color: #fefefe;
   position: relative; /* To position the loading message at the bottom */
 `;
 
@@ -22,7 +22,7 @@ const ScenarioContainer = styled.div`
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  background-color: white;
+  background-color: #fefefe;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   padding: 20px;
@@ -43,7 +43,7 @@ const ScenarioText = styled.pre`
   font-size: 16px;
   line-height: 1.6;
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: #fefefe;
   border: 1px solid #ddd;
   border-radius: 5px;
   overflow-y: auto;

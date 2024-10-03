@@ -1,8 +1,8 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 
 const Button = styled.button`
-  background-color: #C6D0D6;
+  background-color: #cdcdcd;
   border: none;
   border-radius: 5px;
   color: black;
@@ -15,7 +15,7 @@ const Button = styled.button`
   align-items: center;
 
   &:hover {
-    background-color: #AAB9BF;
+    background-color: #999;
   }
 `;
 
@@ -30,7 +30,6 @@ const ButtonContainer = styled.div`
   flex-direction: column;
 `;
 
-
 export default function Settings() {
   return (
     <div>
@@ -38,7 +37,7 @@ export default function Settings() {
         <Button>
           <ButtonImage src="/setting1.png" alt="설정1" />
           저장한 콘텐츠 모두 삭제
-        </Button> 
+        </Button>
         <Button>
           <ButtonImage src="/setting2.png" alt="설정2" />
           회원 탈퇴

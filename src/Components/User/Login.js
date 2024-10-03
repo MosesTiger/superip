@@ -43,13 +43,13 @@ const LoginButton = styled.button`
   border-radius: 5px;
   margin-top: 15px;
   border: none;
-  background-color: #182e3f;
+  background-color: black;
   color: white;
   font-size: 16px;
   cursor: pointer;
 
   &:hover {
-    background-color: #0056b3;
+    background-color: #cdcdcd;
   }
 `;
 
@@ -118,8 +118,8 @@ function Login() {
       await login(email, password);
       navigate("/");
     } catch (error) {
-      console.error('로그인 중 오류 발생:', error);
-      alert(error.message);  // 에러 메시지 표시
+      console.error("로그인 중 오류 발생:", error);
+      alert(error.message || "로그인 중 오류가 발생했습니다.");
     }
   };
 

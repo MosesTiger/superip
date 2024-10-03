@@ -42,13 +42,13 @@ const PWButton = styled.button`
   margin: 5px 0;
   border-radius: 5px;
   border: none;
-  background-color: #182e3f;
+  background-color: black;
   color: white;
   font-size: 16px;
   cursor: pointer;
 
   &:hover {
-    background-color: #0056b3;
+    background-color: #cdcdcd;
   }
 `;
 

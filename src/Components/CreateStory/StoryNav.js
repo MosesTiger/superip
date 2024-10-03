@@ -22,10 +22,10 @@ const NavLink = styled(Link).withConfig({
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   transition: background-color 0.3s ease;
-  background-color: ${({ isActive }) => (isActive ? "#EDF6F6" : "#4E6371")};
+  background-color: ${({ isActive }) => (isActive ? "#f5f5f5" : "#5D5D5D")};
 
   &:hover {
-    background-color: #95a4ad;
+    background-color: #999;
   }
 `;
 
