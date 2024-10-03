@@ -24,7 +24,7 @@ const TextArea = styled.textarea`
   padding: 15px;
   font-size: 16px;
   color: #000;
-  background-color: #859aa5;
+  background-color: #fefefe;
   display: block;
   resize: vertical;
 `;
@@ -41,6 +41,7 @@ const Label = styled.label`
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   margin-top: 20px;
   width: 100%;
   gap: 10px;
@@ -64,10 +65,17 @@ const CombinedButton = styled(Button)`
   color: #000;
 `;
 
+const ExpectResult = styled.div`
+  height: 100%;
+  font-size: 18px;
+  margin-right: 10px;
+`;
+
 function Synopsis() {
   const [characters, setCharacters] = useState("");
   const [plot, setPlot] = useState("");
   const [keyword, setKeyword] = useState(""); // keyword로 필드명 변경
+  const [gptRequest, setGptRequest] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSynopsisComplete, setIsSynopsisComplete] = useState(false);
 
@@ -232,11 +240,12 @@ function Synopsis() {
       <Label>수정 요청사항</Label>
       <TextArea
         placeholder="GPT에게 수정을 요청할 사항을 적어주세요."
-        value={plot}
-        onChange={(e) => setPlot(e.target.value)}
+        value={gptRequest}
+        onChange={(e) => setGptRequest(e.target.value)}
         height="300px"
       />
       <ButtonContainer>
+        <ExpectResult>등급 : ㅁ</ExpectResult>
         <ExpectButton onclick={handlePredictionClick}>
           흥행도 예측 버튼
         </ExpectButton>

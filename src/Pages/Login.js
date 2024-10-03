@@ -8,7 +8,7 @@ const LoginContainer = styled.div`
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #edf6f6;
+  background-color: #f5f5f5;
 `;
 
 const LoginBox = styled.div`

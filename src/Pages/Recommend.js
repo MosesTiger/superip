@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useNavigate, useLocation } from "react-router-dom";
 import Header from "../Components/Header";
 import "../stylefile/Main.css";
 import IconRe from "../Components/Recommend/IconRe";
@@ -48,13 +47,13 @@ const FilterContainer = styled.div`
 
 const FilterButton = styled.button`
   padding: 10px 20px;
-  background-color: ${({ selected }) => (selected ? "#ffffff" : "#192F40")};
+  background-color: ${({ selected }) => (selected ? "#ffffff" : "#1e1e1e")};
   color: ${({ selected }) => (selected ? "black" : "white")};
   border: 1px solid #ffffff;
   border-radius: 30px;
   cursor: pointer;
   &:hover {
-    background-color: #7f94a0;
+    background-color: #999;
     color: black;
   }
 `;

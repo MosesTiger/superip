@@ -73,7 +73,7 @@ const Title = styled.div`
 const Director = styled.div`
   flex: 1;
   font-size: 16px;
-  color: #666;
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center; /* 중앙 정렬 */
@@ -82,7 +82,7 @@ const Director = styled.div`
 const Year = styled.div`
   flex: 1;
   font-size: 16px;
-  color: #999;
+  color: white;
   text-align: center;
   display: flex;
   align-items: center;
@@ -123,7 +123,7 @@ const ListRe = ({ movies, filterType, currentPage, setCurrentPage }) => {
 
   // ListItem 클릭 시 영화 세부 정보로 이동하는 함수
   const handleMovieClick = (movieId) => {
-    navigate(`/movie/${movieId}`); // 해당 영화의 정보 페이지로 이동
+    navigate(`/detail/${movieId}`); // 해당 영화의 정보 페이지로 이동
   };
 
   return (

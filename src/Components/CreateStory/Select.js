@@ -18,7 +18,8 @@ const Section = styled.section`
 const TitleInput = styled.input`
   width: 100%;
   border: 0;
-  background-color: #859aa5;
+  background-color: #f5f5f5;
+  border: 1px solid #cdcdcd;
   height: 45px;
   border-radius: 4px;
   padding: 8px 16px;
@@ -41,9 +42,8 @@ const GenreSelection = styled.div`
   flex-wrap: wrap;
   align-items: flex-start;
   padding: 0;
-  border: 1px solid #ccc;
   border-radius: 4px;
-  background-color: #859aa5;
+  background-color: #f5f5f5;
   color: #000;
   margin-top: -5px;
 `;
@@ -55,7 +55,7 @@ const GenreOption = styled.div`
   align-items: center;
   padding: 8px 10px;
   border-radius: 4px;
-  background-color: ${(props) => (props.selected ? "#E23A3A" : "#d3d3d3")};
+  background-color: ${(props) => (props.selected ? "#e23a3a" : "#cdcdcd")};
   color: ${(props) => (props.selected ? "#fff" : "#000")};
   cursor: pointer;
 
@@ -87,7 +87,8 @@ const DurationSelection = styled.div`
   justify-content: space-between;
   width: 268px;
   border-radius: 4px;
-  background-color: #859aa5;
+  background-color: #f5f5f5;
+  border: 1px solid #cdcdcd;
   padding: 8px;
   gap: 5px;
   margin: 10px 0;
@@ -97,7 +98,7 @@ const DurationSelection = styled.div`
 const DurationInput = styled.input`
   width: 100px;
   border: none;
-  background-color: #859aa5;
+  background-color: #f5f5f5;
   border-radius: 4px;
   padding: 5px;
   font-size: 20px;
@@ -108,13 +109,13 @@ const Select1 = styled.select`
   width: 268px;
   height: 45px;
   border-radius: 4px;
-  background-color: #859aa5;
+  background-color: #f5f5f5;
+  border: 1px solid #cdcdcd;
   padding: 8px;
   font-size: 16px;
   color: #000;
   margin: 10px 0;
   margin-top: -5px;
-  border: none;
 `;
 
 const CheckboxContainer = styled.div`
@@ -178,7 +179,7 @@ const PlusMinusButton = styled.button`
   width: 30px;
   height: 30px;
   border: none;
-  background-color: #859aa5;
+  background-color: #f5f5f5;
   color: black;
   border-radius: 4px;
   cursor: pointer;

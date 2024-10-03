@@ -1,13 +1,12 @@
-import React from 'react';
-import styled from 'styled-components';
-
+import React from "react";
+import styled from "styled-components";
 
 const Button = styled.button`
-  background-color: #C6D0D6;
+  background-color: #cdcdcd;
   border: none;
   border-radius: 5px;
   color: black;
-  font-size:15px;
+  font-size: 15px;
   padding: 15px 20px;
   margin: 10px 0;
   cursor: pointer;
@@ -16,7 +15,7 @@ const Button = styled.button`
   align-items: center;
 
   &:hover {
-    background-color: #AAB9BF;
+    background-color: #999;
   }
 `;
 

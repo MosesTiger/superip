@@ -4,7 +4,7 @@ import Header from "../Components/Header";
 import styled from "styled-components";
 
 const Container = styled.div`
-  background-color: #edf6f6;
+  background-color: white;
   min-height: 100vh; /* 페이지 전체 높이를 차지 */
   padding: 50px 40px;
   border-top: 1px solid #000;

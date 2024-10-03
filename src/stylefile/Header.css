@@ -1,26 +1,16 @@
 .header {
   height: 60px;
   display: flex;
-  background-color: #f1fbfa;
+  background-color: #f5f5f5;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 10px 10px 10px;
-}
-
-.header::before {
-  content: "";
-  position: absolute;
-  top: 10px;
-  left: 0;
-  width: 100%;
-  height: 1px; /* 선의 두께를 설정 */
-  background-color: #182e3f; /* 선의 색상을 설정 */
+  padding: 10px;
 }
 
 .logo {
-  width: 80px; /* 로고의 너비를 설정 */
+  width: 70px; /* 로고의 너비를 설정 */
   height: auto;
-  margin-left: 100px; /* 비율에 따라 높이를 자동으로 설정 */
+  margin-left: 60px; /* 비율에 따라 높이를 자동으로 설정 */
   margin-right: 40px; /* 비율에 따라 높이를 자동으로 설정 */
   cursor: pointer;
 }
@@ -29,67 +19,46 @@
   display: flex;
   position: relative;
   align-items: center;
-  margin-left: 50px;
   width: 65%;
   height: 45px;
-  background-color: #dbe9e8;
-  border: 1px;
+  background-color: white;
+  border: 2px solid #cdcdcd;
   border-radius: 20px;
 }
 
 .search-bar {
   outline: none;
-  width: 90%;
+  width: 80%;
   height: 100%;
-  margin-left: 60px;
+  margin-right: 60px;
   padding: 15px;
-  background-color: #dbe9e8;
+  background-color: white;
   border: 0;
 }
 
 .search-icon {
   position: absolute;
-  left: 20px;
+  right: 20px;
   top: 30%;
   font-size: 20px;
-  color: #846d6d;
+  color: #1e1e1e;
   cursor: pointer;
-}
-
-.notification-icon {
-  font-size: 24px;
-  color: #aaa4a3;
-  margin: 0 0 0 20px;
-  cursor: pointer;
-}
-
-.login-button {
-  font-size: 15px;
-  padding: 10px 25px;
-  margin: 0 20px;
-  background-color: #192f40;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-}
-.login-button:hover {
-  background-color: #0056b3;
 }
 
 .logout-button {
   font-size: 15px;
-  padding: 5px 20px;
-  margin-right: 30px;
-  margin-left: 20px;
-  background-color: #f1fbfa;
-  color: #AAA4A3;
+  width: 90%;
+  display: flex;
+  justify-content: flex-end;
+  background-color: #f5f5f5;
+  color: black;
   border: none;
   border-radius: 10px;
   cursor: pointer;
 }
+
 .logout-button:hover {
-  color: #846d6d;
+  color: #cdcdcd;
 }
 
 .profile-container {
@@ -101,6 +70,7 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
+  border: 2px solid black;
   margin-right: 0px;
   cursor: pointer;
 }
@@ -113,9 +83,7 @@
 
 .profile-name {
   font-size: 23px;
-  font-weight: bold;
   margin: 0px 20px;
-  color: #AAA4A3;
+  color: black;
   cursor: default;
 }
-

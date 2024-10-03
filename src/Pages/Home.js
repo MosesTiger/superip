@@ -1,5 +1,4 @@
 import React from "react";
-import { FaChevronRight } from "react-icons/fa";
 import Header from "../Components/Header";
 import Card from "../Components/Home/Card";
 import Navbar from "../Components/Home/Navbar";
@@ -12,7 +11,7 @@ function Home() {
       cardnum: "card1",
       image: "/CreateStory_Image.jpg",
       title: "Create Story",
-      description: "Get your stories created automatically and effortlessly",
+      description: "스토리를 창작합니다.",
       redirectTo: "/create/select",
     },
     {
@@ -46,12 +45,10 @@ function Home() {
     <div className="main-page">
       <Header />
       <div className="title-wrapper">
-        <div className="circle-icon"></div>
         <div className="title">
           <h1 style={{ cursor: "default" }}>Create Story</h1>
-          <Navbar />
         </div>
-        <FaChevronRight className="nav-arrow" />
+        <Navbar />
       </div>
       <div className="card-container">
         {cardData.map((card) => (
