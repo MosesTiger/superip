@@ -23,7 +23,7 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('http://43.200.200.147/api/token', 
+      const response = await axios.post('http://43.200.200.147/api/v1/token', 
         new URLSearchParams({
           'username': email,
           'password': password
@@ -41,7 +41,7 @@ export function AuthProvider({ children }) {
         localStorage.setItem("token", access_token);
 
         // 사용자 정보 가져오기
-        const userResponse = await axios.get('http://43.200.200.147/api/users/me', {
+        const userResponse = await axios.get('http://43.200.200.147/api/v1/users/me', {
           headers: {
             'Authorization': `Bearer ${access_token}`
           }
