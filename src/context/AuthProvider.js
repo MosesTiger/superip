@@ -1,5 +1,5 @@
 import { useState, useContext, createContext } from "react";
-import axios from 'axios'; // axios import 추가
+import axios from 'axios';
 
 const AuthContext = createContext();
 
@@ -23,10 +23,11 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('http://43.200.200.147/api/token', {
-        username: email,
-        password: password
-      }, {
+      const response = await axios.post('http://43.200.200.147/api/token', 
+        new URLSearchParams({
+          'username': email,
+          'password': password
+        }), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
@@ -58,13 +59,7 @@ export function AuthProvider({ children }) {
       }
     } catch (error) {
       console.error("로그인 중 오류 발생:", error);
-      if (error.response) {
-        throw new Error(`로그인 실패: ${error.response.data.detail}`);
-      } else if (error.request) {
-        throw new Error('서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.');
-      } else {
-        throw new Error('로그인 요청 중 오류가 발생했습니다.');
-      }
+      throw error;
     }
   };
 
@@ -77,30 +72,9 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("token");
   };
 
-  const refreshToken = async () => {
-    try {
-      const response = await axios.post('http://43.200.200.147/api/token/refresh', {
-        refresh_token: localStorage.getItem("refreshToken")
-      });
-
-      if (response.status === 200) {
-        const { access_token } = response.data;
-        setToken(access_token);
-        localStorage.setItem("token", access_token);
-        return access_token;
-      } else {
-        throw new Error("토큰 갱신에 실패했습니다.");
-      }
-    } catch (error) {
-      console.error("토큰 갱신 중 오류 발생:", error);
-      logout();
-      throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
-    }
-  };
-
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, user, token, login, logout, refreshToken }}
+      value={{ isAuthenticated, user, token, login, logout }}
     >
       {children}
     </AuthContext.Provider>
