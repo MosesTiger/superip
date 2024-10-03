@@ -15,7 +15,7 @@ const PageContainer = styled.div`
   padding: 20px;
   box-sizing: border-box;
   background-color: #fefefe;
-  position: relative; /* To position the loading message at the bottom */
+  position: relative;
 `;
 
 const ScenarioContainer = styled.div`
@@ -24,7 +24,6 @@ const ScenarioContainer = styled.div`
   flex-direction: column;
   background-color: #fefefe;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   padding: 20px;
   overflow: hidden;
 `;

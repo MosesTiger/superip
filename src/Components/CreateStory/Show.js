@@ -2,20 +2,28 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
 import TextContent from "./TextContent";
+import Graph from "./Graph";
 
 const DashboardContainer = styled.div`
-  display: grid;
-  grid-template-columns: 2fr 5fr;
-  grid-template-rows: repeat(11, 1fr);
+  display: flex;
+  justify-content:center;
   gap: 20px;
   padding: 20px;
-  height: calc(100vh - 70px);
+  min-height: calc(100vh - 70px);
   width: 95vw;
   box-sizing: border-box;
-  background-color: #182e3f;
+  background-color: #1e1e1e;
   transform: translateX(-50px);
-  position: relative;
 `;
+
+const ResultContainer = styled.div`
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  height: 100%;
+  width: 67%; /* 가로 크기 확실히 지정 */
+`
 
 const Overlay = styled.div`
   position: fixed;
@@ -33,15 +41,13 @@ const DashboardSection = styled.div`
   flex-direction: column;
   padding: 15px;
   border-radius: 8px;
-  background-color: #edf6f6;
-  box-sizing: border-box;
-  position: relative;
+  background-color: #f5f5f5;
   box-shadow: 4px 4px 10px rgba(0, 0, 0, 1); /* 오른쪽과 아래쪽에 섀도우 추가 */
 `;
 
 const TitleSection = styled(DashboardSection)`
-  grid-column: 1 / 2;
-  grid-row: 1 / 8;
+  height: 480px;
+  width: 30%; 
 `;
 
 const Titleposter = styled.img`
@@ -71,14 +77,22 @@ const TitleContent = styled.div`
 `;
 
 const PenaltySection = styled(DashboardSection)`
-  grid-column: 1 / 2;
-  grid-row: 8 / 12;
-  display: grid;
-  grid-template-columns: repeat(8, 1fr); /* 2x2 그리드로 나눔 */
-  grid-template-rows: 1.2fr 1fr;
+  display:flex;
+  justify-content:flex-start;
+  gap: 10px; /* 각 div 간격 */
+  color: white;
+  width: 90%;
+  height:130px;
+`;
+
+const PenaltyContainer = styled.div`
+  display:flex;
+  flex-direction:row;
+  justify-content:space-between;
   gap: 10px; /* 각 div 간격 */
   align-items: center;
   color: white;
+  width: 100%;
 `;
 
 const Divtitle = styled.div`
@@ -108,71 +122,49 @@ const DivContent = styled.div`
 `;
 
 const Div1 = styled.div`
-  grid-column: 1 / 5;
-  background-color: #4e6371;
+  background-color: #1e1e1e;
   border-radius: 8px;
-  width: 100%;
-  height: 100%;
+  width: 20%;
+  height: 100px;
   display: flex;
   flex-direction: column;
   align-items: center;
   overflow: hidden;
 `;
 
-const Div2 = styled.div`
-  grid-column: 5 / 9;
-  background-color: #4e6371;
-  border-radius: 8px;
-  width: 80%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow: hidden;
+const Div2 = styled(Div1)`
+  width: 20%;
 `;
 
-const Div3 = styled.div`
-  grid-column: 1 / 4;
-  background-color: #4e6371;
-  border-radius: 8px;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow: hidden;
+const Div3 = styled(Div1)`
+  width: 20%;
 `;
 
-const Div4 = styled.div`
-  grid-column: 4 / 7;
-  background-color: #4e6371;
-  border-radius: 8px;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow: hidden;
+const Div4 = styled(Div1)`
+  width: 20%;
 `;
 
 const Sectiontitlewrap = styled.div`
   display: flex;
   justify-content: space-between;
+  width:100%;
 `;
 
 const Sectiontitle = styled.div`
   font-size: 17px;
   font-weight: bold;
+  color:black;
 `;
 
 const AnalysisSection = styled(DashboardSection)`
-  grid-column: 2 / 3;
-  grid-row: 1 / 6;
+  width: 90%;
+  height: 300px;
+  align-items: center;
 `;
 
 const BoxofficeSection = styled(DashboardSection)`
-  grid-column: 2 / 3;
-  grid-row: 6 / 12;
+  width: 90%;
+  height: 300px;
 `;
 
 const BoxContainer = styled.div`
@@ -203,7 +195,7 @@ const Boxcontent = styled.div`
 const Box1 = styled.div`
   grid-column: 1;
   grid-row: 1 / 3;
-  background-color: #4e6371;
+  background-color: #1e1e1e;
   border-radius: 8px;
   width: 100%;
   height: 100%;
@@ -220,7 +212,7 @@ const Box1content = styled.div`
 const Box2 = styled.div`
   grid-column: 2;
   grid-row: 1;
-  background-color: #4e6371;
+  background-color: #1e1e1e;
   border-radius: 8px;
   width: 100%;
   height: 100%;
@@ -237,7 +229,7 @@ const Box2content = styled.div`
 const Box3 = styled.div`
   grid-column: 2;
   grid-row: 2;
-  background-color: #4e6371;
+  background-color: #1e1e1e;
   border-radius: 8px;
   width: 100%;
   height: 100%;
@@ -247,7 +239,7 @@ const Box3 = styled.div`
 const Box4 = styled.div`
   grid-column: 3;
   grid-row: 1 / 3;
-  background-color: #4e6371;
+  background-color: #1e1e1e;
   border-radius: 8px;
   width: 100%;
   height: 100%;
@@ -262,9 +254,6 @@ const MoreButton = styled.button`
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  position: absolute;
-  right: 20px;
-  width: 120px;
 `;
 
 const Popup = styled.div`
@@ -295,6 +284,13 @@ const CloseButton = styled.button`
   border-radius: 4px;
   cursor: pointer;
 `;
+
+const graphData = [
+  { label: "개연성", value: 85 },
+  { label: "기승전결", value: 70 },
+  { label: "흐름", value: 55 },
+  { label: "시나리오 완성도", value: 90 },
+];
 
 function Show() {
   const longText = `
@@ -375,42 +371,49 @@ function Show() {
             <TextContent content={longText} />
           </Plot>
         </TitleSection>
-        <AnalysisSection>
-          <Sectiontitle>시나리오 완성도 분석표</Sectiontitle>
-          <MoreButton onClick={toggleAnalysisPopup}>분석 더보기</MoreButton>
-        </AnalysisSection>
+        <ResultContainer>
         <PenaltySection>
-          <Div1>
-            <Divtitle>예상 별점</Divtitle>
-            <DivContent content="star">
-              <img
-                src="/별.svg"
-                alt="별"
-                style={{
-                  width: "40px",
-                  marginRight: "5px",
-                  marginBottom: "5px",
-                }}
-              />
-              {/*{predictionData && (
-                <p>{predictionData["최종 흥행도"].average_score.toFixed(1)}</p>
-              )}*/}
-              3.0 / 4.5
-            </DivContent>
-          </Div1>
-          <Div2>
-            <Divtitle>예상 흥행 등급</Divtitle>
-            <DivContent content="rating">A</DivContent>
-          </Div2>
-          <Div3>
-            <Divtitle>1차 흥행도 예측</Divtitle>
-            <DivContent content="first">A</DivContent>
-          </Div3>
-          <Div4>
-            <Divtitle>시나리오 완성도</Divtitle>
-            <DivContent content="second">70%</DivContent>
-          </Div4>
+          <Sectiontitle>최종 흥행 분석표</Sectiontitle>
+          <PenaltyContainer>
+            <Div1>
+              <Divtitle>예상 흥행 등급</Divtitle>
+              <DivContent content="rating">A</DivContent>
+            </Div1>
+            <Div2>
+              <Divtitle>예상 별점</Divtitle>
+              <DivContent content="star">
+                <img
+                  src="/별.svg"
+                  alt="별"
+                  style={{
+                    width: "40px",
+                    marginRight: "5px",
+                    marginBottom: "5px",
+                  }}
+                />
+                {/*{predictionData && (
+                  <p>{predictionData["최종 흥행도"].average_score.toFixed(1)}</p>
+                )}*/}
+                3.0 / 4.5
+              </DivContent>
+            </Div2>
+            <Div3>
+              <Divtitle>1차 흥행도 예측</Divtitle>
+              <DivContent content="first">A</DivContent>
+            </Div3>
+            <Div4>
+              <Divtitle>시나리오 완성도</Divtitle>
+              <DivContent content="second">70%</DivContent>
+            </Div4>
+          </PenaltyContainer>
         </PenaltySection>
+        <AnalysisSection>
+          <Sectiontitlewrap>
+            <Sectiontitle>시나리오 완성도 분석표</Sectiontitle>
+            <MoreButton onClick={toggleAnalysisPopup}>분석 더보기</MoreButton>
+          </Sectiontitlewrap>
+          <Graph data={graphData}/>
+        </AnalysisSection>
         <BoxofficeSection>
           <Sectiontitlewrap>
             <Sectiontitle>1차 흥행도 분석표</Sectiontitle>
@@ -438,7 +441,9 @@ function Show() {
             </Box4>
           </BoxContainer>
         </BoxofficeSection>
+        </ResultContainer>
       </DashboardContainer>
+      
 
       {isAnalysisPopupOpen && (
         <Popup>
@@ -455,6 +460,7 @@ function Show() {
           {/* Add detailed boxoffice analysis content here */}
         </Popup>
       )}
+      
     </>
   );
 }
