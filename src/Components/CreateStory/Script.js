@@ -14,17 +14,16 @@ const PageContainer = styled.div`
   height: 100vh;
   padding: 20px;
   box-sizing: border-box;
-  background-color: #f0f0f0;
-  position: relative; /* To position the loading message at the bottom */
+  background-color: #f5f5f5;
+  position: relative;
 `;
 
 const ScenarioContainer = styled.div`
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  background-color: white;
+  background-color: #f5f5f5;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   padding: 20px;
   overflow: hidden;
 `;
@@ -39,11 +38,10 @@ const ScenarioText = styled.pre`
   flex-grow: 1;
   white-space: pre-wrap;
   word-wrap: break-word;
-  font-family: "Courier New", Courier, monospace;
   font-size: 16px;
   line-height: 1.6;
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: #f5f5f5;
   border: 1px solid #ddd;
   border-radius: 5px;
   overflow-y: auto;
@@ -55,7 +53,6 @@ const Input = styled.textarea`
   width: 100%;
   height: 100px;
   padding: 10px;
-  font-family: "Noto Sans KR", sans-serif;
   font-size: 14px;
   border: 1px solid #ddd;
   border-radius: 5px;

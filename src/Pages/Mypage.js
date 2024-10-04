@@ -11,12 +11,12 @@ import "../stylefile/Main.css";
 const Container = styled.div`
   display: flex;
   height: 100vh;
-  background-color: #182e3f;
+  background-color: #1e1e1e;
 `;
 
 const Sidebar = styled.div`
   width: 220px;
-  background-color: #edf6f6;
+  background-color: #f5f5f5;
   display: flex;
   flex-direction: column;
   padding: 20px;
@@ -28,7 +28,7 @@ const Sidebar = styled.div`
 const MenuItem = styled.div`
   margin: 10px 0;
   cursor: pointer;
-  background-color: ${(props) => (props.active ? "#182E3F" : "transparent")};
+  background-color: ${(props) => (props.active ? "#1e1e1e" : "transparent")};
   color: ${(props) => (props.active ? "white" : "black")};
   padding: 20px;
   width: 100%;
@@ -38,7 +38,7 @@ const MenuItem = styled.div`
   align-items: center;
 
   &:hover {
-    background-color: #95a4ad;
+    background-color: #cdcdcd;
     color: white;
 
     & img {
@@ -64,7 +64,7 @@ const Item = styled.div`
   margin: 50px;
   margin-left: -10px;
   border-radius: 15px;
-  background-color: #edf6f6;
+  background-color: #f5f5f5;
 `;
 
 const Title = styled.h1`

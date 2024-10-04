@@ -1,6 +1,36 @@
 /* src/index.css */
+@font-face {
+  font-family: 'ChosunGs'; /* 폰트의 이름 */
+  src: url('/public/fonts/ChosunGs.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: '어그로체'; /* 폰트의 이름 */
+  src: url('/public/fonts/SB\ 어그로\ M.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: '조선굴림체'; /* 폰트의 이름 */
+  src: url('/public/fonts/ChosunGu.TTF') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: '애플SD산돌고딕'; /* 폰트의 이름 */
+  src: url('/public/fonts/AppleSDGothicNeoM.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
 body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: '애플SD산돌고딕';
 }

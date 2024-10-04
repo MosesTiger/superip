@@ -1,48 +1,22 @@
 .card-container {
   display: flex;
-  background-color: #edf6f6;
-  margin: 0 80px 40px 80px;
-  padding: 40px 0px;
+  margin: 0 80px;
   border-radius: 20px;
   justify-content: space-evenly;
   flex-wrap: wrap;
   gap: 40px;
+  width: 80%;
 }
 
 .card {
   color: #f4f4ea;
   width: 250px;
-  height: 500px;
+  height: 250px;
   padding: 0px;
-  border-radius: 10px;
+  border: 1px solid white;
   text-align: center;
   box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
   transition: transform 0.2s;
-}
-
-.card1 {
-  border-radius: 10px;
-  margin: 0;
-  padding: 0;
-  background: linear-gradient(to bottom, #ac8b67, 80%, #0b1626);
-}
-.card2 {
-  border-radius: 10px;
-  margin: 0;
-  padding: 0;
-  background: linear-gradient(to bottom, #002645, 80%, #0b1626);
-}
-.card3 {
-  border-radius: 10px;
-  margin: 0;
-  padding: 0;
-  background: linear-gradient(to bottom, #7d6443, 80%, #0b1626);
-}
-.card4 {
-  border-radius: 10px;
-  margin: 0;
-  padding: 0;
-  background: linear-gradient(to bottom, #0c4c74, 80%, #0b1626);
 }
 
 .card h2 {
@@ -61,24 +35,5 @@
 
 .card-image {
   width: 100%;
-  height: 320px;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-}
-
-.go-button {
-  font-size: 20px;
-  background-color: #0b1626;
-  color: #edf6f6;
-  width: 90%;
-  padding: 10px 20px;
-  border: 1px solid #edf6f6;
-  border-radius: 30px;
-  cursor: pointer;
-  margin-top: 10px;
-  margin-bottom: 15px;
-}
-
-.go-button:hover {
-  background-color: #555;
+  height: auto;
 }

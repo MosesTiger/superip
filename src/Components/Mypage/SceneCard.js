@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 
 const ScenarioItem = styled.div`
-  background-color: #c6d0d6;
+  background-color: #cdcdcd;
   border-radius: 10px;
   padding: 10px;
   text-align: center;

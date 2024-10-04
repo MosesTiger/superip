@@ -5,7 +5,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import "../stylefile/Main.css";
 
 const ResultsSection = styled.div`
-  font-family: Arial, sans-serif;
   padding: 40px;
   margin: 0 auto;
   width: 80%;
@@ -66,7 +65,7 @@ const Select = styled.select`
   border-radius: 5px;
   color: white;
   cursor: pointer;
-  background: #192F40;
+  background-color: #1e1e1e;
   font-size: 16px;
 
   &:focus {
@@ -75,7 +74,7 @@ const Select = styled.select`
 
   option {
     color: black;
-    background: transparent;
+    background: white;
     font-size: 16px;
 
     &:hover {
@@ -113,10 +112,9 @@ export default function Search() {
   };
 
   const handleTitleClick = (movie, index) => {
-    const movieId = movie.id || index;  // 영화에 id가 없을 경우 index 사용
+    const movieId = movie.id || index; // 영화에 id가 없을 경우 index 사용
     navigate(`/detail/${movieId}`, { state: { movie } });
   };
-  
 
   return (
     <div className="page">
@@ -132,11 +130,16 @@ export default function Search() {
           </Select>
         </SelectContainer>
         {sortedResults.map((result, index) => (
-          <ResultCard key={index} onClick={() => handleTitleClick(result, index)}>
+          <ResultCard
+            key={index}
+            onClick={() => handleTitleClick(result, index)}
+          >
             <ResultImage src={result.poster} alt={result.title} />
             <ResultDetails>
               <h2>{result.title}</h2>
-              <p>{result.year}, {result.rating}</p>
+              <p>
+                {result.year}, {result.rating}
+              </p>
               <p>감독: {result.director}</p>
             </ResultDetails>
           </ResultCard>
