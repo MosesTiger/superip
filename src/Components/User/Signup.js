@@ -200,7 +200,7 @@ function Signup() {
         password: password,
         full_name: name,
         username: email,
-        social_provider: "LOCAL", // username을 email로 설정
+        social_provider: "local", // username을 email로 설정
         social_id: null      
       });
 
