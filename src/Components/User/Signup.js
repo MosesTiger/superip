@@ -1,10 +1,10 @@
-import styled from "styled-components";
 import React, { useState } from "react";
+import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineKeyboardArrowDown, MdOutlineKeyboardArrowUp } from "react-icons/md";
-import axios from 'axios'; // axios import 추가
+import axios from 'axios';
 
-// 스타일드 컴포넌트 정의 (변경 없음)
+// 스타일드 컴포넌트 정의
 const SignupText = styled.div`
   font-size: 40px;
   font-weight: bold;
@@ -40,7 +40,7 @@ const EyeButton = styled.button`
   color: #757678;
 `;
 
-const LoginButton = styled.button`
+const SignUpButton = styled.button`
   width: 300px;
   height: 45px;
   padding: 10px;
@@ -135,19 +135,19 @@ function Signup() {
     {
       id: 1,
       title: '개인정보 수집 및 이용 동의',
-      contents: '반갑습니다',
+      contents: '개인정보 수집 및 이용에 동의합니다.',
       status: '(필수)',
     },
     {
       id: 2,
       title: '이용약관 필수 동의',
-      contents: '필수입니다',
+      contents: '이용약관에 동의합니다.',
       status: '(필수)',
     },
     {
       id: 3,
       title: '마케팅 정보 수신 선택 동의',
-      contents: '선택입니다',
+      contents: '마케팅 정보 수신에 동의합니다.',
       status: '(선택)',
     }
   ];
@@ -183,37 +183,41 @@ function Signup() {
       alert('모든 필드를 입력해 주세요.');
       return;
     }
-  
+
     if (!allRequiredChecked) {
       alert('필수 약관에 동의해 주세요.');
       return;
     }
-  
+
     if (!isPasswordMatch) {
       alert('비밀번호가 일치하지 않습니다.');
       return;
     }
-  
+
     try {
       const response = await axios.post('http://43.200.200.147/api/v1/register', {
         email: email,
         password: password,
         full_name: name,
         username: email,
-        social_provider: "local", // username을 email로 설정
-        social_id: null      
+        social_provider: "local",
+        social_id: null
       });
 
       if (response.status === 201) {
         alert('회원가입이 완료되었습니다.');
         navigate('/login');
-      } else {
-        throw new Error('회원가입 실패');
       }
     } catch (error) {
       console.error('회원가입 중 오류 발생:', error);
       if (error.response) {
-        alert(`회원가입 실패: ${error.response.data.detail}`);
+        if (error.response.status === 400) {
+          alert(`회원가입 실패: ${error.response.data.detail}`);
+        } else if (error.response.status === 500) {
+          alert('서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        } else {
+          alert(`회원가입 실패: ${error.response.data.detail || '알 수 없는 오류가 발생했습니다.'}`);
+        }
       } else if (error.request) {
         alert('서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.');
       } else {
@@ -316,9 +320,9 @@ function Signup() {
           </React.Fragment>
         ))}
       </CheckboxContainer>
-      <LoginButton onClick={handleSignUp} disabled={!canSignUp}>
-        Sign Up
-      </LoginButton>
+      <SignUpButton onClick={handleSignUp} disabled={!canSignUp}>
+        회원가입
+      </SignUpButton>
     </>
   );
 }
