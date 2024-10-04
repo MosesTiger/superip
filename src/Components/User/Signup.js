@@ -200,7 +200,7 @@ function Signup() {
         password: password,
         full_name: name,
         username: email,
-        social_provider: "local",
+        social_provider: "LOCAL",
         social_id: null
       });
 
