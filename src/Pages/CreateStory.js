@@ -10,7 +10,7 @@ const Main = styled.main`
   height: 100%;
   border-radius: 10px;
   border-top-left-radius: 0px;
-  background-color: #fefefe;
+  background-color: #f5f5f5;
   display: flex;
   flex-direction: column;
   margin: 0px auto;

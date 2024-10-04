@@ -5,7 +5,6 @@ import Header from "../Components/Header";
 import { readXlsxFile } from "../context/xlsxReader"; // xlsxReader 불러오기
 
 const MovieInfo = styled.div`
-  font-family: Arial, sans-serif;
   padding: 100px;
   margin-left: 40px;
   margin-right: 40px;

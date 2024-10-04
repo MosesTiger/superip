@@ -63,8 +63,9 @@ const Loginprofile = styled(PiUserCircleBold)`
 
 const LoginButton = styled.button`
   text-decoration: none;
+  font-family: "조선굴림체";
   font-size: 25px;
-  font-weight: thin;
+  font-weight:100;
   padding: 0px 5px;
   background-color: #f5f5f5;
   color: black;
@@ -137,7 +138,7 @@ const Header = () => {
     <header className="header">
       <LeftContainer>
         <Link to="/">
-          <img src="/로고 임시.png" alt="Logo" className="logo" />
+          <img src="/로고.png" alt="Logo" className="logo" />
         </Link>
         <div className="search-container">
           <VerticalLine />
@@ -176,9 +177,11 @@ const Header = () => {
             }
           />
           <div className="profile-info">
-            <span className="profile-name">{user?.name || "User"}</span>
-            <button className="logout-button" onClick={logout}>
-              Logout
+          <span className="profile-name" style={{ fontFamily: "조선굴림체" }}>
+            {user?.name || "User"} 님
+          </span>
+            <button className="logout-button" onClick={logout} style={{ fontFamily: "조선굴림체" }}>
+              LOGOUT
             </button>
           </div>
         </div>

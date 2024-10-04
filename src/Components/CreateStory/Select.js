@@ -10,7 +10,6 @@ const Section = styled.section`
   margin: 0;
   font-size: 16px;
   color: #000;
-  font-family: "Poppins", sans-serif;
   position: relative;
   height: auto;
 `;
@@ -24,7 +23,6 @@ const TitleInput = styled.input`
   border-radius: 4px;
   padding: 8px 16px;
   box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
   font-weight: 500;
   font-size: 20px;
   min-width: 250px;

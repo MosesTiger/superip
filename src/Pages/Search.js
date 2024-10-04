@@ -5,7 +5,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import "../stylefile/Main.css";
 
 const ResultsSection = styled.div`
-  font-family: Arial, sans-serif;
   padding: 40px;
   margin: 0 auto;
   width: 80%;

@@ -7,6 +7,7 @@ const LinkButton = styled(Link)`
   text-decoration: none;
   font-size: 25px;
   cursor: pointer; /* 커서가 포인터로 변경 */
+  font-family: "조선굴림체";
 
   &:hover {
     text-decoration: underline;
@@ -33,11 +34,11 @@ function Navbar() {
 
   return (
     <NavbarContainer>
-      <LinkButton to="/info/How">How</LinkButton>
-      <LinkButton to="/info/QnA">QnA</LinkButton>
+      <LinkButton to="/info/How">HOW</LinkButton>
+      <LinkButton to="/info/QnA">Q&A</LinkButton>
       <LinkButton to="/info/FAQ">FAQ</LinkButton>
       <LinkButton as="div" onClick={handleSettingsClick}>
-        Setting
+        SETTING
       </LinkButton>
     </NavbarContainer>
   );

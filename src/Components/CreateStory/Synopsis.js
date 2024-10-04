@@ -10,7 +10,6 @@ const Section = styled.section`
   margin: 0;
   font-size: 16px;
   color: #000;
-  font-family: "Poppins", sans-serif;
   position: relative;
   padding-right: 35px;
 `;
@@ -24,7 +23,7 @@ const TextArea = styled.textarea`
   padding: 15px;
   font-size: 16px;
   color: #000;
-  background-color: #fefefe;
+  background-color: #f5f5f5;
   display: block;
   resize: vertical;
 `;
