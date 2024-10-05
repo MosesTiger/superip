@@ -20,7 +20,7 @@ const NavbarContainer = styled.div`
   display: flex;
   justify-content: center;
   margin: 0;
-  gap: 130px;
+  gap: 100px;
   padding-right: 30px;
 `;
 

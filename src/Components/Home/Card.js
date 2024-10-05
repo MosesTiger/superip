@@ -60,7 +60,7 @@ const TextContainer = styled.div`
 `;
 
 const Title = styled.h2`
-  font-family: 'ChosunGs', sans-serif;
+  font-family: "ChosunGs", sans-serif;
   font-size: 28px;
   font-weight: 100;
   margin: 0;
@@ -68,7 +68,7 @@ const Title = styled.h2`
 `;
 
 const Description = styled.p`
-  font-family: '조선굴림체';
+  font-family: "조선굴림체";
   font-size: 14px;
   margin-top: 5px;
   color: white;
@@ -84,7 +84,7 @@ const GoText = styled.div`
   font-weight: bold;
   color: #f5f5f5;
   display: block;
-  
+
   &::before {
     content: ">>";
     transition: transform 0.3s ease, opacity 0.3s ease;
@@ -112,11 +112,24 @@ const GoText = styled.div`
   }
 `;
 
-const Card = ({ cardnum, image, title, description, redirectTo, selectedMenu }) => {
+const Card = ({
+  cardnum,
+  image,
+  title,
+  description,
+  redirectTo,
+  selectedMenu,
+  scrollToExampleSection,
+}) => {
   const [navigate, setNavigate] = useState(false);
 
   const handleClick = () => {
-    setNavigate(true);
+    if (cardnum === "card2") {
+      // 두 번째 카드일 경우 ExampleSection으로 스크롤
+      scrollToExampleSection();
+    } else {
+      setNavigate(true);
+    }
   };
 
   if (navigate) {
