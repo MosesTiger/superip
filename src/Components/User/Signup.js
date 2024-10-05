@@ -112,71 +112,52 @@ const Passwordcheck = styled.p`
 `;
 
 function Signup() {
-  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [name, setName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [checkItems, setCheckItems] = useState([]);
   const [open0, setOpen0] = useState(false);
   const [open1, setOpen1] = useState(false);
   const [open2, setOpen2] = useState(false);
   const [open3, setOpen3] = useState(false);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [name, setName] = useState('');
-  const [checkItems, setCheckItems] = useState([]);
+  const navigate = useNavigate();
 
   const data = [
-    {
-      id: 0,
-      title: '만 14세 이상임에 필수 동의',
-      contents: '만 14세 이상임에 필수 동의합니다.',
-      status: '(필수)',
-    },
-    {
-      id: 1,
-      title: '개인정보 수집 및 이용 동의',
-      contents: '개인정보 수집 및 이용에 동의합니다.',
-      status: '(필수)',
-    },
-    {
-      id: 2,
-      title: '이용약관 필수 동의',
-      contents: '이용약관에 동의합니다.',
-      status: '(필수)',
-    },
-    {
-      id: 3,
-      title: '마케팅 정보 수신 선택 동의',
-      contents: '마케팅 정보 수신에 동의합니다.',
-      status: '(선택)',
-    }
+    { id: 0, title: '이용약관 동의', contents: '이용약관 내용...', status: '(필수)' },
+    { id: 1, title: '개인정보 수집 및 이용 동의', contents: '개인정보 수집 및 이용 내용...', status: '(필수)' },
+    { id: 2, title: '마케팅 정보 수신 동의', contents: '마케팅 정보 수신 내용...', status: '(선택)' },
+    { id: 3, title: '이벤트 정보 수신 동의', contents: '이벤트 정보 수신 내용...', status: '(선택)' },
   ];
 
-  const requiredItems = data.filter(item => item.status === '(필수)');
-  const allRequiredChecked = requiredItems.every(item => checkItems.includes(item.id));
-  const allInputsFilled = email !== '' && password !== '' && confirmPassword !== '' && name !== '';
-  const isPasswordMatch = password === confirmPassword;
-  const canSignUp = allInputsFilled && allRequiredChecked && isPasswordMatch;
-
-  const selectChecked = (checked, id) => {
-    if (checked) {
-      setCheckItems(prev => [...prev, id]);
-    } else {
-      setCheckItems(prev => prev.filter(el => el !== id));
-    }
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const allChecked = (checked) => {
     if (checked) {
-      setCheckItems(data.map(el => el.id));
+      const idArray = [];
+      data.forEach((el) => idArray.push(el.id));
+      setCheckItems(idArray);
     } else {
       setCheckItems([]);
     }
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(prev => !prev);
+  const selectChecked = (checked, id) => {
+    if (checked) {
+      setCheckItems(prev => [...prev, id]);
+    } else {
+      setCheckItems(checkItems.filter((el) => el !== id));
+    }
   };
+
+  const isPasswordMatch = password === confirmPassword;
+  const allInputsFilled = email && password && confirmPassword && name;
+  const allRequiredChecked = checkItems.includes(0) && checkItems.includes(1);
+  const canSignUp = allInputsFilled && isPasswordMatch && allRequiredChecked;
 
   const handleSignUp = async () => {
     if (!allInputsFilled) {
@@ -195,7 +176,7 @@ function Signup() {
     }
 
     try {
-      const response = await axios.post('http://43.200.200.147/api/v1/register', {
+      const response = await axios.post('http://3.36.168.204/api/v1/auth/register', {
         email: email,
         password: password,
         full_name: name,
@@ -259,13 +240,7 @@ function Signup() {
           {showPassword ? '👁️' : '👁️‍🗨️'}
         </EyeButton>
       </InputContainer>
-      <div style={{minHeight: '15px'}}>
-        {confirmPassword && (
-          <Passwordcheck style={{ color: isPasswordMatch ? 'green' : 'red' }}>
-            {isPasswordMatch ? '비밀번호가 일치합니다.' : '비밀번호가 일치하지 않습니다.'}
-          </Passwordcheck>
-        )}
-      </div>
+      {!isPasswordMatch && <Passwordcheck>비밀번호가 일치하지 않습니다.</Passwordcheck>}
       <InputContainer>
         <Input
           type="text"
