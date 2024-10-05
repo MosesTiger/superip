@@ -3,10 +3,11 @@ import styled from "styled-components";
 import axios from "axios";
 import TextContent from "./TextContent";
 import Graph from "./Graph";
+import BoxofficeSection from "./BoxofficeSection";
 
 const DashboardContainer = styled.div`
   display: flex;
-  justify-content:center;
+  justify-content: center;
   gap: 20px;
   padding: 20px;
   min-height: calc(100vh - 70px);
@@ -17,13 +18,13 @@ const DashboardContainer = styled.div`
 `;
 
 const ResultContainer = styled.div`
-  display:flex;
+  display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
   height: 100%;
   width: 67%; /* 가로 크기 확실히 지정 */
-`
+`;
 
 const Overlay = styled.div`
   position: fixed;
@@ -47,7 +48,7 @@ const DashboardSection = styled.div`
 
 const TitleSection = styled(DashboardSection)`
   height: 480px;
-  width: 30%; 
+  width: 30%;
 `;
 
 const Titleposter = styled.img`
@@ -77,18 +78,18 @@ const TitleContent = styled.div`
 `;
 
 const PenaltySection = styled(DashboardSection)`
-  display:flex;
-  justify-content:flex-start;
+  display: flex;
+  justify-content: flex-start;
   gap: 10px; /* 각 div 간격 */
   color: white;
   width: 90%;
-  height:130px;
+  height: 130px;
 `;
 
 const PenaltyContainer = styled.div`
-  display:flex;
-  flex-direction:row;
-  justify-content:space-between;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   gap: 10px; /* 각 div 간격 */
   align-items: center;
   color: white;
@@ -147,103 +148,19 @@ const Div4 = styled(Div1)`
 const Sectiontitlewrap = styled.div`
   display: flex;
   justify-content: space-between;
-  width:100%;
+  width: 100%;
 `;
 
 const Sectiontitle = styled.div`
   font-size: 17px;
   font-weight: bold;
-  color:black;
+  color: black;
 `;
 
 const AnalysisSection = styled(DashboardSection)`
   width: 90%;
   height: 300px;
   align-items: center;
-`;
-
-const BoxofficeSection = styled(DashboardSection)`
-  width: 90%;
-  height: 300px;
-`;
-
-const BoxContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: 1.2fr 1fr;
-  gap: 10px; /* 각 div 간격 */
-  box-sizing: border-box;
-  align-items: center;
-  color: white;
-  height: 95%;
-  padding: 10px 0px;
-`;
-
-const Boxtitle = styled.div`
-  width: 100%;
-  font-size: 17px;
-  font-weight: bold;
-  padding: 10px 20px;
-`;
-
-const Boxcontent = styled.div`
-  width: 100%;
-  font-size: 15px;
-  padding: 5px 20px;
-`;
-
-const Box1 = styled.div`
-  grid-column: 1;
-  grid-row: 1 / 3;
-  background-color: #1e1e1e;
-  border-radius: 8px;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-`;
-
-const Box1content = styled.div`
-  width: 100%;
-  font-size: 13px;
-  padding: 0px 10px;
-  white-space: pre-wrap;
-`;
-
-const Box2 = styled.div`
-  grid-column: 2;
-  grid-row: 1;
-  background-color: #1e1e1e;
-  border-radius: 8px;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-`;
-
-const Box2content = styled.div`
-  width: 100%;
-  font-size: 13px;
-  padding: 0px 10px;
-  white-space: pre-wrap;
-`;
-
-const Box3 = styled.div`
-  grid-column: 2;
-  grid-row: 2;
-  background-color: #1e1e1e;
-  border-radius: 8px;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-`;
-
-const Box4 = styled.div`
-  grid-column: 3;
-  grid-row: 1 / 3;
-  background-color: #1e1e1e;
-  border-radius: 8px;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
 `;
 
 const MoreButton = styled.button`
@@ -296,32 +213,14 @@ function Show() {
   const longText = `
     이것은 매우 긴 텍스트입니다. 128자를 넘어가는 텍스트는 자동으로 자르고 '더보기' 버튼을 생성하게 됩니다. 예를 들어 이 텍스트는 128자를 넘어가도록 작성하고 있습니다. 사용자가 더보기를 클릭하면 전체 텍스트를 팝업 창에서 확인할 수 있습니다. 자주 사용될 수 있는 패턴입니다.
   `;
+  const genreScore = 85;
+  const runtimeScore = 70;
+  const ratingScore = 50;
+  const countryScore = 90;
+
   const [isAnalysisPopupOpen, setIsAnalysisPopupOpen] = useState(false);
   const [isBoxofficePopupOpen, setIsBoxofficePopupOpen] = useState(false);
   const [predictionData, setPredictionData] = useState(null);
-
-  const genreRank = `
-    장르 추천 순위
-
-    1위 : 액션
-    2위 : 멜로
-    3위 : 드라마
-    4위 : 범죄
-    5위 : 판타지
-  `;
-  const screenTime = `
-    추천 상영 시간
-    100 ~ 120분
-  `;
-  const countryRank = `
-    배경국가 추천 순위
-
-    1위 : 한국
-    2위 : 미국
-    3위 : 일본
-    4위 : 중국
-    5위 : 베트남
-  `;
 
   useEffect(() => {
     fetchPredictionData();
@@ -372,78 +271,57 @@ function Show() {
           </Plot>
         </TitleSection>
         <ResultContainer>
-        <PenaltySection>
-          <Sectiontitle>최종 흥행 분석표</Sectiontitle>
-          <PenaltyContainer>
-            <Div1>
-              <Divtitle>예상 흥행 등급</Divtitle>
-              <DivContent content="rating">A</DivContent>
-            </Div1>
-            <Div2>
-              <Divtitle>예상 별점</Divtitle>
-              <DivContent content="star">
-                <img
-                  src="/별.svg"
-                  alt="별"
-                  style={{
-                    width: "40px",
-                    marginRight: "5px",
-                    marginBottom: "5px",
-                  }}
-                />
-                {/*{predictionData && (
+          <PenaltySection>
+            <Sectiontitle>최종 흥행 분석표</Sectiontitle>
+            <PenaltyContainer>
+              <Div1>
+                <Divtitle>예상 흥행 등급</Divtitle>
+                <DivContent content="rating">A</DivContent>
+              </Div1>
+              <Div2>
+                <Divtitle>예상 별점</Divtitle>
+                <DivContent content="star">
+                  <img
+                    src="/별.svg"
+                    alt="별"
+                    style={{
+                      width: "40px",
+                      marginRight: "5px",
+                      marginBottom: "5px",
+                    }}
+                  />
+                  {/*{predictionData && (
                   <p>{predictionData["최종 흥행도"].average_score.toFixed(1)}</p>
                 )}*/}
-                3.0 / 4.5
-              </DivContent>
-            </Div2>
-            <Div3>
-              <Divtitle>1차 흥행도 예측</Divtitle>
-              <DivContent content="first">A</DivContent>
-            </Div3>
-            <Div4>
-              <Divtitle>시나리오 완성도</Divtitle>
-              <DivContent content="second">70%</DivContent>
-            </Div4>
-          </PenaltyContainer>
-        </PenaltySection>
-        <AnalysisSection>
-          <Sectiontitlewrap>
-            <Sectiontitle>시나리오 완성도 분석표</Sectiontitle>
-            <MoreButton onClick={toggleAnalysisPopup}>분석 더보기</MoreButton>
-          </Sectiontitlewrap>
-          <Graph data={graphData}/>
-        </AnalysisSection>
-        <BoxofficeSection>
-          <Sectiontitlewrap>
-            <Sectiontitle>1차 흥행도 분석표</Sectiontitle>
-            <MoreButton onClick={toggleBoxofficePopup}>분석 더보기</MoreButton>
-          </Sectiontitlewrap>
-          <BoxContainer>
-            <Box1>
-              <Boxtitle>장르</Boxtitle>
-              <Boxcontent>장르 내용내용내용</Boxcontent>
-              <Box1content>{genreRank}</Box1content>
-            </Box1>
-            <Box2>
-              <Boxtitle>상영 시간</Boxtitle>
-              <Boxcontent>상영시간 내용내용내용</Boxcontent>
-              <Box2content>{screenTime}</Box2content>
-            </Box2>
-            <Box3>
-              <Boxtitle>관람 등급</Boxtitle>
-              <Boxcontent>관람등급 내용내용내용</Boxcontent>
-            </Box3>
-            <Box4>
-              <Boxtitle>배경 국가</Boxtitle>
-              <Boxcontent>배경국가 내용내용내용</Boxcontent>
-              <Box1content>{countryRank}</Box1content>
-            </Box4>
-          </BoxContainer>
-        </BoxofficeSection>
+                  3.0 / 4.5
+                </DivContent>
+              </Div2>
+              <Div3>
+                <Divtitle>1차 흥행도 예측</Divtitle>
+                <DivContent content="first">A</DivContent>
+              </Div3>
+              <Div4>
+                <Divtitle>시나리오 완성도</Divtitle>
+                <DivContent content="second">70%</DivContent>
+              </Div4>
+            </PenaltyContainer>
+          </PenaltySection>
+          <AnalysisSection>
+            <Sectiontitlewrap>
+              <Sectiontitle>시나리오 완성도 분석표</Sectiontitle>
+              <MoreButton onClick={toggleAnalysisPopup}>분석 더보기</MoreButton>
+            </Sectiontitlewrap>
+            <Graph data={graphData} />
+          </AnalysisSection>
+          <BoxofficeSection
+            genreScore={genreScore}
+            runtimeScore={runtimeScore}
+            ratingScore={ratingScore}
+            countryScore={countryScore}
+            onMoreClick={toggleBoxofficePopup}
+          />
         </ResultContainer>
       </DashboardContainer>
-      
 
       {isAnalysisPopupOpen && (
         <Popup>
@@ -460,7 +338,6 @@ function Show() {
           {/* Add detailed boxoffice analysis content here */}
         </Popup>
       )}
-      
     </>
   );
 }

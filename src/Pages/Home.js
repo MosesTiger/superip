@@ -1,24 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Header from "../Components/Header";
 import Card from "../Components/Home/Card";
 import Navbar from "../Components/Home/Navbar";
 import "../stylefile/Main.css";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import ExampleCard from "../Components/Home/ExampleCard";
+import { IoIosArrowDropright, IoIosArrowDropleft } from "react-icons/io";
+
+const slideAnimation = keyframes`
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-10%);
+  }
+`;
+
+const Wrapper = styled.div`
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+  height:100%:
+`;
 
 const FilmContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width:100%;
-  margin-top:10px;
+  width: 80%;
+  margin-top: 10px;
+  overflow: hidden;
 `;
 
 const FilmRow = styled.div`
   display: flex;
-  justify-content: space-between;
   margin: 10px 0; /* 위아래 간격 */
-  width:80%;
+  width: 200%; /* 두 배로 설정해 반복되도록 만듦 */
+  gap: 40px;
+  animation: ${slideAnimation} 5s linear infinite; /* 15초 동안 왼쪽으로 이동, 무한 반복 */
 `;
 
 const FilmWhite = styled.div`
@@ -30,11 +50,11 @@ const FilmWhite = styled.div`
 `;
 
 const TitleContainer = styled.div`
-  display:flex;
-  width:100%;
-  align-items:center;
-  justify-content:center;
-`
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+`;
 
 const CircleIcon = styled.div`
   width: 45px; /* 동그라미의 가로 크기 */
@@ -42,22 +62,22 @@ const CircleIcon = styled.div`
   background-color: #f5f5f5; /* 동그라미 색상 */
   border-radius: 50%; /* 동그라미 모양을 위해 50% */
   margin-right: 20px; /* 제목과의 간격 */
-  margin-left:160px;
-  margin-top:20px;
+  margin-left: 160px;
+  margin-top: 20px;
 `;
 
 const TitleWrapper = styled.div`
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding: 0px 20px;
-  padding-top:5px;
-  width:75%;
-  margin-top:30px;
-  margin-right:10%;
+  padding: 0px 20x;
+  padding-top: 5px;
+  width: 80%;
+  margin-top: 30px;
+  margin-right: 10%;
   border-top: 3px solid white;
   border-bottom: 3px solid white;
-`
+`;
 
 const VerticalLine = styled.div`
   width: 2px;
@@ -67,13 +87,12 @@ const VerticalLine = styled.div`
 `;
 
 const ExampleSection = styled.div`
-  width: 100%;
-  height: 500px;
+  width: 90%;
+  height: 680px;
   margin-top: 50px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  background-color:blue;
+  align-items: flex-start;
 `;
 
 const ExampleTitle = styled.h2`
@@ -85,21 +104,34 @@ const ExampleTitle = styled.h2`
 const CardWrapper = styled.div`
   display: flex;
   overflow: hidden;
-  width: 90%;
-  height:100px;
+  width: 100%;
 `;
 
 const CardRow = styled.div`
   display: flex;
   transition: transform 0.3s ease;
-  transform: ${({ scrollPosition }) => `translateX(-${scrollPosition * 100}%)`};
+  transform: ${({ scrollPosition }) => `translateX(-${scrollPosition * 17}%)`};
 `;
 
-const ArrowButton = styled.button`
+const ArrowWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  position: relative;
+  margin-top: 20px;
+`;
+
+const ArrowContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const IconButton = styled.button`
   background-color: transparent;
   border: none;
-  color: white;
-  font-size: 24px;
+  color: #f5f5f5;
+  font-size: 40px; /* Adjust the size of the icons */
   cursor: pointer;
 
   &:disabled {
@@ -107,15 +139,6 @@ const ArrowButton = styled.button`
     cursor: not-allowed;
   }
 `;
-
-const ArrowWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  position: relative;
-  margin-top: 20px;
-`;
-
 
 function Home() {
   const cardData = [
@@ -145,7 +168,6 @@ function Home() {
           예시작을 참고해보세요.
         </>
       ),
-      redirectTo: "/create/script",
     },
     {
       id: 3,
@@ -179,11 +201,38 @@ function Home() {
   ];
 
   const exampleData = [
-    { id: 1, title: "Story 1", description: "Example Story 1", image: "/추천시나리오1.png" },
-    { id: 2, title: "Story 2", description: "Example Story 2", image: "/추천시나리오2.png" },
-    { id: 3, title: "Story 3", description: "Example Story 3", image: "/추천시나리오3.png" },
-    { id: 4, title: "Story 4", description: "Example Story 4", image: "/추천시나리오4.png" },
+    {
+      id: 1,
+      title: "Story 1",
+      genre: "SF, 전쟁",
+      image: "/추천시나리오1.png",
+    },
+    {
+      id: 2,
+      title: "Story 2",
+      genre: "범죄, 스릴러",
+      image: "/추천시나리오2.png",
+    },
+    {
+      id: 3,
+      title: "Story 3",
+      genre: "판타지",
+      image: "/추천시나리오3.png",
+    },
+    {
+      id: 4,
+      title: "Story 4",
+      genre: "액션, 무협",
+      image: "/추천시나리오4.png",
+    },
   ];
+
+  const exampleSectionRef = useRef(null);
+  const scrollToExampleSection = () => {
+    if (exampleSectionRef.current) {
+      exampleSectionRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   const [scrollPosition, setScrollPosition] = useState(0);
 
@@ -212,76 +261,121 @@ function Home() {
           <Navbar />
         </TitleWrapper>
       </TitleContainer>
-      <FilmContainer>
-        <FilmRow>
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-        </FilmRow>
-        <div className="card-container">
-          {cardData.map((card) => (
-            <Card
-              key={card.id}
-              cardnum={card.cardnum}
-              image={card.image}
-              title={card.title}
-              description={card.description}
-              redirectTo={card.redirectTo}
-              selectedMenu={card.selectedMenu} // selectedMenu 전달
-            />
-          ))}
-        </div>
-        <FilmRow>
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-          <FilmWhite />
-        </FilmRow>
-      </FilmContainer>
-      <ExampleSection>
-        <ExampleTitle>Example Story</ExampleTitle>
-        <ArrowWrapper>
-          <ArrowButton onClick={handleScrollLeft} disabled={scrollPosition === 0}>
-            {"<"}
-          </ArrowButton>
+      <Wrapper>
+        <FilmContainer>
+          <FilmRow>
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+          </FilmRow>
+          <div className="card-container">
+            {cardData.map((card) => (
+              <Card
+                key={card.id}
+                cardnum={card.cardnum}
+                image={card.image}
+                title={card.title}
+                description={card.description}
+                redirectTo={card.redirectTo}
+                selectedMenu={card.selectedMenu}
+                scrollToExampleSection={scrollToExampleSection} // 함수 전달
+              />
+            ))}
+          </div>
+          <FilmRow>
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+            <FilmWhite />
+          </FilmRow>
+        </FilmContainer>
+      </Wrapper>
+      <Wrapper>
+        <ExampleSection ref={exampleSectionRef}>
+          <ExampleTitle>EXAMPLE STORY</ExampleTitle>
           <CardWrapper>
             <CardRow scrollPosition={scrollPosition}>
               {exampleData.map((story) => (
-                <ExampleCard key={story.id} title={story.title} description={story.description} image={story.image} />
+                <ExampleCard
+                  key={story.id}
+                  title={story.title}
+                  genre={story.genre}
+                  image={story.image}
+                />
               ))}
             </CardRow>
           </CardWrapper>
-          <ArrowButton
-            onClick={handleScrollRight}
-            disabled={scrollPosition >= exampleData.length - 2}
-          >
-            {">"}
-          </ArrowButton>
-        </ArrowWrapper>
-      </ExampleSection>
+          <ArrowWrapper>
+            <ArrowContainer>
+              <IconButton
+                onClick={handleScrollLeft}
+                disabled={scrollPosition === 0}
+              >
+                <IoIosArrowDropleft />
+              </IconButton>
+              <IconButton
+                onClick={handleScrollRight}
+                disabled={scrollPosition >= exampleData.length - 2}
+              >
+                <IoIosArrowDropright />
+              </IconButton>
+            </ArrowContainer>
+          </ArrowWrapper>
+        </ExampleSection>
+      </Wrapper>
     </div>
   );
 }
