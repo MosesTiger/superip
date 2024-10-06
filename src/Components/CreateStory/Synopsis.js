@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate, useLocation } from "react-router-dom";
-
+import axios from 'axios';
+import { useAuth } from '../../context/AuthProvider';  // 경로는 실제 위치에 맞게 조정하세요
 const Section = styled.section`
   display: flex;
   flex-direction: column;
@@ -27,7 +28,16 @@ const TextArea = styled.textarea`
   display: block;
   resize: vertical;
 `;
-
+const SuccessRateDisplay = styled.div`
+  font-size: 18px;
+  margin-top: 10px;
+  color: #4a4a4a;
+  font-weight: bold;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  text-align: center;
+`;
 const Label = styled.label`
   display: block;
   width: 80%;
@@ -73,144 +83,142 @@ const ExpectResult = styled.div`
 function Synopsis() {
   const [characters, setCharacters] = useState("");
   const [plot, setPlot] = useState("");
-  const [keyword, setKeyword] = useState(""); // keyword로 필드명 변경
+  const [keyword, setKeyword] = useState("");
   const [gptRequest, setGptRequest] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSynopsisComplete, setIsSynopsisComplete] = useState(false);
+  const [successRate, setSuccessRate] = useState(null);
+  const [scenarioId, setScenarioId] = useState(null);
 
   const navigate = useNavigate();
   const location = useLocation();
   const movieData = location.state;
+  const { token } = useAuth();
 
   useEffect(() => {
-    console.log("Current location:", location.pathname);
-  }, [location]);
+    if (movieData && movieData.scenarioId) {
+      setScenarioId(movieData.scenarioId);
+    }
+  }, [movieData]);
 
-  const handleButtonClick = () => {
-    if (!isGenerating && !isSynopsisComplete) {
-      if (movieData && characters && keyword) {
-        // keyword로 체크
-        setIsGenerating(true);
-        setPlot(""); // Reset plot before generating new one
-
-        const eventSource = new EventSource(
-          `http://43.200.200.147/api/v1/synopsis/generate?${new URLSearchParams(
-            {
-              keyword: keyword, // keyword 사용
-              genre: movieData.selectedGenres.join(", "),
-              theme: movieData.country,
-              characters: characters,
-            }
-          )}`
-        );
-
-        eventSource.onmessage = (event) => {
-          if (event.data === "[DONE]") {
-            eventSource.close();
-            setIsGenerating(false);
-          } else {
-            try {
-              const data = JSON.parse(event.data);
-              if (data.storyline) {
-                setPlot(data.storyline);
-              }
-            } catch (error) {
-              // If it's not a JSON, it's a part of the storyline
-              setPlot((prevPlot) => prevPlot + event.data);
-            }
+  const updateUserRequest = async () => {
+    try {
+      await axios.put(
+        `http://43.200.200.147/api/v1/scenarios/${scenarioId}/user-request`,
+        { user_request: gptRequest },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
           }
-        };
-        setIsGenerating(true);
-        setTimeout(() => {
-          setIsSynopsisComplete(true);
-        }, 1000);
-
-        eventSource.onerror = (error) => {
-          console.error("Error:", error);
-          eventSource.close();
-          setIsGenerating(false);
-          alert("시놉시스 생성 중 오류가 발생했습니다.");
-        };
-      } else {
-        alert("영화 정보, 등장인물, 키워드를 모두 입력해주세요.");
-      }
-    } else if (isSynopsisComplete) {
-      // 시나리오 생성 함수 호출
-      handleCreateScenario();
+        }
+      );
+      console.log("사용자 요청사항이 업데이트되었습니다.");
+    } catch (error) {
+      console.error("사용자 요청사항 업데이트 중 오류:", error);
+      alert("사용자 요청사항 업데이트 중 오류가 발생했습니다.");
     }
   };
 
-  const handleCreateScenario = (e) => {
-    e.stopPropagation();
-    if (!plot) {
-      alert("시놉시스를 먼저 생성해주세요.");
-      return;
-    }
-
-    const scenarioData = {
-      title: movieData.title,
-      genre: movieData.selectedGenres.join(", "),
-      theme: movieData.country,
-      characters: characters,
-      keyword: keyword, // keyword 필드만 사용
-      synopsis: plot,
-      duration: movieData.duration, // duration 값을 포함
-    };
-
-    console.log(
-      "Attempting to navigate to Script component with data:",
-      scenarioData
-    );
+  const generateSynopsis = async () => {
+    setIsGenerating(true);
     try {
-      navigate("/create/script", {
-        state: { scenarioData, autoStart: true },
-        replace: true,
-      });
-      console.log("이동 성공적으로 이뤄짐");
+      await updateUserRequest();
+      const response = await axios.post(
+        'http://43.200.200.147/api/v1/synopsis/generate',
+        {
+          scenario_id: scenarioId,
+          keyword: keyword,
+          genre: movieData.selectedGenres.join(", "),
+          theme: movieData.country,
+          characters: characters.split(",").map(char => char.trim())
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      setPlot(response.data.storyline);
+      setIsSynopsisComplete(true);
+      
+      // 1차 흥행률 예측 API 호출
+      const predictionResponse = await axios.post(
+        'http://43.200.200.147/api/v1/success-rate/first_predict',
+        {
+          scenario_id: scenarioId,
+          keyword: keyword,
+          genre: movieData.selectedGenres.join(", "),
+          runtime: movieData.duration,
+          gender: movieData.mainCharacterGender,
+          rating: movieData.rating,
+          theme: movieData.country
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      setSuccessRate(predictionResponse.data["1차 흥행도"]);
     } catch (error) {
-      console.error("Navigation error:", error);
+      console.error("시놉시스 생성 중 오류:", error);
+      alert("시놉시스 생성 중 오류가 발생했습니다.");
+    } finally {
+      setIsGenerating(false);
     }
   };
 
   const handlePredictionClick = async () => {
     try {
-      const {
-        title,
-        selectedGenres,
-        duration,
-        rating,
-        country,
-        isSeries,
-        mainCharacterGender,
-      } = movieData;
-
-      const response = await fetch(
-        "http://43.200.200.147/api/v1/success-rate/predict",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            title,
-            genres: selectedGenres,
-            duration,
-            rating,
-            country,
-            isSeries, // isSeries는 movieData의 isCheckboxChecked를 받아온 값입니다.
-            mainCharacterGender,
-          }),
+      const response = await axios.post('http://43.200.200.147/api/v1/success-rate/predict', {
+        scenario_id: scenarioId,
+        title: movieData.title,
+        genres: movieData.selectedGenres,
+        duration: movieData.duration,
+        rating: movieData.rating,
+        country: movieData.country,
+        isSeries: movieData.isSeries,
+        mainCharacterGender: movieData.mainCharacterGender,
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-      );
-
-      if (!response.ok) {
-        throw new Error("흥행률 예측 실패");
-      }
-      const data = await response.json();
-      alert(`예상 흥행률: ${data.success_rate}%`);
+      });
+      setSuccessRate(response.data.success_rate);
+      alert(`예상 흥행률: ${response.data.success_rate}%`);
     } catch (error) {
       console.error("Error:", error);
       alert("흥행률 예측 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleCreateScenario = async () => {
+    if (!plot) {
+      alert("시놉시스를 먼저 생성해주세요.");
+      return;
+    }
+
+    try {
+      const response = await axios.put(
+        `http://43.200.200.147/api/v1/scenarios/${scenarioId}`,
+        {
+          synopsis: plot,
+          characters: characters.split(",").map(char => char.trim()),
+          keyword: keyword
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      navigate("/create/script", {
+        state: { scenarioId, autoStart: true },
+        replace: true,
+      });
+    } catch (error) {
+      console.error("Navigation error:", error);
     }
   };
 
@@ -225,7 +233,7 @@ function Synopsis() {
       <Label>키워드 태그 (콤마로 구분)</Label>
       <TextArea
         placeholder="예: 모험, 우정, 성장"
-        value={keyword} // 단일 키워드 필드로 설정
+        value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
       />
       <Label>시놉시스</Label>
@@ -243,12 +251,14 @@ function Synopsis() {
         onChange={(e) => setGptRequest(e.target.value)}
         height="300px"
       />
+      {successRate && (
+        <SuccessRateDisplay>예상 흥행률: {successRate}%</SuccessRateDisplay>
+      )}
       <ButtonContainer>
-        <ExpectResult>등급 : ㅁ</ExpectResult>
-        <ExpectButton onclick={handlePredictionClick}>
-          흥행도 예측 버튼
+        <ExpectButton onClick={handlePredictionClick}>
+          흥행도 예측
         </ExpectButton>
-        <CombinedButton onClick={handleButtonClick} disabled={isGenerating}>
+        <CombinedButton onClick={isSynopsisComplete ? handleCreateScenario : generateSynopsis} disabled={isGenerating}>
           {isGenerating
             ? "생성 중..."
             : isSynopsisComplete

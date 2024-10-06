@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from '../../context/AuthProvider';
+import axios from 'axios';
 
 const Section = styled.section`
   display: flex;
@@ -47,144 +49,99 @@ const GenreSelection = styled.div`
 `;
 
 const GenreOption = styled.div`
-  margin: 8px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 8px 10px;
-  border-radius: 4px;
-  background-color: ${(props) => (props.selected ? "#e23a3a" : "#cdcdcd")};
-  color: ${(props) => (props.selected ? "#fff" : "#000")};
+  padding: 8px 16px;
+  margin: 5px;
+  border-radius: 20px;
+  background-color: ${(props) => (props.selected ? "#007bff" : "#e0e0e0")};
+  color: ${(props) => (props.selected ? "#ffffff" : "#000000")};
   cursor: pointer;
+  transition: all 0.3s ease;
 
   &:hover {
-    background-color: #e23a3a;
-    color: #fff;
-  }
-  &:active {
-    background-color: #be3232;
-    color: #fff;
+    background-color: ${(props) => (props.selected ? "#0056b3" : "#d0d0d0")};
   }
 `;
 
-const GenreLabel = styled.div`
-  font-weight: 500;
-  text-align: center;
+const Label = styled.label`
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 10px;
 `;
 
-const Label = styled.div`
-  font-size: 16px;
-  color: #000;
-  margin: -5px 0;
-`;
-
-const DurationSelection = styled.div`
+const DurationControl = styled.div`
   display: flex;
-  flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  width: 268px;
-  border-radius: 4px;
-  background-color: #f5f5f5;
-  border: 1px solid #cdcdcd;
-  padding: 8px;
-  gap: 5px;
-  margin: 10px 0;
-  margin-top: -5px;
+  width: 200px;
+  margin-top: 10px;
 `;
 
-const DurationInput = styled.input`
-  width: 100px;
+const DurationButton = styled.button`
+  width: 30px;
+  height: 30px;
   border: none;
-  background-color: #f5f5f5;
-  border-radius: 4px;
-  padding: 5px;
+  background-color: #007bff;
+  color: white;
   font-size: 20px;
-  text-align: center;
+  cursor: pointer;
+  border-radius: 50%;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+
+  &:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+`;
+
+const DurationDisplay = styled.span`
+  font-size: 18px;
+  font-weight: bold;
 `;
 
 const Select1 = styled.select`
-  width: 268px;
-  height: 45px;
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
   border-radius: 4px;
-  background-color: #f5f5f5;
-  border: 1px solid #cdcdcd;
-  padding: 8px;
   font-size: 16px;
-  color: #000;
-  margin: 10px 0;
-  margin-top: -5px;
 `;
 
 const CheckboxContainer = styled.div`
   display: flex;
-  flex-direction: row;
   align-items: center;
-  gap: 7px;
-  margin: 10px 0;
-  padding-bottom: 10px;
-  margin-bottom: 20px;
-  margin-top: -5px;
+  margin-top: 20px;
 `;
 
 const Checkbox = styled.input`
-  width: 25px;
-  height: 25px;
-  margin: 0;
-  accent-color: ${(props) => (props.checked ? "#E23A3A" : "#859AA5")};
-`;
-
-const Actions = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 22px;
-  bottom: 20px;
-  margin: 15px 0;
-`;
-
-const PredictionButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 15%;
-  padding: 20px;
-  border: none;
-  border-radius: 10px;
-  background-color: #e23a3a;
-  text-decoration: none;
-  color: black;
-  font-weight: bold;
-  font-size: 20px;
-  text-align: center;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #be3232;
-  }
+  margin-right: 10px;
 `;
 
 const MovieDetails = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 20px;
-  border-bottom: 1px solid #ccc;
+  margin-top: 20px;
 `;
 
-const PlusMinusButton = styled.button`
-  width: 30px;
-  height: 30px;
-  border: none;
-  background-color: #f5f5f5;
-  color: black;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 18px;
+const Actions = styled.div`
+  margin-top: 30px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+`;
+
+const PredictionButton = styled.button`
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #0056b3;
+  }
 `;
 
 function Select() {
@@ -195,6 +152,8 @@ function Select() {
   const [rating, setRating] = useState("all");
   const [country, setCountry] = useState("korea");
   const [mainCharacterGender, setMainCharacterGender] = useState("male");
+  const { token } = useAuth();
+  const navigate = useNavigate();
 
   const handleGenreClick = (genre) => {
     setSelectedGenres((prev) =>
@@ -209,14 +168,12 @@ function Select() {
   };
 
   const increaseDuration = () => {
-    setDuration((prev) => Math.min(prev + 10, 180)); // 10분씩 증가, 최대 180분
+    setDuration((prev) => Math.min(prev + 10, 120)); // 10분씩 증가, 최대 120분
   };
 
   const decreaseDuration = () => {
     setDuration((prev) => Math.max(prev - 10, 10)); // 10분씩 감소, 최소 10분
   };
-
-  const navigate = useNavigate();
 
   const handleSubmit = async () => {
     if (!title || selectedGenres.length === 0) {
@@ -225,8 +182,22 @@ function Select() {
     }
 
     try {
+      const response = await axios.post('http://3.36.168.204/api/v1/scenario/create', {
+        title,
+        genre: selectedGenres.join(', '),
+        theme: isCheckboxChecked ? "시리즈" : "단편",
+        runtime: duration,
+        gender: mainCharacterGender,
+        rating,
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
       navigate("/create/synopsis", {
         state: {
+          scenarioId: response.data.id,
           title,
           selectedGenres,
           duration,
@@ -238,7 +209,7 @@ function Select() {
       });
     } catch (error) {
       console.error("Error:", error);
-      alert("다음 단계로 이동 중 오류가 발생했습니다.");
+      alert("시나리오 생성 중 오류가 발생했습니다.");
     }
   };
 
@@ -256,72 +227,34 @@ function Select() {
         </Label>
         <Label>장르를 선택하세요. (최대 3개)</Label>
         <GenreSelection>
-          {[
-            "드라마",
-            "액션",
-            "코메디",
-            "범죄",
-            "스릴러",
-            "미스터리",
-            "시대극/사극",
-            "전쟁",
-            "가족",
-            "멜로/로맨스",
-            "어드벤쳐",
-            "판타지",
-            "공포",
-            "스포츠",
-            "SF",
-            "느와르",
-            "반공/분단",
-            "첩보",
-            "인물",
-            "재난",
-            "전기",
-            "하이틴",
-            "역사",
-            "갱스터",
-            "사회물(경향)",
-            "뮤직",
-            "청춘",
-            "활극",
-            "동성애",
-            "뮤지컬",
-            "신파",
-            "무협",
-          ].map((genre) => (
+          {["액션", "로맨스", "코미디", "스릴러", "SF", "판타지", "드라마", "공포", "애니메이션"].map((genre) => (
             <GenreOption
               key={genre}
               selected={selectedGenres.includes(genre)}
               onClick={() => handleGenreClick(genre)}
             >
-              <GenreLabel>{genre}</GenreLabel>
+              {genre}
             </GenreOption>
           ))}
         </GenreSelection>
-        <small style={{ color: "red" }}>
-          {selectedGenres.length >= 3
-            ? "최대 3개의 장르까지 선택할 수 있습니다."
-            : ""}
-        </small>
-        <Label>상영 시간을 입력하세요.</Label>
-        <DurationSelection>
-          <PlusMinusButton onClick={decreaseDuration}>-</PlusMinusButton>
-          <DurationInput
-            type="number"
-            value={duration}
-            readOnly // 읽기 전용으로 설정하여 사용자가 직접 수정할 수 없게 함
-          />
-          <PlusMinusButton onClick={increaseDuration}>+</PlusMinusButton>
-        </DurationSelection>
+        <Label>영화 상영 시간을 선택하세요.</Label>
+        <DurationControl>
+          <DurationButton onClick={decreaseDuration} disabled={duration <= 10}>
+            -
+          </DurationButton>
+          <DurationDisplay>{duration}분</DurationDisplay>
+          <DurationButton onClick={increaseDuration} disabled={duration >= 120}>
+            +
+          </DurationButton>
+        </DurationControl>
         <Label>관람 등급을 선택하세요.</Label>
         <Select1 value={rating} onChange={(e) => setRating(e.target.value)}>
           <option value="all">전체 관람가</option>
-          <option value="12">12세 관람가</option>
-          <option value="15">15세 관람가</option>
-          <option value="19">19세 관람가</option>
+          <option value="12">12세 이상 관람가</option>
+          <option value="15">15세 이상 관람가</option>
+          <option value="19">청소년 관람불가</option>
         </Select1>
-        <Label>영화의 배경 국가를 선택하세요.</Label>
+        <Label>국가를 선택하세요.</Label>
         <Select1 value={country} onChange={(e) => setCountry(e.target.value)}>
           <option value="korea">한국</option>
           <option value="china">중국</option>
