@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-
+import axios from 'axios';
+import { useEffect } from "react";
 const StyledTextContent = styled.div`
   max-height: 120px;
   overflow: hidden;
@@ -58,8 +59,22 @@ const CloseButton = styled.button`
   cursor: pointer;
 `;
 
-const TextContent = ({ content }) => {
+const TextContent = ({ scenarioId }) => {
+  const [content, setContent] = useState("");
   const [showFullText, setShowFullText] = useState(false);
+
+  useEffect(() => {
+    const fetchFinalAssessment = async () => {
+      try {
+        const response = await axios.get(`/api/scenario/${scenarioId}/generate-final-assessment`);
+        setContent(response.data.assessment);
+      } catch (error) {
+        console.error("Error fetching final assessment:", error);
+      }
+    };
+
+    fetchFinalAssessment();
+  }, [scenarioId]);
 
   const handleTogglePopup = () => {
     setShowFullText(!showFullText);
