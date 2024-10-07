@@ -1,7 +1,9 @@
+// src/components/Login.js
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "../context/AuthProvider";
+import axios from "axios";
 
 const LoginText = styled.div`
   font-size: 40px;
@@ -46,37 +48,6 @@ const LoginButton = styled.button`
     background-color: #cdcdcd;
   }
 `;
-const OAuthButton = styled.button`
-  width: 300px;
-  height: 40px;
-  padding: 10px;
-  margin: 5px 0;
-  border-radius: 5px;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  &.kakao {
-    background-color: #fee500;
-    color: #181600;
-  }
-  &.naver {
-    background-color: #03c75a;
-  }
-  img {
-    position: absolute;
-    left: 20px;
-    width: 14px;
-    height: auto;
-  }
-  &:hover {
-    opacity: 0.9;
-  }
-`;
 const LinkContainer = styled.div`
   display: flex;
   justify-content: space-between;
@@ -111,10 +82,6 @@ function Login() {
     }
   };
 
-  const handleOAuthLogin = (provider) => {
-    window.location.href = `http://43.200.111.65/api/v1/auth/${provider}`;
-  };
-
   return (
     <>
       <LoginText>LOGIN</LoginText>
@@ -141,18 +108,10 @@ function Login() {
         </InputContainer>
         <LoginButton type="submit">Login</LoginButton>
       </form>
-      <OAuthButton className="kakao" onClick={() => handleOAuthLogin('kakao')}>
-        <img src="/카카오.png" alt="Ka Logo" />
-        카카오톡 로그인
-      </OAuthButton>
-      <OAuthButton className="naver" onClick={() => handleOAuthLogin('naver')}>
-        <img src="/네이버.png" alt="Naver Logo" />
-        네이버 로그인
-      </OAuthButton>
+      {/* 소셜 로그인 버튼과 회원가입 링크를 제외합니다 */}
       <LinkContainer>
         <LinkButton to="/login/findid">아이디 찾기</LinkButton>
         <LinkButton to="/login/findpw">비밀번호 찾기</LinkButton>
-        <LinkButton to="/login/Signup">회원가입</LinkButton>
       </LinkContainer>
     </>
   );
