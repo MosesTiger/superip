@@ -112,7 +112,7 @@ function Login() {
   };
 
   const handleOAuthLogin = (provider) => {
-    window.location.href = `http://43.200.111.65/api/v1/${provider}`;
+    window.location.href = `http://43.200.111.65/api/v1/auth/${provider}`;
   };
 
   return (
