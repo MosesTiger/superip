@@ -23,7 +23,7 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('http://43.200.111.65//api/v1/auth/token', {
+      const response = await axios.post('http://43.200.111.65/api/v1/auth/token', {
         username: email,
         password: password
       }, {
@@ -64,7 +64,7 @@ export function AuthProvider({ children }) {
 
   const register = async (email, password, fullName, username) => {
     try {
-      const response = await axios.post('hhttp://43.200.111.65//api/v1/auth/register', {
+      const response = await axios.post('hhttp://43.200.111.65/api/v1/auth/register', {
         email,
         password,
         full_name: fullName,
