@@ -23,7 +23,7 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('http://43.200.111.65/api/v1/auth/token', {
+      const response = await axios.post('http://43.200.111.65/api/v1/token', {
         username: email,
         password: password
       }, {
@@ -37,7 +37,7 @@ export function AuthProvider({ children }) {
       setIsAuthenticated(true);
       
       // 사용자 정보 가져오기
-      const userResponse = await axios.get('http://43.200.111.65//api/v1/auth/profile/', {
+      const userResponse = await axios.get('http://43.200.111.65/api/v1/profile', {
         headers: {
           'Authorization': `Bearer ${access_token}`
         }
@@ -64,7 +64,7 @@ export function AuthProvider({ children }) {
 
   const register = async (email, password, fullName, username) => {
     try {
-      const response = await axios.post('hhttp://43.200.111.65/api/v1/auth/register', {
+      const response = await axios.post('http://43.200.111.65/api/v1/register', {
         email,
         password,
         full_name: fullName,

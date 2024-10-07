@@ -176,7 +176,7 @@ function Signup() {
     }
 
     try {
-      const response = await axios.post('http://43.200.111.65/api/v1/auth/register', {
+      const response = await axios.post('http://43.200.111.65/api/v1/register', {
         email: email,
         password: password,
         full_name: name,
