@@ -113,6 +113,7 @@ function Login() {
         <LinkButton to="/login/findid">아이디 찾기</LinkButton>
         <LinkButton to="/login/findpw">비밀번호 찾기</LinkButton>
       </LinkContainer>
+      <SignupLink to="/signup">회원가입</SignupLink>
     </>
   );
 }
