@@ -50,16 +50,27 @@ const LoginButton = styled.button`
 `;
 const LinkContainer = styled.div`
   display: flex;
-  justify-content: space-between;
-  width: 280px;
-  margin-top: 10px;
-  gap: 10px;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
 `;
+
 const LinkButton = styled(Link)`
   color: #757678;
   text-decoration: none;
   font-size: 14px;
-  margin-right: 5px;
+  margin: 5px 0;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const SignupLink = styled(Link)`
+  color: #0056b3;
+  text-decoration: none;
+  font-size: 16px;
+  margin-top: 15px;
+  font-weight: bold;
   &:hover {
     text-decoration: underline;
   }
@@ -108,12 +119,11 @@ function Login() {
         </InputContainer>
         <LoginButton type="submit">Login</LoginButton>
       </form>
-      {/* 소셜 로그인 버튼과 회원가입 링크를 제외합니다 */}
       <LinkContainer>
         <LinkButton to="/login/findid">아이디 찾기</LinkButton>
         <LinkButton to="/login/findpw">비밀번호 찾기</LinkButton>
+        <SignupLink to="/signup">회원가입</SignupLink>
       </LinkContainer>
-      <SignupLink to="/signup">회원가입</SignupLink>
     </>
   );
 }
