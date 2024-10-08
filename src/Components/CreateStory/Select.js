@@ -194,7 +194,7 @@ function Select() {
     }
 
     try {
-      const response = await axios.post('http://3.36.168.204/api/v1/scenario/create', {
+      const response = await axios.post('http://43.200.111.65/api/v1/scenario/create', {
         title: title,
         genre: selectedGenres.join(", "),
         runtime: duration,
