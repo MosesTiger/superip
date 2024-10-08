@@ -157,9 +157,10 @@ function Select() {
   const [rating, setRating] = useState("all");
   const [country, setCountry] = useState("korea");
   const [mainCharacterGender, setMainCharacterGender] = useState("male");
-  const { token } = useAuth();
+  const { token, user } = useAuth(); 
   const navigate = useNavigate();
 
+  
   const handleGenreClick = (genre) => {
     setSelectedGenres((prev) =>
       prev.includes(genre)
@@ -186,33 +187,32 @@ function Select() {
       return;
     }
 
+    if (!user) {
+      alert("로그인이 필요합니다.");
+      navigate("/login");
+      return;
+    }
+
     try {
       const response = await axios.post('http://3.36.168.204/api/v1/scenario/create', {
-        title,
-        genre: selectedGenres.join(', '),
-        theme: isCheckboxChecked ? "시리즈" : "단편",
+        title: title,
+        genre: selectedGenres.join(", "),
         runtime: duration,
+        rating: rating,
+        theme: country,
         gender: mainCharacterGender,
-        rating,
+        is_series: isCheckboxChecked,
       }, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
-      navigate("/create/synopsis", {
-        state: {
-          scenarioId: response.data.id,
-          title,
-          selectedGenres,
-          duration,
-          rating,
-          country,
-          isSeries: isCheckboxChecked,
-          mainCharacterGender,
-        },
-      });
-    } catch (error) {
+      if (response.status === 201) {
+        const scenarioId = response.data.id;
+        navigate("/create/synopsis", {state: {scenarioId}});
+     } 
+   }  catch (error) {
       console.error("Error:", error);
       alert("시나리오 생성 중 오류가 발생했습니다.");
     }
