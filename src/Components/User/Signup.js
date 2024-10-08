@@ -115,7 +115,8 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [name, setName] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [username, setUsername] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [checkItems, setCheckItems] = useState([]);
   const [open0, setOpen0] = useState(false);
@@ -155,16 +156,16 @@ function Signup() {
   };
 
   const isPasswordMatch = password === confirmPassword;
-  const allInputsFilled = email && password && confirmPassword && name;
+  const allInputsFilled = email && password && confirmPassword && fullName && username;
   const allRequiredChecked = checkItems.includes(0) && checkItems.includes(1);
   const canSignUp = allInputsFilled && isPasswordMatch && allRequiredChecked;
+ 
 
   const handleSignUp = async () => {
     if (!allInputsFilled) {
       alert('모든 필드를 입력해 주세요.');
       return;
     }
-
     if (!allRequiredChecked) {
       alert('필수 약관에 동의해 주세요.');
       return;
@@ -179,8 +180,8 @@ function Signup() {
       const response = await axios.post('http://43.200.111.65/api/v1/auth/register', {
         email: email,
         password: password,
-        full_name: name,
-        username: email,
+        full_name: fullName,
+        username: username,
         social_provider: "LOCAL",
         social_id: null
       });
@@ -245,8 +246,16 @@ function Signup() {
         <Input
           type="text"
           placeholder="이름 입력"
-          value={name}
+          value={fullName}
           onChange={e => setName(e.target.value)}
+        />
+      </InputContainer>
+      <InputContainer>
+        <Input
+          type="text"
+          placeholder="사용자 아이디 입력"
+          value={username}
+          onChange={e => setUsername(e.target.value)}
         />
       </InputContainer>
       <CheckboxContainer>
