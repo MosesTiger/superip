@@ -15,6 +15,14 @@ const Section = styled.section`
   padding-right: 35px;
 `;
 
+const TitleDisplay = styled.h2`
+  font-size: 18px;
+  color: #4a4a4a;
+  margin-bottom: 20px;
+  text-align: left;
+`;
+
+
 const TextArea = styled.textarea`
   width: 100%;
   height: ${(props) => props.height || "120px"};
@@ -89,6 +97,7 @@ function Synopsis() {
   const [isSynopsisComplete, setIsSynopsisComplete] = useState(false);
   const [successRate, setSuccessRate] = useState(null);
   const [scenarioId, setScenarioId] = useState(null);
+  const [title, setTitle] = useState("시나리오 제목");
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -98,8 +107,24 @@ function Synopsis() {
   useEffect(() => {
     if (movieData && movieData.scenarioId) {
       setScenarioId(movieData.scenarioId);
+      fetchScenarioTitle(movieData.scenarioId);
     }
   }, [movieData]);
+
+  const fetchScenarioTitle = async (id) => {
+    try {
+      const response = await axios.get(`http://43.200.200.147/api/v1/scenarios/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.data && response.data.title) {
+        setTitle(response.data.title);
+      }
+    } catch (error) {
+      console.error("시나리오 제목 가져오기 실패:", error);
+    }
+  };
 
   const updateUserRequest = async () => {
     try {
@@ -224,6 +249,7 @@ function Synopsis() {
 
   return (
     <Section>
+      <TitleDisplay>{title}</TitleDisplay>
       <Label>등장인물 (콤마로 구분)</Label>
       <TextArea
         placeholder="예: 홍길동, 김철수, 이영희"
