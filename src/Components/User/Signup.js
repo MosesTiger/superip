@@ -1,10 +1,18 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { MdOutlineKeyboardArrowDown, MdOutlineKeyboardArrowUp } from "react-icons/md";
 import axios from 'axios';
 
-// 스타일드 컴포넌트 정의
+const SignupContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+`;
+
 const SignupText = styled.div`
   font-size: 40px;
   font-weight: bold;
@@ -13,15 +21,14 @@ const SignupText = styled.div`
 
 const InputContainer = styled.div`
   position: relative;
-  width: 80%;
-  transform: translateX(-8%); 
+  width: 100%;
+  margin-bottom: 15px;
 `;
 
 const Input = styled.input`
   width: 100%;
   padding: 10px;
   padding-left: 40px;
-  margin: 10px 0;
   border-radius: 5px;
   border: 1px solid #ddd;
   font-size: 16px;
@@ -30,9 +37,9 @@ const Input = styled.input`
 
 const EyeButton = styled.button`
   position: absolute;
-  right: -40px;
+  right: 10px;
   top: 50%;
-  transform: translateY(-160%);
+  transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
@@ -41,10 +48,10 @@ const EyeButton = styled.button`
 `;
 
 const SignUpButton = styled.button`
-  width: 300px;
+  width: 100%;
   height: 45px;
   padding: 10px;
-  margin: 15px 0;
+  margin: 20px 0;
   border-radius: 5px;
   border: none;
   background-color: #182e3f;
@@ -66,7 +73,7 @@ const CheckboxContainer = styled.div`
   display: flex;
   flex-direction: column;
   margin: 10px 0;
-  width: 90%;
+  width: 100%;
   text-align: left;
 `;
 
@@ -99,16 +106,29 @@ const CheckboxLabelBold = styled(CheckboxLabel)`
 
 const ContentsWrap = styled.div`
   font-size: 13px;
-  display: flex;
-  align-items: center;
   margin-top: -10px;
+  margin-bottom: 10px;
+  padding-left: 25px;
 `;
 
 const Passwordcheck = styled.p`
   font-size: 13px;
-  display: flex;
-  align-items: center;
+  color: red;
   margin-top: -10px;
+  margin-bottom: 10px;
+`;
+
+const LoginLink = styled(Link)`
+  display: block;
+  width: 100%;
+  text-align: center;
+  color: #0056b3;
+  text-decoration: none;
+  font-size: 16px;
+  margin-top: 20px;
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 function Signup() {
@@ -160,7 +180,6 @@ function Signup() {
   const allRequiredChecked = checkItems.includes(0) && checkItems.includes(1);
   const canSignUp = allInputsFilled && isPasswordMatch && allRequiredChecked;
  
-
   const handleSignUp = async () => {
     if (!allInputsFilled) {
       alert('모든 필드를 입력해 주세요.');
@@ -209,7 +228,7 @@ function Signup() {
   };
 
   return (
-    <>
+    <SignupContainer>
       <SignupText>회원가입</SignupText>
       <InputContainer>
         <Input
@@ -307,7 +326,8 @@ function Signup() {
       <SignUpButton onClick={handleSignUp} disabled={!canSignUp}>
         회원가입
       </SignUpButton>
-    </>
+      <LoginLink to="/login">이미 계정이 있으신가요? 로그인</LoginLink>
+    </SignupContainer>
   );
 }
 

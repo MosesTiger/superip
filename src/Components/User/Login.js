@@ -1,29 +1,43 @@
-// src/components/Login.js
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
-import axios from "axios";
+
+const LoginContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+`;
 
 const LoginText = styled.div`
   font-size: 40px;
   font-weight: bold;
   margin-bottom: 20px;
 `;
+
+const Form = styled.form`
+  width: 100%;
+`;
+
 const InputContainer = styled.div`
   position: relative;
   width: 100%;
+  margin-bottom: 15px;
 `;
+
 const Input = styled.input`
-  width: 90%;
+  width: 100%;
   padding: 10px;
   padding-left: 40px;
-  margin: 10px 0;
   border-radius: 5px;
   border: 1px solid #ddd;
   font-size: 16px;
   background-color: #f4f5f5;
 `;
+
 const InputImage = styled.img`
   position: absolute;
   left: 10px;
@@ -32,44 +46,47 @@ const InputImage = styled.img`
   width: 23px;
   height: auto;
 `;
+
 const LoginButton = styled.button`
-  width: 300px;
+  width: 100%;
   height: 45px;
   padding: 10px;
-  margin: 5px 0;
+  margin: 20px 0;
   border-radius: 5px;
-  margin-top: 15px;
   border: none;
   background-color: black;
   color: white;
   font-size: 16px;
   cursor: pointer;
   &:hover {
-    background-color: #cdcdcd;
+    background-color: #333;
   }
 `;
+
 const LinkContainer = styled.div`
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 20px;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 15px;
 `;
 
 const LinkButton = styled(Link)`
   color: #757678;
   text-decoration: none;
   font-size: 14px;
-  margin: 5px 0;
   &:hover {
     text-decoration: underline;
   }
 `;
 
 const SignupLink = styled(Link)`
+  display: block;
+  width: 100%;
+  text-align: center;
   color: #0056b3;
   text-decoration: none;
   font-size: 16px;
-  margin-top: 15px;
+  margin-top: 20px;
   font-weight: bold;
   &:hover {
     text-decoration: underline;
@@ -94,9 +111,9 @@ function Login() {
   };
 
   return (
-    <>
+    <LoginContainer>
       <LoginText>LOGIN</LoginText>
-      <form onSubmit={handleLogin}>
+      <Form onSubmit={handleLogin}>
         <InputContainer>
           <InputImage src="/아이디.svg" alt="ID Icon" />
           <Input
@@ -108,7 +125,7 @@ function Login() {
           />
         </InputContainer>
         <InputContainer>
-          <InputImage src="/비밀번호.svg" alt="pass Icon" />
+          <InputImage src="/비밀번호.svg" alt="Password Icon" />
           <Input
             type="password"
             placeholder="비밀번호"
@@ -118,13 +135,13 @@ function Login() {
           />
         </InputContainer>
         <LoginButton type="submit">Login</LoginButton>
-      </form>
+      </Form>
       <LinkContainer>
         <LinkButton to="/login/findid">아이디 찾기</LinkButton>
         <LinkButton to="/login/findpw">비밀번호 찾기</LinkButton>
-        <SignupLink to="/signup">회원가입</SignupLink>
       </LinkContainer>
-    </>
+      <SignupLink to="/signup">회원가입</SignupLink>
+    </LoginContainer>
   );
 }
 
