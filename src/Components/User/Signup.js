@@ -4,15 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { MdOutlineKeyboardArrowDown, MdOutlineKeyboardArrowUp } from "react-icons/md";
 import axios from 'axios';
 
-const SignupContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
-`;
-
+// 스타일드 컴포넌트 정의
 const SignupText = styled.div`
   font-size: 40px;
   font-weight: bold;
@@ -21,14 +13,15 @@ const SignupText = styled.div`
 
 const InputContainer = styled.div`
   position: relative;
-  width: 100%;
-  margin-bottom: 15px;
+  width: 80%;
+  transform: translateX(-8%); 
 `;
 
 const Input = styled.input`
   width: 100%;
   padding: 10px;
   padding-left: 40px;
+  margin: 10px 0;
   border-radius: 5px;
   border: 1px solid #ddd;
   font-size: 16px;
@@ -37,9 +30,9 @@ const Input = styled.input`
 
 const EyeButton = styled.button`
   position: absolute;
-  right: 10px;
+  right: -40px;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-160%);
   background: none;
   border: none;
   cursor: pointer;
@@ -48,10 +41,10 @@ const EyeButton = styled.button`
 `;
 
 const SignUpButton = styled.button`
-  width: 100%;
+  width: 300px;
   height: 45px;
   padding: 10px;
-  margin: 20px 0;
+  margin: 15px 0;
   border-radius: 5px;
   border: none;
   background-color: #182e3f;
@@ -73,7 +66,7 @@ const CheckboxContainer = styled.div`
   display: flex;
   flex-direction: column;
   margin: 10px 0;
-  width: 100%;
+  width: 90%;
   text-align: left;
 `;
 
@@ -106,16 +99,16 @@ const CheckboxLabelBold = styled(CheckboxLabel)`
 
 const ContentsWrap = styled.div`
   font-size: 13px;
+  display: flex;
+  align-items: center;
   margin-top: -10px;
-  margin-bottom: 10px;
-  padding-left: 25px;
 `;
 
 const Passwordcheck = styled.p`
   font-size: 13px;
-  color: red;
+  display: flex;
+  align-items: center;
   margin-top: -10px;
-  margin-bottom: 10px;
 `;
 
 const LoginLink = styled(Link)`
@@ -135,8 +128,7 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [checkItems, setCheckItems] = useState([]);
   const [open0, setOpen0] = useState(false);
@@ -176,15 +168,16 @@ function Signup() {
   };
 
   const isPasswordMatch = password === confirmPassword;
-  const allInputsFilled = email && password && confirmPassword && fullName && username;
+  const allInputsFilled = email && password && confirmPassword && name;
   const allRequiredChecked = checkItems.includes(0) && checkItems.includes(1);
   const canSignUp = allInputsFilled && isPasswordMatch && allRequiredChecked;
- 
+
   const handleSignUp = async () => {
     if (!allInputsFilled) {
       alert('모든 필드를 입력해 주세요.');
       return;
     }
+
     if (!allRequiredChecked) {
       alert('필수 약관에 동의해 주세요.');
       return;
@@ -199,8 +192,8 @@ function Signup() {
       const response = await axios.post('http://43.200.111.65/api/v1/auth/register', {
         email: email,
         password: password,
-        full_name: fullName,
-        username: username,
+        full_name: name,
+        username: email,
         social_provider: "LOCAL",
         social_id: null
       });
@@ -228,7 +221,7 @@ function Signup() {
   };
 
   return (
-    <SignupContainer>
+    <>
       <SignupText>회원가입</SignupText>
       <InputContainer>
         <Input
@@ -265,16 +258,8 @@ function Signup() {
         <Input
           type="text"
           placeholder="이름 입력"
-          value={fullName}
-          onChange={e => setFullName(e.target.value)}
-        />
-      </InputContainer>
-      <InputContainer>
-        <Input
-          type="text"
-          placeholder="사용자 아이디 입력"
-          value={username}
-          onChange={e => setUsername(e.target.value)}
+          value={name}
+          onChange={e => setName(e.target.value)}
         />
       </InputContainer>
       <CheckboxContainer>
@@ -327,7 +312,7 @@ function Signup() {
         회원가입
       </SignUpButton>
       <LoginLink to="/login">이미 계정이 있으신가요? 로그인</LoginLink>
-    </SignupContainer>
+    </>
   );
 }
 
