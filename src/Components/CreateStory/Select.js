@@ -124,6 +124,11 @@ const MovieDetails = styled.div`
   margin-top: 20px;
 `;
 
+const GenreLabel = styled.div`
+  font-weight: 500;
+  text-align: center;
+`;
+
 const Actions = styled.div`
   margin-top: 30px;
   display: flex;
@@ -227,16 +232,51 @@ function Select() {
         </Label>
         <Label>장르를 선택하세요. (최대 3개)</Label>
         <GenreSelection>
-          {["액션", "로맨스", "코미디", "스릴러", "SF", "판타지", "드라마", "공포", "애니메이션"].map((genre) => (
+          {[
+            "드라마",
+            "액션",
+            "코메디",
+            "범죄",
+            "스릴러",
+            "미스터리",
+            "시대극/사극",
+            "전쟁",
+            "가족",
+            "멜로/로맨스",
+            "어드벤쳐",
+            "판타지",
+            "공포",
+            "스포츠",
+            "SF",
+            "느와르",
+            "반공/분단",
+            "첩보",
+            "인물",
+            "재난",
+            "전기",
+            "하이틴",
+            "역사",
+            "갱스터",
+            "사회물(경향)",
+            "뮤직",
+            "청춘",
+            "활극",
+            "뮤지컬",
+            "신파",
+            "무협",
+          ].map((genre) => (
             <GenreOption
               key={genre}
               selected={selectedGenres.includes(genre)}
               onClick={() => handleGenreClick(genre)}
             >
-              {genre}
+              <GenreLabel>{genre}</GenreLabel>
             </GenreOption>
           ))}
         </GenreSelection>
+        <small style={{color: "red"}}>
+          {selectedGenres.length >= 3 ? "최대 3개의 장르만 선택할 수 있습니다." : ""}
+        </small>
         <Label>영화 상영 시간을 선택하세요.</Label>
         <DurationControl>
           <DurationButton onClick={decreaseDuration} disabled={duration <= 10}>
