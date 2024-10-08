@@ -247,7 +247,7 @@ function Signup() {
           type="text"
           placeholder="이름 입력"
           value={fullName}
-          onChange={e => setName(e.target.value)}
+          onChange={e => setFullName(e.target.value)}
         />
       </InputContainer>
       <InputContainer>
