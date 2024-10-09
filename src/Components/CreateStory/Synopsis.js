@@ -244,7 +244,7 @@ function Synopsis() {
         height="300px"
       />
       <ButtonContainer>
-        <ExpectResult>등급 : ㅁ</ExpectResult>
+        <ExpectResult>등급 : </ExpectResult>
         <ExpectButton onclick={handlePredictionClick}>
           흥행도 예측 버튼
         </ExpectButton>

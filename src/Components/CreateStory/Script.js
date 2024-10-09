@@ -149,14 +149,17 @@ function Script() {
     };
 
     try {
-      const response = await fetch('http://43.200.200.147/api/v1/scenario/generate', {
-        method: "POST",
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestData),
-      });
+      const response = await fetch(
+        "http://43.200.200.147/api/v1/scenario/generate",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestData),
+        }
+      );
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder("utf-8");
@@ -204,7 +207,7 @@ function Script() {
         {
           method: "POST",
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ user_input: userInput }),
@@ -257,9 +260,7 @@ function Script() {
   return (
     <PageContainer>
       <ScenarioContainer>
-        <ChapterTitle>
-          Chapter {currentChapter} / {totalChapters}
-        </ChapterTitle>
+        <ChapterTitle>Chapter {currentChapter} / 9</ChapterTitle>
         <Spinner isGenerating={isGenerating} />
         <ScenarioText isGenerating={isGenerating}>
           {scenarioContent}

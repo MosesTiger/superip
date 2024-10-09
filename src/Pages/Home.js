@@ -202,25 +202,25 @@ function Home() {
 
   const exampleData = [
     {
-      id: 1,
-      title: "Story 1",
+      id: "example1",
+      title: "시간의 전쟁",
       genre: "SF, 전쟁",
       image: "/추천시나리오1.png",
     },
     {
-      id: 2,
+      id: "example2",
       title: "Story 2",
       genre: "범죄, 스릴러",
       image: "/추천시나리오2.png",
     },
     {
-      id: 3,
+      id: "example3",
       title: "Story 3",
       genre: "판타지",
       image: "/추천시나리오3.png",
     },
     {
-      id: 4,
+      id: "example4",
       title: "Story 4",
       genre: "액션, 무협",
       image: "/추천시나리오4.png",
