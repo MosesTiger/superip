@@ -113,7 +113,7 @@ function Synopsis() {
 
   const fetchScenarioTitle = async (id) => {
     try {
-      const response = await axios.get(`http://43.200.200.147/api/v1/scenarios/${id}`, {
+      const response = await axios.get(`http://127.0.0.1:8000/api/v1/scenarios/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -129,7 +129,7 @@ function Synopsis() {
   const updateUserRequest = async () => {
     try {
       await axios.put(
-        `http://43.200.200.147/api/v1/scenarios/${scenarioId}/user-request`,
+        `http://127.0.0.1:8000/api/v1/scenarios/${scenarioId}/user-request`,
         { user_request: gptRequest },
         {
           headers: {
@@ -149,7 +149,7 @@ function Synopsis() {
     try {
       await updateUserRequest();
       const response = await axios.post(
-        'http://43.200.200.147/api/v1/synopsis/generate',
+        'http://127.0.0.1:8000/api/v1/synopsis/generate',
         {
           scenario_id: scenarioId,
           keyword: keyword,
@@ -168,7 +168,7 @@ function Synopsis() {
       
       // 1차 흥행률 예측 API 호출
       const predictionResponse = await axios.post(
-        'http://43.200.200.147/api/v1/success-rate/first_predict',
+        'http://127.0.0.1:8000/api/v1/success-rate/first_predict',
         {
           scenario_id: scenarioId,
           keyword: keyword,
@@ -195,7 +195,7 @@ function Synopsis() {
 
   const handlePredictionClick = async () => {
     try {
-      const response = await axios.post('http://43.200.200.147/api/v1/success-rate/predict', {
+      const response = await axios.post('http://127.0.0.1:8000/api/v1/success-rate/predict', {
         scenario_id: scenarioId,
         title: movieData.title,
         genres: movieData.selectedGenres,
@@ -225,7 +225,7 @@ function Synopsis() {
 
     try {
       const response = await axios.put(
-        `http://43.200.200.147/api/v1/scenarios/${scenarioId}`,
+        `http://127.0.0.1:8000/api/v1/scenarios/${scenarioId}`,
         {
           synopsis: plot,
           characters: characters.split(",").map(char => char.trim()),
