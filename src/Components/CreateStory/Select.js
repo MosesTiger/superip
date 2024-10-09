@@ -53,19 +53,19 @@ const GenreOption = styled.div`
   margin: 5px;
   border-radius: 20px;
   background-color: ${(props) => (props.selected ? "#007bff" : "#e0e0e0")};
-  color: ${(props) => (props.selected ? "#ffffff" : "#000000")};
+  color: ${(props) => (props.selected ? "white" : "black")};
   cursor: pointer;
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: ${(props) => (props.selected ? "#0056b3" : "#d0d0d0")};
+    background-color: ${(props) => (props.selected ? "#0056b3" : "#c0c0c0")};
   }
 `;
 
 const Label = styled.label`
-  font-weight: bold;
+  display: block;
   margin-top: 20px;
-  margin-bottom: 10px;
+  font-weight: bold;
 `;
 
 const DurationControl = styled.div`
@@ -149,6 +149,20 @@ const PredictionButton = styled.button`
   }
 `;
 
+const TextArea = styled.textarea`
+  width: 100%;
+  height: ${(props) => props.height || "120px"};
+  margin-bottom: 15px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  padding: 15px;
+  font-size: 16px;
+  color: #000;
+  background-color: #f5f5f5;
+  display: block;
+  resize: vertical;
+`;
+
 function Select() {
   const [duration, setDuration] = useState(120);
   const [selectedGenres, setSelectedGenres] = useState([]);
@@ -157,9 +171,11 @@ function Select() {
   const [rating, setRating] = useState("all");
   const [country, setCountry] = useState("korea");
   const [mainCharacterGender, setMainCharacterGender] = useState("male");
-  const { token, user } = useAuth(); 
+  const [characters, setCharacters] = useState("");
+  const [keyword, setKeyword] = useState("");
+  const [userRequest, setUserRequest] = useState("");
+  const { token, user, setToken } = useAuth(); 
   const navigate = useNavigate();
-  console.log("Current token:", token); 
   
   const handleGenreClick = (genre) => {
     setSelectedGenres((prev) =>
@@ -174,11 +190,27 @@ function Select() {
   };
 
   const increaseDuration = () => {
-    setDuration((prev) => Math.min(prev + 10, 120)); // 10분씩 증가, 최대 120분
+    setDuration((prev) => Math.min(prev + 10, 120));
   };
 
   const decreaseDuration = () => {
-    setDuration((prev) => Math.max(prev - 10, 10)); // 10분씩 감소, 최소 10분
+    setDuration((prev) => Math.max(prev - 10, 10));
+  };
+
+  const refreshToken = async () => {
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/api/v1/auth/refresh-token', {
+        refresh_token: localStorage.getItem('refreshToken')
+      });
+      const newToken = response.data.access_token;
+      setToken(newToken);
+      localStorage.setItem('token', newToken);
+      return newToken;
+    } catch (error) {
+      console.error("Token refresh failed:", error);
+      navigate("/login");
+      throw error;
+    }
   };
 
   const handleSubmit = async () => {
@@ -193,28 +225,45 @@ function Select() {
       return;
     }
 
-    try {
-      const response = await axios.post('http://127.0.0.1:8000/api/v1/scenario/create', {
-        title: title,
-        genre: selectedGenres,
-        runtime: duration,
-        rating: rating,
-        theme: country,
-        gender: mainCharacterGender,
-        is_series: isCheckboxChecked,
-        chapter_count: Math.ceil(duration / 10), 
-      }, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+    const createScenario = async (token) => {
+      try {
+        const response = await axios.post('http://127.0.0.1:8000/api/v1/scenario/create', {
+          title: title,
+          genre: selectedGenres,
+          runtime: duration,
+          rating: rating,
+          theme: country,
+          gender: mainCharacterGender,
+          is_series: isCheckboxChecked,
+          chapter_count: Math.ceil(duration / 10),
+          characters: characters.split(',').map(char => char.trim()),
+          keywords: keyword.split(',').map(kw => kw.trim()),
+          user_request: userRequest
+        }, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
 
-      if (response.status === 201) {
-        const scenarioId = response.data.id;
-        navigate("/create/synopsis", {state: {scenarioId}});
-     } 
-   }  catch (error) {
+        if (response.status === 201 || response.status === 200) {
+          const scenarioId = response.data.id;
+          navigate("/create/synopsis", {state: {scenarioId}});
+        } else {
+          throw new Error("오류가 발생했습니다.");
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 401 && error.response.data.detail === "Token expired") {
+          const newToken = await refreshToken();
+          return createScenario(newToken);
+        }
+        throw error;
+      }
+    };
+
+    try {
+      await createScenario(token);
+    } catch (error) {
       console.error("Error:", error);
       alert("시나리오 생성 중 오류가 발생했습니다.");
     }
@@ -235,37 +284,10 @@ function Select() {
         <Label>장르를 선택하세요. (최대 3개)</Label>
         <GenreSelection>
           {[
-            "드라마",
-            "액션",
-            "코메디",
-            "범죄",
-            "스릴러",
-            "미스터리",
-            "시대극/사극",
-            "전쟁",
-            "가족",
-            "멜로/로맨스",
-            "어드벤쳐",
-            "판타지",
-            "공포",
-            "스포츠",
-            "SF",
-            "느와르",
-            "반공/분단",
-            "첩보",
-            "인물",
-            "재난",
-            "전기",
-            "하이틴",
-            "역사",
-            "갱스터",
-            "사회물(경향)",
-            "뮤직",
-            "청춘",
-            "활극",
-            "뮤지컬",
-            "신파",
-            "무협",
+            "드라마", "액션", "코메디", "범죄", "스릴러", "미스터리", "시대극/사극",
+            "전쟁", "가족", "멜로/로맨스", "어드벤쳐", "판타지", "공포", "스포츠",
+            "SF", "느와르", "반공/분단", "첩보", "인물", "재난", "전기", "하이틴",
+            "역사", "갱스터", "사회물(경향)", "뮤직", "청춘", "활극", "뮤지컬", "신파", "무협"
           ].map((genre) => (
             <GenreOption
               key={genre}
@@ -330,6 +352,25 @@ function Select() {
           <option value="female">여성</option>
           <option value="mixed">혼성</option>
         </Select1>
+        <Label>등장인물 (콤마로 구분)</Label>
+        <TextArea
+          placeholder="예: 홍길동, 김철수, 이영희"
+          value={characters}
+          onChange={(e) => setCharacters(e.target.value)}
+        />
+        <Label>키워드 태그 (콤마로 구분)</Label>
+        <TextArea
+          placeholder="예: 모험, 우정, 성장"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+        />
+        <Label>요청사항</Label>
+        <TextArea
+          placeholder="GPT에게 요청할 사항을 적어주세요."
+          value={userRequest}
+          onChange={(e) => setUserRequest(e.target.value)}
+          height="300px"
+        />
         <CheckboxContainer>
           <Checkbox
             type="checkbox"
