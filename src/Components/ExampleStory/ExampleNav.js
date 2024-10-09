@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import styled from "styled-components";
 
 const Nav = styled.nav`
@@ -36,27 +36,28 @@ const NavLinkWrap = styled.div`
   justify-content: flex-start;
 `;
 
-function StoryNav() {
+function ExampleNav() {
   const location = useLocation();
+  const { id } = useParams();
 
   return (
     <Nav>
       <NavLinkWrap>
         <NavLink
-          to="/example/select"
-          isActive={location.pathname === "/example/select"}
+          to={`/example/${id}/select`}
+          isActive={location.pathname === `/example/${id}/select`}
         >
           영화 정보
         </NavLink>
         <NavLink
-          to="/example/synopsis"
-          isActive={location.pathname === "/example/synopsis"}
+          to={`/example/${id}/synopsis`}
+          isActive={location.pathname === `/example/${id}/synopsis`}
         >
           시놉시스
         </NavLink>
         <NavLink
-          to="/example/script"
-          isActive={location.pathname === "/example/script"}
+          to={`/example/${id}/script`}
+          isActive={location.pathname === `/example/${id}/script`}
         >
           시나리오
         </NavLink>
@@ -65,4 +66,4 @@ function StoryNav() {
   );
 }
 
-export default StoryNav;
+export default ExampleNav;

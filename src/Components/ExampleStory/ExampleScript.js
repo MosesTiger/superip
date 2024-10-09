@@ -1,12 +1,7 @@
-import React, { useState, useEffect } from "react";
-import styled, { keyframes } from "styled-components";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthProvider";
-
-const spin = keyframes`
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-`;
+import React, { useState } from "react";
+import styled from "styled-components";
+import { useOutletContext } from "react-router-dom";
+import { IoIosArrowDropright, IoIosArrowDropleft } from "react-icons/io";
 
 const PageContainer = styled.div`
   display: flex;
@@ -46,75 +41,74 @@ const ScenarioText = styled.pre`
   border-radius: 5px;
   overflow-y: auto;
   margin-bottom: 20px;
-  display: ${(props) => (props.isGenerating ? "none" : "block")};
 `;
 
-const Input = styled.textarea`
-  width: 100%;
-  height: 100px;
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  resize: vertical;
-  margin-bottom: 20px;
+const NavigationContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
 `;
 
-const Button = styled.button`
-  padding: 10px 20px;
-  background-color: #ff4136;
-  color: white;
+const NavButton = styled.button`
+  background-color: #5d5d5d;
+  color: #fff;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
+  padding: 10px 15px;
   font-size: 16px;
-  margin-right: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #999;
+  }
 
   &:disabled {
-    background-color: #ffcccb;
+    background-color: #ccc;
     cursor: not-allowed;
   }
 `;
 
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: flex-start;
-`;
-
-const PredictionButton = styled(Button)`
-  background-color: #75c96e;
-`;
-
-const Spinner = styled.div`
-  border: 16px solid #f3f3f3;
-  border-top: 16px solid #3498db;
-  border-radius: 50%;
-  width: 120px;
-  height: 120px;
-  animation: ${spin} 2s linear infinite;
-  display: ${(props) => (props.isGenerating ? "block" : "none")};
-  margin: auto;
-`;
-
-const LoadingMessage = styled.div`
-  position: absolute;
-  bottom: 10px;
-  width: 100%;
-  text-align: center;
-  font-size: 16px;
-  color: #333;
-  display: ${(props) => (props.isGenerating ? "block" : "none")};
-`;
-
 function ExampleScript() {
+  const { movieData } = useOutletContext();
+  const [currentChapter, setCurrentChapter] = useState(1);
+
+  if (!movieData) {
+    return <div>데이터를 불러오는 중입니다...</div>;
+  }
+
+  const totalChapters = Math.ceil(movieData.duration / 10);
+  const chapterText = movieData.script[currentChapter - 1];
+
+  const handlePreviousChapter = () => {
+    if (currentChapter > 1) {
+      setCurrentChapter(currentChapter - 1);
+    }
+  };
+
+  const handleNextChapter = () => {
+    if (currentChapter < totalChapters) {
+      setCurrentChapter(currentChapter + 1);
+    }
+  };
+
   return (
     <PageContainer>
       <ScenarioContainer>
-        <ChapterTitle>Chapter {currentChapter} / 9</ChapterTitle>
-        <Spinner isGenerating={isGenerating} />
-        <ScenarioText isGenerating={isGenerating}></ScenarioText>
-        <Input value={userInput} />
+        <ChapterTitle>
+          Chapter {currentChapter} / {totalChapters}
+        </ChapterTitle>
+        <ScenarioText>{chapterText}</ScenarioText>
       </ScenarioContainer>
+      <NavigationContainer>
+        <NavButton onClick={handlePreviousChapter} disabled={currentChapter === 1}>
+          <IoIosArrowDropleft /> 이전 챕터
+        </NavButton>
+        <NavButton onClick={handleNextChapter} disabled={currentChapter === totalChapters}>
+          다음 챕터 <IoIosArrowDropright />
+        </NavButton>
+      </NavigationContainer>
     </PageContainer>
   );
 }

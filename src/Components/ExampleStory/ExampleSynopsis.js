@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { useOutletContext } from "react-router-dom";
 
 const Section = styled.section`
   display: flex;
@@ -37,28 +38,22 @@ const Label = styled.label`
 `;
 
 function ExampleSynopsis() {
+  const { movieData } = useOutletContext();
+
+  if (!movieData) {
+    return <div>데이터를 불러오는 중입니다...</div>;
+  }
+
+  const { characters, keywords, synopsis } = movieData;
+
   return (
     <Section>
       <Label>등장인물 (콤마로 구분)</Label>
-      <TextArea placeholder="예: 홍길동, 김철수, 이영희" value={characters} />
+      <TextArea value={characters} readOnly />
       <Label>키워드 태그 (콤마로 구분)</Label>
-      <TextArea
-        placeholder="예: 모험, 우정, 성장"
-        value={keyword} // 단일 키워드 필드로 설정
-      />
+      <TextArea value={keywords} readOnly />
       <Label>시놉시스</Label>
-      <TextArea
-        placeholder="시놉시스를 생성하려면 '시놉시스 생성' 버튼을 클릭하세요."
-        value={plot}
-        height="300px"
-        readOnly={isGenerating}
-      />
-      <Label>수정 요청사항</Label>
-      <TextArea
-        placeholder="GPT에게 수정을 요청할 사항을 적어주세요."
-        value={gptRequest}
-        height="300px"
-      />
+      <TextArea value={synopsis} readOnly height="300px" />
     </Section>
   );
 }

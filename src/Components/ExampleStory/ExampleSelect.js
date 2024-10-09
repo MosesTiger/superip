@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 
 const Section = styled.section`
   display: flex;
@@ -14,7 +14,7 @@ const Section = styled.section`
   height: auto;
 `;
 
-const TitleInput = styled.div`
+const TitleInput = styled.input`
   width: 100%;
   border: 0;
   background-color: #f5f5f5;
@@ -134,37 +134,6 @@ const Checkbox = styled.input`
   accent-color: ${(props) => (props.checked ? "#E23A3A" : "#859AA5")};
 `;
 
-const Actions = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 22px;
-  bottom: 20px;
-  margin: 15px 0;
-`;
-
-const PredictionButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 15%;
-  padding: 20px;
-  border: none;
-  border-radius: 10px;
-  background-color: #e23a3a;
-  text-decoration: none;
-  color: black;
-  font-weight: bold;
-  font-size: 20px;
-  text-align: center;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #be3232;
-  }
-`;
-
 const MovieDetails = styled.div`
   display: flex;
   flex-direction: column;
@@ -173,27 +142,35 @@ const MovieDetails = styled.div`
   border-bottom: 1px solid #ccc;
 `;
 
-const PlusMinusButton = styled.button`
-  width: 30px;
-  height: 30px;
-  border: none;
-  background-color: #f5f5f5;
-  color: black;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
 
 function ExampleSelect() {
+
+  const { movieData } = useOutletContext();
+
+  if (!movieData) {
+    return <div>데이터를 불러오는 중입니다...</div>;
+  }
+
+  const {
+    title,
+    selectedGenres = [],
+    duration,
+    rating,
+    country,
+    mainCharacterGender,
+    isSeries,
+  } = movieData;
+
   return (
     <Section>
       <MovieDetails>
         <Label>
           영화 제목
-          <TitleInput></TitleInput>
+          <TitleInput
+            value={title}
+            readOnly
+            placeholder="영화 제목을 입력하세요"
+          />
         </Label>
         <Label>장르</Label>
         <GenreSelection>
@@ -231,30 +208,31 @@ function ExampleSelect() {
             "신파",
             "무협",
           ].map((genre) => (
-            <GenreOption key={genre} selected={selectedGenres.includes(genre)}>
+            <GenreOption
+              key={genre}
+              selected={selectedGenres.includes(genre)}
+            >
               <GenreLabel>{genre}</GenreLabel>
             </GenreOption>
           ))}
         </GenreSelection>
-        <Label>상영 시간</Label>
+        <Label>상영 시간 (분)</Label>
         <DurationSelection>
-          <PlusMinusButton onClick={decreaseDuration}>-</PlusMinusButton>
           <DurationInput
             type="number"
             value={duration}
-            readOnly // 읽기 전용으로 설정하여 사용자가 직접 수정할 수 없게 함
+            readOnly
           />
-          <PlusMinusButton onClick={increaseDuration}>+</PlusMinusButton>
         </DurationSelection>
         <Label>관람 등급</Label>
-        <Select1 value={rating}>
+        <Select1 value={rating} disabled>
           <option value="all">전체 관람가</option>
           <option value="12">12세 관람가</option>
           <option value="15">15세 관람가</option>
           <option value="19">19세 관람가</option>
         </Select1>
         <Label>영화의 배경 국가</Label>
-        <Select1 value={country}>
+        <Select1 value={country} disabled>
           <option value="korea">한국</option>
           <option value="china">중국</option>
           <option value="us">미국</option>
@@ -279,13 +257,20 @@ function ExampleSelect() {
           <option value="portugal">포르투갈</option>
         </Select1>
         <Label>메인 주인공의 성별</Label>
-        <Select1 value={mainCharacterGender}>
+        <Select1
+          value={mainCharacterGender}
+          disabled
+        >
           <option value="male">남성</option>
           <option value="female">여성</option>
           <option value="mixed">혼성</option>
         </Select1>
         <CheckboxContainer>
-          <Checkbox type="checkbox" checked={isCheckboxChecked} />
+          <Checkbox
+            type="checkbox"
+            checked={isSeries}
+            readOnly
+          />
           <Label>시리즈물 여부</Label>
         </CheckboxContainer>
       </MovieDetails>

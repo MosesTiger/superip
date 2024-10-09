@@ -58,7 +58,7 @@ function App() {
           <Route path="show" element={<Show />} />
           <Route path="predict" element={<Show />} />
         </Route>
-        <Route path="/example" element={<ExampleStory />}>
+        <Route path="/example/:id" element={<ExampleStory />}>
           <Route path="select" element={<ExampleSelect />} />
           <Route path="synopsis" element={<ExampleSynopsis />} />
           <Route path="script" element={<ExampleScript />} />

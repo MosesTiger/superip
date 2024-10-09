@@ -1,6 +1,6 @@
 import React from "react";
-import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 
 // ExampleCard styled component
 const ExampleCardContainer = styled.div`
@@ -71,8 +71,10 @@ const ExampleDescription = styled.p`
 const ExampleCard = ({ id, title, genre, image }) => {
   const navigate = useNavigate();
 
+  const exampleId = id;
+
   const handleClick = () => {
-    navigate(`/story/${id}`);
+    navigate(`/example/${exampleId}/select`);
   };
 
   return (

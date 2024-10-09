@@ -1,8 +1,9 @@
-import React from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Outlet, useParams } from "react-router-dom";
 import styled from "styled-components";
 import Header from "../Components/Header";
-import StoryNav from "../Components/CreateStory/StoryNav";
+import ExampleNav from "../Components/ExampleStory/ExampleNav";
+import { exampleData } from "../Components/ExampleStory/exampleData";
 import "../stylefile/Main.css";
 
 const Main = styled.main`
@@ -26,17 +27,24 @@ const MainWrapper = styled.div`
 `;
 
 function ExampleStory() {
-  const location = useLocation();
-  const hideStoryNav =
-    location.pathname === "/create/show" ||
-    location.pathname === "/create/predict";
+  const { id } = useParams();
+  const [movieData, setMovieData] = useState({});
+
+  useEffect(() => {
+    // 해당 id의 데이터를 찾아 설정합니다.
+    const story = exampleData.find((item) => item.id === parseInt(id));
+    if (story) {
+      setMovieData(story);
+    }
+  }, [id]);
+
   return (
     <div className="page">
       <Header />
       <MainWrapper>
-        {!hideStoryNav && <StoryNav />}
+        <ExampleNav />
         <Main>
-          <Outlet />
+          <Outlet context={{ movieData, setMovieData }} />
         </Main>
       </MainWrapper>
     </div>
