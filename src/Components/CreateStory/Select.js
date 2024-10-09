@@ -202,6 +202,7 @@ function Select() {
         theme: country,
         gender: mainCharacterGender,
         is_series: isCheckboxChecked,
+        chapter_count: Math.ceil(duration / 10), 
       }, {
         headers: {
           'Authorization': `Bearer ${token}`
