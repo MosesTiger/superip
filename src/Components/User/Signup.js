@@ -32,7 +32,7 @@ const EyeButton = styled.button`
   position: absolute;
   right: -40px;
   top: 50%;
-  transform: translateY(-160%);
+  transform: translateY(-65%);
   background: none;
   border: none;
   cursor: pointer;
@@ -259,7 +259,7 @@ function Signup() {
           {showPassword ? '👁️' : '👁️‍🗨️'}
         </EyeButton>
       </InputContainer>
-      <div style={{minHeight: '15px'}}>
+      <div style={{ minHeight: '15px' }}>
         {confirmPassword && (
           <Passwordcheck style={{ color: isPasswordMatch ? 'green' : 'red' }}>
             {isPasswordMatch ? '비밀번호가 일치합니다.' : '비밀번호가 일치하지 않습니다.'}
@@ -296,19 +296,19 @@ function Signup() {
                 />
                 <span style={{ marginRight: '5px', color: item.status === '(필수)' ? 'red' : 'gray' }}>
                   {item.status}
-                </span> 
+                </span>
                 {item.title}
               </label>
-              {eval(`open${index}`) ? 
-                <MdOutlineKeyboardArrowUp 
-                  size={30} 
-                  color='gray' 
-                  onClick={() => eval(`setOpen${index}(!open${index})`)} 
+              {eval(`open${index}`) ?
+                <MdOutlineKeyboardArrowUp
+                  size={30}
+                  color='gray'
+                  onClick={() => eval(`setOpen${index}(!open${index})`)}
                 /> :
-                <MdOutlineKeyboardArrowDown 
-                  size={30} 
-                  color='gray' 
-                  onClick={() => eval(`setOpen${index}(!open${index})`)} 
+                <MdOutlineKeyboardArrowDown
+                  size={30}
+                  color='gray'
+                  onClick={() => eval(`setOpen${index}(!open${index})`)}
                 />
               }
             </CheckboxLabel>
