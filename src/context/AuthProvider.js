@@ -23,9 +23,8 @@ export function AuthProvider({ children }) {
   });
 
   useEffect(() => {
-    if (token && !user) {
-      // 토큰이 있으나 유저 정보가 없는 경우 유저 정보를 가져옵니다.
-      axios.get('http://43.200.111.65/api/v1/auth/profile/', {
+    if (token) {
+      axios.get('http://127.0.0.1:8000/api/v1/auth/profile', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -33,17 +32,21 @@ export function AuthProvider({ children }) {
       .then(response => {
         setUser(response.data);
         localStorage.setItem("user", JSON.stringify(response.data));
+        setIsAuthenticated(true);
       })
       .catch(error => {
         console.error("Failed to fetch user profile:", error);
         logout();
       });
+    } else {
+      setIsAuthenticated(false);
+      setUser(null);
     }
-  }, [token, user]);
+  }, [token]);
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('http://43.200.111.65/api/v1/auth/token', {
+      const response = await axios.post('http://127.0.0.1:8000/api/v1/auth/token', {
         username: email,
         password: password
       }, {
@@ -54,18 +57,8 @@ export function AuthProvider({ children }) {
 
       const { access_token } = response.data;
       setToken(access_token);
-      setIsAuthenticated(true);
       localStorage.setItem("token", access_token);
-      localStorage.setItem("isAuthenticated", "true");
-
-      // 사용자 정보 가져오기
-      const userResponse = await axios.get('http://43.200.111.65/api/v1/auth/profile/', {
-        headers: {
-          'Authorization': `Bearer ${access_token}`
-        }
-      });
-      setUser(userResponse.data);
-      localStorage.setItem("user", JSON.stringify(userResponse.data));
+      // useEffect가 나머지 작업을 수행할 것입니다.
     } catch (error) {
       console.error("Login failed:", error);
       throw error;
@@ -83,7 +76,7 @@ export function AuthProvider({ children }) {
 
   const register = async (email, password, fullName, username) => {
     try {
-      const response = await axios.post('http://43.200.111.65/api/v1/auth/register', {
+      const response = await axios.post('http://127.0.0.1:8000/api/v1/auth/register', {
         email,
         password,
         full_name: fullName,

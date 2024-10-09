@@ -159,7 +159,7 @@ function Select() {
   const [mainCharacterGender, setMainCharacterGender] = useState("male");
   const { token, user } = useAuth(); 
   const navigate = useNavigate();
-
+  console.log("Current token:", token); 
   
   const handleGenreClick = (genre) => {
     setSelectedGenres((prev) =>
@@ -194,9 +194,9 @@ function Select() {
     }
 
     try {
-      const response = await axios.post('http://43.200.111.65/api/v1/scenario/create', {
+      const response = await axios.post('http://127.0.0.1:8000/api/v1/scenario/create', {
         title: title,
-        genre: selectedGenres.join(", "),
+        genre: selectedGenres,
         runtime: duration,
         rating: rating,
         theme: country,
@@ -205,7 +205,8 @@ function Select() {
         chapter_count: Math.ceil(duration / 10), 
       }, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
 
