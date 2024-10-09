@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import "../stylefile/Header.css";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/TestAuthProvider";
+import { useAuth } from "../context/AutoProvider";
 import { readXlsxFile } from "../context/xlsxReader"; // xlsxReader 가져오기
 import styled from "styled-components";
 import { PiUserCircleBold } from "react-icons/pi";

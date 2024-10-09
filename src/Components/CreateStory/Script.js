@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/TestAuthProvider";
+import { useAuth } from "../../context/AutoProvider";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 

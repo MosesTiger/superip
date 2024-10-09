@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { useAuth } from "../../context/TestAuthProvider"; // 경로에 맞게 수정
+import { useAuth } from "../../context/AutoProvider"; // 경로에 맞게 수정
 
 // 스타일드 컴포넌트 정의
 const ProfileCard = styled.div`

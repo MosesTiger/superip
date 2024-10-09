@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from '../../context/TestAuthProvider';
+import { useAuth } from '../../context/AutoProvider';
 import axios from 'axios';
 
 

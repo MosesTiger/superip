@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from 'axios';
-import { useAuth } from '../../context/TestAuthProvider';  // 경로는 실제 위치에 맞게 조정하세요
+import { useAuth } from '../../context/AutoProvider';  // 경로는 실제 위치에 맞게 조정하세요
 const Section = styled.section`
   display: flex;
   flex-direction: column;
