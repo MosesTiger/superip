@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from 'axios';
-import { useAuth } from '../../context/AuthProvider';  // 경로는 실제 위치에 맞게 조정하세요
+import { useAuth } from '../../context/TestAuthProvider';  // 경로는 실제 위치에 맞게 조정하세요
 const Section = styled.section`
   display: flex;
   flex-direction: column;
@@ -82,12 +82,6 @@ const CombinedButton = styled(Button)`
   color: #000;
 `;
 
-const ExpectResult = styled.div`
-  height: 100%;
-  font-size: 18px;
-  margin-right: 10px;
-`;
-
 function Synopsis() {
   const [characters, setCharacters] = useState("");
   const [plot, setPlot] = useState("");
@@ -165,7 +159,7 @@ function Synopsis() {
       );
       setPlot(response.data.storyline);
       setIsSynopsisComplete(true);
-      
+
       // 1차 흥행률 예측 API 호출
       const predictionResponse = await axios.post(
         'http://127.0.0.1:8000/api/v1/success-rate/first_predict',
@@ -281,7 +275,6 @@ function Synopsis() {
         <SuccessRateDisplay>예상 흥행률: {successRate}%</SuccessRateDisplay>
       )}
       <ButtonContainer>
-        <ExpectResult>등급 : </ExpectResult>
         <ExpectButton onclick={handlePredictionClick}>
           흥행도 예측
         </ExpectButton>
@@ -289,8 +282,8 @@ function Synopsis() {
           {isGenerating
             ? "생성 중..."
             : isSynopsisComplete
-            ? "시나리오 생성"
-            : "시놉시스 생성"}
+              ? "시나리오 생성"
+              : "시놉시스 생성"}
         </CombinedButton>
       </ButtonContainer>
     </Section>

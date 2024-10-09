@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "../../context/TestAuthProvider";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 
@@ -336,14 +336,14 @@ function Script() {
           </Info>
         </Header>
         <ChapterNavigation>
-          <NavButton 
+          <NavButton
             onClick={() => changeChapter(currentChapter - 1)}
             disabled={currentChapter === 1}
           >
             <ChevronLeft />
           </NavButton>
           <ChapterTitle>Chapter {currentChapter} / {totalChapters}</ChapterTitle>
-          <NavButton 
+          <NavButton
             onClick={() => changeChapter(currentChapter + 1)}
             disabled={currentChapter === totalChapters}
           >

@@ -15,7 +15,7 @@ import FindIDRes from "./Components/User/FindIDRes";
 import FindPW from "./Components/User/FindPW";
 import FindPWRes from "./Components/User/FindPWRes";
 import PageNotFound from "./Pages/PageNotFound";
-import { AuthProvider, useAuth } from "./context/AuthProvider";
+import TestAuthProvider, { useAuth } from './context/TestAuthProvider';
 import Select from "./Components/CreateStory/Select";
 import Synopsis from "./Components/CreateStory/Synopsis";
 import Script from "./Components/CreateStory/Script";
@@ -33,7 +33,7 @@ import ExampleSynopsis from "./Components/ExampleStory/ExampleSynopsis";
 
 function App() {
   return (
-    <AuthProvider>
+    <TestAuthProvider>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<User />}>
@@ -99,7 +99,7 @@ function App() {
         <Route path="/detail/:id" element={<Detail />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
-    </AuthProvider>
+    </TestAuthProvider>
   );
 }
 
