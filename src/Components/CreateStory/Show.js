@@ -229,7 +229,7 @@ function Show() {
   const fetchPredictionData = async () => {
     try {
       const response = await axios.post(
-        "http://43.200.200.147/api/v1/success-rate/first_predict",
+        "http://127.0.0.1:8000/api/v1/success-rate/first_predict",
         {
           keyword: "범죄도시 5",
           genre: "액션",

@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-
+import { useState, useEffect } from "react";
+import axios from 'axios';
 // Container for the whole graph section
 const GraphContainer = styled.div`
   display: grid;
@@ -46,13 +47,31 @@ const Percentage = styled.div`
   color: #333;
 `;
 
-export default function Graph({ data }) {
-  // data 배열은 퍼센트 값과 레이블을 가지고 있는 객체들의 배열입니다.
-  // 예: [{ label: "개연성", value: 85 }, { label: "기승전결", value: 70 }, ...]
+export default function Graph({ scenarioId }) {
+  const [graphData, setGraphData] = useState([]);
+
+  useEffect(() => {
+    const fetchCompleteness = async () => {
+      try {
+        const response = await axios.get(`/api/scenario/${scenarioId}/evaluate-completeness`);
+        const { Coherence, Structure, Flow, Overall } = response.data;
+        setGraphData([
+          { label: "개연성", value: Coherence },
+          { label: "구조", value: Structure },
+          { label: "흐름", value: Flow },
+          { label: "전체", value: Overall }
+        ]);
+      } catch (error) {
+        console.error("Error fetching completeness data:", error);
+      }
+    };
+
+    fetchCompleteness();
+  }, [scenarioId]);
 
   return (
     <GraphContainer>
-      {data.map((item, index) => (
+      {graphData.map((item, index) => (
         <BarContainer key={index}>
           <Percentage>{item.value}%</Percentage>
           <Bar height={item.value} />

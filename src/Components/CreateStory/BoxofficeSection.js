@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-
+import axios from 'axios';
+import { useState, useEffect } from "react";
 // BoxofficeSection styled components
 const BoxofficeSectionContainer = styled.div`
   width: 90%;
@@ -137,13 +138,26 @@ const getGrade = (score) => {
 };
 
 // BoxofficeSection 컴포넌트
-const BoxofficeSection = ({
-  genreScore,
-  runtimeScore,
-  ratingScore,
-  countryScore,
-  onMoreClick,
-}) => {
+const BoxofficeSection = ({ scenarioId, onMoreClick }) => {
+  const [analysisData, setAnalysisData] = useState(null);
+
+  useEffect(() => {
+    const fetchAnalysisData = async () => {
+      try {
+        const response = await axios.get(`/api/scenario/${scenarioId}/first-predict`);
+        setAnalysisData(response.data);
+      } catch (error) {
+        console.error("Error fetching analysis data:", error);
+      }
+    };
+
+    fetchAnalysisData();
+  }, [scenarioId]);
+
+  if (!analysisData) return <div>Loading...</div>;
+
+  const { genre_score, runtime_score, rating_score, country_score } = analysisData.상세_점수;
+
   return (
     <BoxofficeSectionContainer>
       <Sectiontitlewrap>
@@ -154,36 +168,36 @@ const BoxofficeSection = ({
         <Box1>
           <Boxtitle>장르</Boxtitle>
           <Boxcontent>
-            여기에 사용자가 선택한 장르 :&nbsp;
-            <GradeBox grade={getGrade(genreScore)}>
-              {getGrade(genreScore)}
+            {analysisData.genre} :&nbsp;
+            <GradeBox grade={getGrade(genre_score)}>
+              {getGrade(genre_score)}
             </GradeBox>
           </Boxcontent>
         </Box1>
         <Box2>
           <Boxtitle>상영 시간</Boxtitle>
           <Boxcontent>
-            여기에 사용자가 선택한 상영시간 :&nbsp;
-            <GradeBox grade={getGrade(runtimeScore)}>
-              {getGrade(runtimeScore)}
+            {analysisData.runtime}분 :&nbsp;
+            <GradeBox grade={getGrade(runtime_score)}>
+              {getGrade(runtime_score)}
             </GradeBox>
           </Boxcontent>
         </Box2>
         <Box3>
           <Boxtitle>관람 등급</Boxtitle>
           <Boxcontent>
-            여기에 사용자가 선택한 관람등급 :&nbsp;
-            <GradeBox grade={getGrade(ratingScore)}>
-              {getGrade(ratingScore)}
+            {analysisData.rating} :&nbsp;
+            <GradeBox grade={getGrade(rating_score)}>
+              {getGrade(rating_score)}
             </GradeBox>
           </Boxcontent>
         </Box3>
         <Box4>
           <Boxtitle>배경 국가</Boxtitle>
           <Boxcontent>
-            여기에 사용자가 선택한 배경국가 :&nbsp;
-            <GradeBox grade={getGrade(countryScore)}>
-              {getGrade(countryScore)}
+            {analysisData.country} :&nbsp;
+            <GradeBox grade={getGrade(country_score)}>
+              {getGrade(country_score)}
             </GradeBox>
           </Boxcontent>
         </Box4>
