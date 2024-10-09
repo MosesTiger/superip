@@ -281,7 +281,8 @@ function Synopsis() {
         <SuccessRateDisplay>예상 흥행률: {successRate}%</SuccessRateDisplay>
       )}
       <ButtonContainer>
-        <ExpectButton onClick={handlePredictionClick}>
+        <ExpectResult>등급 : </ExpectResult>
+        <ExpectButton onclick={handlePredictionClick}>
           흥행도 예측
         </ExpectButton>
         <CombinedButton onClick={isSynopsisComplete ? handleCreateScenario : generateSynopsis} disabled={isGenerating}>

@@ -26,6 +26,10 @@ import FAQ from "./Components/Info/FAQ";
 import QnA from "./Components/Info/QnA";
 import Inquiry from "./Components/Info/Inquiry";
 import InquiryDetail from "./Components/Info/InquiryDetail";
+import ExampleStory from "./Pages/ExampleStory";
+import ExampleScript from "./Components/ExampleStory/ExampleScript";
+import ExampleSelect from "./Components/ExampleStory/ExampleSelect";
+import ExampleSynopsis from "./Components/ExampleStory/ExampleSynopsis";
 
 function App() {
   return (
@@ -53,6 +57,11 @@ function App() {
           <Route path="script" element={<Script />} />
           <Route path="show" element={<Show />} />
           <Route path="predict" element={<Show />} />
+        </Route>
+        <Route path="/example/:id" element={<ExampleStory />}>
+          <Route path="select" element={<ExampleSelect />} />
+          <Route path="synopsis" element={<ExampleSynopsis />} />
+          <Route path="script" element={<ExampleScript />} />
         </Route>
         <Route
           path="/mypage"
