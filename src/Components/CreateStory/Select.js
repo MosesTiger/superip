@@ -172,6 +172,66 @@ const PredictionButton = styled.button`
   }
 `;
 
+const TextArea = styled.textarea`
+  width: 100%;
+  height: 100px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 10px;
+  font-size: 16px;
+  resize: vertical;
+`;
+
+const TagInput = styled.input`
+  width: calc(100% - 70px);
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;
+  font-size: 16px;
+`;
+
+const AddTagButton = styled.button`
+  width: 70px;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  font-size: 16px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+`;
+
+const TagContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10px;
+`;
+
+const Tag = styled.div`
+  background-color: #e0e0e0;
+  color: #000000;
+  padding: 5px 10px;
+  margin: 5px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+`;
+
+const RemoveTagButton = styled.button`
+  background-color: transparent;
+  border: none;
+  color: #666;
+  margin-left: 5px;
+  cursor: pointer;
+  font-size: 16px;
+`;
+
 function Select() {
   const [duration, setDuration] = useState(120);
   const [selectedGenres, setSelectedGenres] = useState([]);
@@ -180,9 +240,13 @@ function Select() {
   const [rating, setRating] = useState("all");
   const [country, setCountry] = useState("korea");
   const [mainCharacterGender, setMainCharacterGender] = useState("male");
+  const [keywords, setKeywords] = useState([]);
+  const [currentKeyword, setCurrentKeyword] = useState("");
+  const [request, setRequest] = useState("");
+  const [characters, setCharacters] = useState([]);
+  const [currentCharacter, setCurrentCharacter] = useState("");
   const { token, user } = useAuth();
   const navigate = useNavigate();
-  console.log("Current token:", token);
 
   const handleGenreClick = (genre) => {
     setSelectedGenres((prev) =>
@@ -197,16 +261,43 @@ function Select() {
   };
 
   const increaseDuration = () => {
-    setDuration((prev) => Math.min(prev + 10, 120)); // 10분씩 증가, 최대 120분
+    setDuration((prev) => Math.min(prev + 10, 120));
   };
 
   const decreaseDuration = () => {
-    setDuration((prev) => Math.max(prev - 10, 10)); // 10분씩 감소, 최소 10분
+    setDuration((prev) => Math.max(prev - 10, 10));
+  };
+
+  const handleAddKeyword = () => {
+    if (currentKeyword && !keywords.includes(currentKeyword)) {
+      setKeywords([...keywords, currentKeyword]);
+      setCurrentKeyword("");
+    }
+  };
+
+  const handleRemoveKeyword = (keyword) => {
+    setKeywords(keywords.filter((k) => k !== keyword));
+  };
+
+  const handleAddCharacter = () => {
+    if (currentCharacter && !characters.includes(currentCharacter)) {
+      setCharacters([...characters, currentCharacter]);
+      setCurrentCharacter("");
+    }
+  };
+
+  const handleRemoveCharacter = (character) => {
+    setCharacters(characters.filter((c) => c !== character));
   };
 
   const handleSubmit = async () => {
-    if (!title || selectedGenres.length === 0) {
-      alert("제목과 최소 한 개의 장르를 선택해주세요.");
+    if (!title.trim()) {
+      alert("영화 제목을 입력해주세요.");
+      return;
+    }
+
+    if (selectedGenres.length === 0) {
+      alert("최소 한 개의 장르를 선택해주세요.");
       return;
     }
 
@@ -216,30 +307,40 @@ function Select() {
       return;
     }
 
+    const scenarioData = {
+      title: title.trim(),
+      genre: selectedGenres,
+      runtime: duration,
+      rating: rating,
+      theme: country,
+      gender: mainCharacterGender,
+      is_series: isCheckboxChecked,
+      chapter_count: Math.ceil(duration / 10),
+      characters: characters,
+      keywords: keywords,
+      user_request: request.trim()
+    };
+    console.log("Sending scenario data:", scenarioData);
+    console.log("Type of genre:", typeof scenarioData.genre);
+    console.log("Is genre an array:", Array.isArray(scenarioData.genre));
+
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/v1/scenario/create', {
-        title: title,
-        genre: selectedGenres,
-        runtime: duration,
-        rating: rating,
-        theme: country,
-        gender: mainCharacterGender,
-        is_series: isCheckboxChecked,
-        chapter_count: Math.ceil(duration / 10),
-      }, {
+      const response = await axios.post('http://127.0.0.1:8000/api/v1/scenario/create', scenarioData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
 
+      console.log("Response received:", response.data);
+
       if (response.status === 201) {
         const scenarioId = response.data.id;
-        navigate("/create/synopsis", { state: { scenarioId } });
+        navigate("/create/synopsis", {state: {scenarioId}});
       }
     } catch (error) {
-      console.error("Error:", error);
-      alert("시나리오 생성 중 오류가 발생했습니다.");
+      console.error("Error details:", error.response?.data || error.message);
+      alert("시나리오 생성 중 오류가 발생했습니다: " + (error.response?.data?.detail || error.message));
     }
   };
 
@@ -253,42 +354,16 @@ function Select() {
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            required
           />
         </Label>
         <Label>장르를 선택하세요. (최대 3개)</Label>
         <GenreSelection>
           {[
-            "드라마",
-            "액션",
-            "코메디",
-            "범죄",
-            "스릴러",
-            "미스터리",
-            "시대극/사극",
-            "전쟁",
-            "가족",
-            "멜로/로맨스",
-            "어드벤쳐",
-            "판타지",
-            "공포",
-            "스포츠",
-            "SF",
-            "느와르",
-            "반공/분단",
-            "첩보",
-            "인물",
-            "재난",
-            "전기",
-            "하이틴",
-            "역사",
-            "갱스터",
-            "사회물(경향)",
-            "뮤직",
-            "청춘",
-            "활극",
-            "뮤지컬",
-            "신파",
-            "무협",
+            "드라마", "액션", "코메디", "범죄", "스릴러", "미스터리", "시대극/사극",
+            "전쟁", "가족", "멜로/로맨스", "어드벤쳐", "판타지", "공포", "스포츠",
+            "SF", "느와르", "반공/분단", "첩보", "인물", "재난", "전기", "하이틴",
+            "역사", "갱스터", "사회물(경향)", "뮤직", "청춘", "활극", "뮤지컬", "신파", "무협"
           ].map((genre) => (
             <GenreOption
               key={genre}
@@ -361,6 +436,52 @@ function Select() {
           />
           <Label>이 영화는 시리즈물입니까?</Label>
         </CheckboxContainer>
+        <Label>키워드를 입력하세요.</Label>
+        <div>
+          <TagInput
+            type="text"
+            value={currentKeyword}
+            onChange={(e) => setCurrentKeyword(e.target.value)}
+            placeholder="키워드 입력"
+          />
+          <AddTagButton onClick={handleAddKeyword}>추가</AddTagButton>
+        </div>
+        <TagContainer>
+          {keywords.map((keyword, index) => (
+            <Tag key={index}>
+              {keyword}
+              <RemoveTagButton onClick={() => handleRemoveKeyword(keyword)}>
+              ×
+              </RemoveTagButton>
+            </Tag>
+          ))}
+        </TagContainer>
+        <Label>등장인물을 입력하세요.</Label>
+        <div>
+          <TagInput
+            type="text"
+            value={currentCharacter}
+            onChange={(e) => setCurrentCharacter(e.target.value)}
+            placeholder="등장인물 입력"
+          />
+          <AddTagButton onClick={handleAddCharacter}>추가</AddTagButton>
+        </div>
+        <TagContainer>
+          {characters.map((character, index) => (
+            <Tag key={index}>
+              {character}
+              <RemoveTagButton onClick={() => handleRemoveCharacter(character)}>
+                ×
+              </RemoveTagButton>
+            </Tag>
+          ))}
+        </TagContainer>
+        <Label>gpt 요청사항을 입력하세요.</Label>
+        <TextArea
+          value={request}
+          onChange={(e) => setRequest(e.target.value)}
+          placeholder="시나리오에 대한 특별한 요청사항이 있다면 입력해주세요."
+        />
       </MovieDetails>
       <Actions>
         <PredictionButton onClick={handleSubmit}>다음 단계</PredictionButton>

@@ -1,47 +1,25 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AutoProvider";
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
+import { useAuth } from '../../context/AuthProvider';
 
-const PageContainer = styled.div`
+const Section = styled.section`
   display: flex;
   flex-direction: column;
-  height: 100vh;
   padding: 20px;
-  box-sizing: border-box;
-  background-color: #f5f5f5;
-  position: relative;
+  max-width: 100%;
+  margin: 0 auto;
+  font-size: 16px;
+  color: #000;
 `;
 
-const ScenarioContainer = styled.div`
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  background-color: #ffffff;
-  border-radius: 10px;
-  padding: 20px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-`;
-
-const Header = styled.div`
-  background-color: #f0f0f0;
-  padding: 15px;
-  border-radius: 10px 10px 0 0;
+const Select = styled.select`
+  width: 100%;
+  padding: 10px;
   margin-bottom: 20px;
-`;
-
-const Title = styled.h1`
-  font-size: 24px;
-  color: #333;
-  margin-bottom: 10px;
-`;
-
-const Info = styled.p`
-  font-size: 14px;
-  color: #666;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
 `;
 
 const ChapterNavigation = styled.div`
@@ -52,334 +30,260 @@ const ChapterNavigation = styled.div`
 `;
 
 const NavButton = styled.button`
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #fff;
   background-color: #007bff;
-  color: white;
   border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #0056b3;
+  }
 
   &:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
   }
-
-  &:hover:not(:disabled) {
-    background-color: #0056b3;
-  }
 `;
 
-const ChapterTitle = styled.h2`
-  font-size: 20px;
-  color: #333;
-`;
-
-const ScenarioText = styled.pre`
-  flex-grow: 1;
-  white-space: pre-wrap;
-  word-wrap: break-word;
+const ChapterInfo = styled.span`
   font-size: 16px;
-  line-height: 1.6;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  overflow-y: auto;
-  margin-bottom: 20px;
+  font-weight: bold;
 `;
 
-const Input = styled.textarea`
+const TextArea = styled.textarea`
   width: 100%;
-  height: 100px;
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  height: 300px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  padding: 15px;
+  font-size: 16px;
+  color: #000;
+  background-color: #f5f5f5;
   resize: vertical;
-  margin-bottom: 20px;
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
 `;
 
 const Button = styled.button`
   padding: 10px 20px;
+  font-size: 16px;
+  color: #fff;
   background-color: #28a745;
-  color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 16px;
   transition: background-color 0.3s;
+  margin-bottom: 15px;
+
+  &:hover {
+    background-color: #218838;
+  }
 
   &:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
   }
-
-  &:hover:not(:disabled) {
-    background-color: #218838;
-  }
 `;
 
-const SaveButton = styled(Button)`
-  background-color: #17a2b8;
-
-  &:hover:not(:disabled) {
-    background-color: #138496;
-  }
-`;
-
-const LoadingOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-`;
-
-const LoadingSpinner = styled.div`
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
+const ErrorMessage = styled.p`
+  color: #dc3545;
+  font-weight: bold;
 `;
 
 function Script() {
-  const [scenarioContent, setScenarioContent] = useState("");
+  const { token } = useAuth();
+  const [userScenarios, setUserScenarios] = useState([]);
+  const [selectedScenarioId, setSelectedScenarioId] = useState(null);
   const [currentChapter, setCurrentChapter] = useState(1);
-  const [scenarioId, setScenarioId] = useState(null);
+  const [chapterContent, setChapterContent] = useState("");
+  const [feedback, setFeedback] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [userInput, setUserInput] = useState("");
-  const [scenarioData, setScenarioData] = useState(null);
-  const [chapters, setChapters] = useState([]);
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { isAuthenticated, token } = useAuth();
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/login");
-      return;
-    }
+    const fetchUserScenarios = async () => {
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/api/v1/scenario/user-scenarios', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        setUserScenarios(response.data);
+      } catch (error) {
+        console.error("시나리오 목록을 가져오는 중 오류 발생:", error);
+        setError("시나리오 목록을 가져오는데 실패했습니다.");
+      }
+    };
 
-    if (location.state?.scenarioId) {
-      setScenarioId(location.state.scenarioId);
-      fetchScenarioData(location.state.scenarioId);
-    }
-  }, [isAuthenticated, location.state, navigate]);
+    fetchUserScenarios();
+  }, [token]);
 
-  const fetchScenarioData = async (id) => {
-    try {
-      const response = await axios.get(`http://43.200.200.147/api/v1/scenario/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setScenarioData(response.data);
-      fetchChapters(id);
-    } catch (error) {
-      console.error("Error fetching scenario data:", error);
+  const handleScenarioSelect = (event) => {
+    setSelectedScenarioId(event.target.value);
+    setCurrentChapter(1);
+    setChapterContent("");
+    setFeedback("");
+  };
+
+  const handlePreviousChapter = () => {
+    if (currentChapter > 1) {
+      setCurrentChapter(prev => prev - 1);
+      fetchChapterContent(currentChapter - 1);
     }
   };
 
-  const fetchChapters = async (id) => {
+  const handleNextChapter = () => {
+    const selectedScenario = userScenarios.find(s => s.id === parseInt(selectedScenarioId));
+    if (currentChapter < selectedScenario.chapter_count) {
+      setCurrentChapter(prev => prev + 1);
+      fetchChapterContent(currentChapter + 1);
+    }
+  };
+
+  const fetchChapterContent = async (chapterNumber) => {
     try {
-      const response = await axios.get(`http://43.200.200.147/api/v1/scenario/${id}/chapters`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const response = await axios.get(`http://127.0.0.1:8000/api/v1/scenario/${selectedScenarioId}/chapters/${chapterNumber}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
-      setChapters(response.data);
+      setChapterContent(response.data.content);
+      fetchFeedback(chapterNumber);
+    } catch (error) {
+      console.error("챕터 내용을 가져오는 중 오류 발생:", error);
+      setError("챕터 내용을 가져오는데 실패했습니다.");
+    }
+  };
+
+  const fetchFeedback = async (chapterNumber) => {
+    try {
+      const response = await axios.get(`http://127.0.0.1:8000/api/v1/scenario/${selectedScenarioId}/feedbacks?chapter_id=${chapterNumber}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (response.data.length > 0) {
-        setScenarioContent(response.data[0].content);
+        setFeedback(response.data[0].content);
+      } else {
+        setFeedback("");
       }
     } catch (error) {
-      console.error("Error fetching chapters:", error);
+      console.error("피드백을 가져오는 중 오류 발생:", error);
+      setError("피드백을 가져오는데 실패했습니다.");
     }
   };
-
-  const totalChapters = scenarioData ? scenarioData.chapter_count : 0;
 
   const generateChapter = async () => {
     setIsGenerating(true);
-    setScenarioContent("");
-
+    setError(null);
     try {
       const response = await axios.post(
-        `http://43.200.200.147/api/v1/scenario/${scenarioId}/chapters`,
-        {
-          number: currentChapter,
-          title: `Chapter ${currentChapter}`,
-          content: ""
-        },
+        `http://127.0.0.1:8000/api/v1/scenario/${selectedScenarioId}/chapters/${currentChapter}/generate`,
+        {},
         {
           headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+            'Authorization': `Bearer ${token}`
+          }
         }
       );
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder("utf-8");
-
+      
+      const reader = response.data.getReader();
+      let result = '';
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        const chunk = decoder.decode(value);
-        const lines = chunk.split("\n");
+        result += new TextDecoder().decode(value);
+        const lines = result.split('\n');
         for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            const data = JSON.parse(line.slice(5));
-            if (data.type === "content") {
-              setScenarioContent(prev => prev + data.content);
+          if (line.startsWith('data: ')) {
+            const data = JSON.parse(line.slice(6));
+            if (data.type === 'content') {
+              setChapterContent(prev => prev + data.content);
             }
           }
         }
       }
-
-      setCurrentChapter(prev => prev + 1);
-      setUserInput("");
     } catch (error) {
-      console.error("Error:", error);
-      alert("챕터 생성 중 오류가 발생했습니다.");
+      console.error("챕터 생성 중 오류 발생:", error);
+      setError("챕터 생성에 실패했습니다.");
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const handleSave = async () => {
-    try {
-      await axios.put(
-        `http://43.200.200.147/api/v1/scenario/${scenarioId}/chapters/${currentChapter}`,
-        {
-          content: scenarioContent,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      alert("챕터가 성공적으로 저장되었습니다.");
-    } catch (error) {
-      console.error("Error:", error);
-      alert("챕터 저장 중 오류가 발생했습니다.");
-    }
-  };
-
-  const handleFeedback = async () => {
+  const saveFeedback = async () => {
     try {
       await axios.post(
-        `http://43.200.200.147/api/v1/scenario/${scenarioId}/chapters/${currentChapter}/feedback`,
-        {
-          content: userInput,
-        },
+        `http://127.0.0.1:8000/api/v1/scenario/${selectedScenarioId}/chapters/${currentChapter}/feedback`,
+        { content: feedback },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+            'Authorization': `Bearer ${token}`
+          }
         }
       );
-      alert("피드백이 성공적으로 저장되었습니다.");
-      setUserInput("");
+      alert("피드백이 저장되었습니다.");
     } catch (error) {
-      console.error("Error:", error);
-      alert("피드백 저장 중 오류가 발생했습니다.");
+      console.error("피드백 저장 중 오류:", error);
+      setError("피드백 저장에 실패했습니다.");
     }
   };
-
-  const handlePredictionClick = () => {
-    navigate("/create/show", { state: { scenarioId } });
-  };
-
-  const changeChapter = (newChapter) => {
-    if (newChapter > 0 && newChapter <= totalChapters) {
-      setCurrentChapter(newChapter);
-      if (chapters[newChapter - 1]) {
-        setScenarioContent(chapters[newChapter - 1].content);
-      } else {
-        setScenarioContent("");
-      }
-    }
-  };
-
-  if (!scenarioData) {
-    return <div>Loading scenario data...</div>;
-  }
 
   return (
-    <PageContainer>
-      <ScenarioContainer>
-        <Header>
-          <Title>{scenarioData.title || 'Untitled Scenario'}</Title>
-          <Info>
-            {scenarioData.genre} | {scenarioData.runtime}분 | {scenarioData.rating} | {scenarioData.gender}
-          </Info>
-        </Header>
-        <ChapterNavigation>
-          <NavButton
-            onClick={() => changeChapter(currentChapter - 1)}
-            disabled={currentChapter === 1}
-          >
-            <ChevronLeft />
-          </NavButton>
-          <ChapterTitle>Chapter {currentChapter} / {totalChapters}</ChapterTitle>
-          <NavButton
-            onClick={() => changeChapter(currentChapter + 1)}
-            disabled={currentChapter === totalChapters}
-          >
-            <ChevronRight />
-          </NavButton>
-        </ChapterNavigation>
-        <ScenarioText>{scenarioContent || "이 챕터의 내용이 아직 생성되지 않았습니다."}</ScenarioText>
-        <Input
-          value={userInput}
-          onChange={(e) => setUserInput(e.target.value)}
-          placeholder="다음 챕터에 대한 의견이나 조언을 입력하세요"
-        />
-        <ButtonContainer>
-          {currentChapter <= totalChapters ? (
-            <>
-              <Button onClick={generateChapter} disabled={isGenerating}>
-                {isGenerating ? "생성 중..." : "챕터 생성/수정"}
-              </Button>
-              <Button onClick={handleFeedback} disabled={isGenerating || !userInput}>
-                피드백 제출
-              </Button>
-            </>
-          ) : (
-            <Button onClick={handlePredictionClick}>최종 흥행도 예측</Button>
-          )}
-          <SaveButton onClick={handleSave} disabled={isGenerating || !scenarioContent}>
-            저장
-          </SaveButton>
-        </ButtonContainer>
-      </ScenarioContainer>
-      {isGenerating && (
-        <LoadingOverlay>
-          <LoadingSpinner />
-        </LoadingOverlay>
+    <Section>
+      <Select onChange={handleScenarioSelect} value={selectedScenarioId || ""}>
+        <option value="">시나리오를 선택하세요</option>
+        {userScenarios.map((scenario) => (
+          <option key={scenario.id} value={scenario.id}>
+            {scenario.title}
+          </option>
+        ))}
+      </Select>
+
+      {selectedScenarioId && (
+        <>
+          <ChapterNavigation>
+            <NavButton onClick={handlePreviousChapter} disabled={currentChapter === 1}>
+              이전 챕터
+            </NavButton>
+            <ChapterInfo>
+              챕터 {currentChapter} / {userScenarios.find(s => s.id === parseInt(selectedScenarioId))?.chapter_count}
+            </ChapterInfo>
+            <NavButton 
+              onClick={handleNextChapter} 
+              disabled={currentChapter === userScenarios.find(s => s.id === parseInt(selectedScenarioId))?.chapter_count}
+            >
+              다음 챕터
+            </NavButton>
+          </ChapterNavigation>
+
+          <TextArea
+            value={chapterContent}
+            onChange={(e) => setChapterContent(e.target.value)}
+            placeholder="챕터 내용"
+            readOnly={isGenerating}
+          />
+
+          <Button onClick={generateChapter} disabled={isGenerating}>
+            {isGenerating ? "생성 중..." : "챕터 생성"}
+          </Button>
+
+          <TextArea
+            value={feedback}
+            onChange={(e) => setFeedback(e.target.value)}
+            placeholder="피드백을 입력하세요"
+          />
+
+          <Button onClick={saveFeedback}>피드백 저장</Button>
+        </>
       )}
-    </PageContainer>
+
+      {error && <ErrorMessage>{error}</ErrorMessage>}
+    </Section>
   );
 }
 
