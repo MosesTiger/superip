@@ -17,6 +17,10 @@ const ErrorMessage = styled.p`
   text-align: center;
 `;
 
+const NameTitle = styled.h2`
+  color: black;
+`;
+
 export default function Scenario() {
   const [scenarios, setScenarios] = useState([]);
   const [error, setError] = useState(null);
@@ -59,7 +63,7 @@ export default function Scenario() {
 
   return (
     <div>
-      <h2>{user.full_name || user.username}의 시나리오 보관함</h2>
+      <NameTitle>{user.full_name || user.username}의 시나리오</NameTitle>
       <ScenarioGrid>
         {scenarios.map((scenario) => (
           <SceneCard
