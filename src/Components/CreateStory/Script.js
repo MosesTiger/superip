@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import axios from 'axios';
-import { useAuth } from '../../context/AuthProvider';
+import axios from "axios";
+import { useAuth } from "../../context/AuthProvider";
+import { GoChevronRight, GoChevronLeft } from "react-icons/go";
 
 const Section = styled.section`
   display: flex;
   flex-direction: column;
   padding: 20px;
-  max-width: 100%;
+  width: 95%;
   margin: 0 auto;
   font-size: 16px;
   color: #000;
+  align-items: center;
 `;
 
 const Select = styled.select`
@@ -27,24 +29,37 @@ const ChapterNavigation = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  width: 20%;
 `;
 
-const NavButton = styled.button`
+const NavRightButton = styled(GoChevronRight)`
   padding: 10px 20px;
-  font-size: 16px;
-  color: #fff;
-  background-color: #007bff;
+  font-size: 20px;
+  color: black;
+  background-color: #f5f5f5;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
 
-  &:hover {
-    background-color: #0056b3;
+  &:disabled {
+    color: #f5f5f5;
+    cursor: not-allowed;
   }
+`;
+
+const NavLeftButton = styled(GoChevronLeft)`
+  padding: 10px 20px;
+  font-size: 20px;
+  color: black;
+  background-color: #f5f5f5;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 
   &:disabled {
-    background-color: #cccccc;
+    color: #f5f5f5;
     cursor: not-allowed;
   }
 `;
@@ -91,6 +106,22 @@ const Button = styled.button`
 const ErrorMessage = styled.p`
   color: #dc3545;
   font-weight: bold;
+`;
+
+const ButtonWrap = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+`;
+
+const PredictButton = styled(Button)`
+  background-color: #e23a3a;
+  color: black;
+  font-weight: bold;
+
+  &:hover {
+    background-color: #cb3737;
+  }
 `;
 
 function Script() {
@@ -257,18 +288,25 @@ function Script() {
       {selectedScenarioId && (
         <>
           <ChapterNavigation>
-            <NavButton onClick={handlePreviousChapter} disabled={currentChapter === 1}>
-              이전 챕터
-            </NavButton>
+            <NavLeftButton
+              onClick={handlePreviousChapter}
+              disabled={currentChapter === 1}
+            />
             <ChapterInfo>
-              챕터 {currentChapter} / {userScenarios.find(s => s.id === parseInt(selectedScenarioId))?.chapter_count}
+              챕터 {currentChapter} /{" "}
+              {
+                userScenarios.find((s) => s.id === parseInt(selectedScenarioId))
+                  ?.chapter_count
+              }
             </ChapterInfo>
-            <NavButton 
-              onClick={handleNextChapter} 
-              disabled={currentChapter === userScenarios.find(s => s.id === parseInt(selectedScenarioId))?.chapter_count}
-            >
-              다음 챕터
-            </NavButton>
+            <NavRightButton
+              onClick={handleNextChapter}
+              disabled={
+                currentChapter ===
+                userScenarios.find((s) => s.id === parseInt(selectedScenarioId))
+                  ?.chapter_count
+              }
+            />
           </ChapterNavigation>
 
           <TextArea
@@ -278,17 +316,29 @@ function Script() {
             readOnly={isGenerating}
           />
 
-          <Button onClick={generateChapter} disabled={isGenerating}>
-            {isGenerating ? "생성 중..." : "챕터 생성"}
-          </Button>
-
+          <ButtonWrap>
+            <Button onClick={generateChapter} disabled={isGenerating}>
+              {isGenerating ? "생성 중..." : "챕터 생성"}
+            </Button>
+          </ButtonWrap>
           <TextArea
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
             placeholder="피드백을 입력하세요"
           />
+          <ButtonWrap>
+            <Button onClick={saveFeedback}>피드백 저장</Button>
+          </ButtonWrap>
 
-          <Button onClick={saveFeedback}>피드백 저장</Button>
+          {currentChapter ===
+            userScenarios.find((s) => s.id === parseInt(selectedScenarioId))
+              ?.chapter_count && (
+            <ButtonWrap>
+              <PredictButton onClick={() => alert("흥행도 예측 실행")}>
+                흥행도 예측
+              </PredictButton>
+            </ButtonWrap>
+          )}
         </>
       )}
 
