@@ -104,23 +104,29 @@ function Script() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchUserScenarios = async () => {
-      try {
-        const response = await axios.get('http://127.0.0.1:8000/api/v1/scenario/user-scenarios', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        setUserScenarios(response.data);
-      } catch (error) {
-        console.error("시나리오 목록을 가져오는 중 오류 발생:", error);
-        setError("시나리오 목록을 가져오는데 실패했습니다.");
-      }
-    };
-
     fetchUserScenarios();
   }, [token]);
+
+  useEffect(() => {
+    if (selectedScenarioId) {
+      fetchChapterContent(currentChapter);
+    }
+  }, [selectedScenarioId, currentChapter]);
+
+  const fetchUserScenarios = async () => {
+    try {
+      const response = await axios.get('http://127.0.0.1:8000/api/v1/scenario/user-scenarios', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      setUserScenarios(response.data);
+    } catch (error) {
+      console.error("시나리오 목록을 가져오는 중 오류 발생:", error);
+      setError("시나리오 목록을 가져오는데 실패했습니다.");
+    }
+  };
 
   const handleScenarioSelect = (event) => {
     setSelectedScenarioId(event.target.value);
@@ -132,7 +138,6 @@ function Script() {
   const handlePreviousChapter = () => {
     if (currentChapter > 1) {
       setCurrentChapter(prev => prev - 1);
-      fetchChapterContent(currentChapter - 1);
     }
   };
 
@@ -140,13 +145,12 @@ function Script() {
     const selectedScenario = userScenarios.find(s => s.id === parseInt(selectedScenarioId));
     if (currentChapter < selectedScenario.chapter_count) {
       setCurrentChapter(prev => prev + 1);
-      fetchChapterContent(currentChapter + 1);
     }
   };
 
   const fetchChapterContent = async (chapterNumber) => {
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/api/v1/scenario/${selectedScenarioId}/chapters/${chapterNumber}`, {
+      const response = await axios.get(`http://127.0.0.1:8000/api/v1/scenario/${selectedScenarioId}/chapters/${chapterNumber}/content`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -161,9 +165,12 @@ function Script() {
 
   const fetchFeedback = async (chapterNumber) => {
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/api/v1/scenario/${selectedScenarioId}/feedbacks?chapter_id=${chapterNumber}`, {
+      const response = await axios.get(`http://127.0.0.1:8000/api/v1/scenario/${selectedScenarioId}/feedbacks`, {
         headers: {
           'Authorization': `Bearer ${token}`
+        },
+        params: {
+          chapter_id: chapterNumber
         }
       });
       if (response.data.length > 0) {
@@ -187,7 +194,8 @@ function Script() {
         {
           headers: {
             'Authorization': `Bearer ${token}`
-          }
+          },
+          responseType: 'stream'
         }
       );
       
@@ -203,6 +211,8 @@ function Script() {
             const data = JSON.parse(line.slice(6));
             if (data.type === 'content') {
               setChapterContent(prev => prev + data.content);
+            } else if (data === '[DONE]') {
+              break;
             }
           }
         }
