@@ -53,19 +53,19 @@ const GenreOption = styled.div`
   margin: 5px;
   border-radius: 20px;
   background-color: ${(props) => (props.selected ? "#007bff" : "#e0e0e0")};
-  color: ${(props) => (props.selected ? "white" : "black")};
+  color: ${(props) => (props.selected ? "#ffffff" : "#000000")};
   cursor: pointer;
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: ${(props) => (props.selected ? "#0056b3" : "#c0c0c0")};
+    background-color: ${(props) => (props.selected ? "#0056b3" : "#d0d0d0")};
   }
 `;
 
 const Label = styled.label`
-  display: block;
-  margin-top: 20px;
   font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 10px;
 `;
 
 const DurationControl = styled.div`
@@ -151,16 +151,62 @@ const PredictionButton = styled.button`
 
 const TextArea = styled.textarea`
   width: 100%;
-  height: ${(props) => props.height || "120px"};
-  margin-bottom: 15px;
-  border-radius: 10px;
+  height: 100px;
+  margin-top: 5px;
   border: 1px solid #ccc;
-  padding: 15px;
+  border-radius: 4px;
+  padding: 10px;
   font-size: 16px;
-  color: #000;
-  background-color: #f5f5f5;
-  display: block;
   resize: vertical;
+`;
+
+const TagInput = styled.input`
+  width: calc(100% - 70px);
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;
+  font-size: 16px;
+`;
+
+const AddTagButton = styled.button`
+  width: 70px;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  font-size: 16px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+`;
+
+const TagContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10px;
+`;
+
+const Tag = styled.div`
+  background-color: #e0e0e0;
+  color: #000000;
+  padding: 5px 10px;
+  margin: 5px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+`;
+
+const RemoveTagButton = styled.button`
+  background-color: transparent;
+  border: none;
+  color: #666;
+  margin-left: 5px;
+  cursor: pointer;
+  font-size: 16px;
 `;
 
 function Select() {
@@ -171,12 +217,14 @@ function Select() {
   const [rating, setRating] = useState("all");
   const [country, setCountry] = useState("korea");
   const [mainCharacterGender, setMainCharacterGender] = useState("male");
-  const [characters, setCharacters] = useState("");
-  const [keyword, setKeyword] = useState("");
-  const [userRequest, setUserRequest] = useState("");
-  const { token, user, setToken } = useAuth(); 
+  const [keywords, setKeywords] = useState([]);
+  const [currentKeyword, setCurrentKeyword] = useState("");
+  const [request, setRequest] = useState("");
+  const [characters, setCharacters] = useState([]);
+  const [currentCharacter, setCurrentCharacter] = useState("");
+  const { token, user } = useAuth();
   const navigate = useNavigate();
-  
+
   const handleGenreClick = (genre) => {
     setSelectedGenres((prev) =>
       prev.includes(genre)
@@ -197,25 +245,36 @@ function Select() {
     setDuration((prev) => Math.max(prev - 10, 10));
   };
 
-  const refreshToken = async () => {
-    try {
-      const response = await axios.post('http://127.0.0.1:8000/api/v1/auth/refresh-token', {
-        refresh_token: localStorage.getItem('refreshToken')
-      });
-      const newToken = response.data.access_token;
-      setToken(newToken);
-      localStorage.setItem('token', newToken);
-      return newToken;
-    } catch (error) {
-      console.error("Token refresh failed:", error);
-      navigate("/login");
-      throw error;
+  const handleAddKeyword = () => {
+    if (currentKeyword && !keywords.includes(currentKeyword)) {
+      setKeywords([...keywords, currentKeyword]);
+      setCurrentKeyword("");
     }
   };
 
+  const handleRemoveKeyword = (keyword) => {
+    setKeywords(keywords.filter((k) => k !== keyword));
+  };
+
+  const handleAddCharacter = () => {
+    if (currentCharacter && !characters.includes(currentCharacter)) {
+      setCharacters([...characters, currentCharacter]);
+      setCurrentCharacter("");
+    }
+  };
+
+  const handleRemoveCharacter = (character) => {
+    setCharacters(characters.filter((c) => c !== character));
+  };
+
   const handleSubmit = async () => {
-    if (!title || selectedGenres.length === 0) {
-      alert("제목과 최소 한 개의 장르를 선택해주세요.");
+    if (!title.trim()) {
+      alert("영화 제목을 입력해주세요.");
+      return;
+    }
+
+    if (selectedGenres.length === 0) {
+      alert("최소 한 개의 장르를 선택해주세요.");
       return;
     }
 
@@ -225,47 +284,40 @@ function Select() {
       return;
     }
 
-    const createScenario = async (token) => {
-      try {
-        const response = await axios.post('http://127.0.0.1:8000/api/v1/scenario/create', {
-          title: title,
-          genre: selectedGenres,
-          runtime: duration,
-          rating: rating,
-          theme: country,
-          gender: mainCharacterGender,
-          is_series: isCheckboxChecked,
-          chapter_count: Math.ceil(duration / 10),
-          characters: characters.split(',').map(char => char.trim()),
-          keywords: keyword.split(',').map(kw => kw.trim()),
-          user_request: userRequest
-        }, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (response.status === 201 || response.status === 200) {
-          const scenarioId = response.data.id;
-          navigate("/create/synopsis", {state: {scenarioId}});
-        } else {
-          throw new Error("오류가 발생했습니다.");
-        }
-      } catch (error) {
-        if (error.response && error.response.status === 401 && error.response.data.detail === "Token expired") {
-          const newToken = await refreshToken();
-          return createScenario(newToken);
-        }
-        throw error;
-      }
+    const scenarioData = {
+      title: title.trim(),
+      genre: selectedGenres,
+      runtime: duration,
+      rating: rating,
+      theme: country,
+      gender: mainCharacterGender,
+      is_series: isCheckboxChecked,
+      chapter_count: Math.ceil(duration / 10),
+      characters: characters,
+      keywords: keywords,
+      user_request: request.trim()
     };
+    console.log("Sending scenario data:", scenarioData);
+    console.log("Type of genre:", typeof scenarioData.genre);
+    console.log("Is genre an array:", Array.isArray(scenarioData.genre));
 
     try {
-      await createScenario(token);
+      const response = await axios.post('http://127.0.0.1:8000/api/v1/scenario/create', scenarioData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log("Response received:", response.data);
+
+      if (response.status === 201) {
+        const scenarioId = response.data.id;
+        navigate("/create/synopsis", {state: {scenarioId}});
+      }
     } catch (error) {
-      console.error("Error:", error);
-      alert("시나리오 생성 중 오류가 발생했습니다.");
+      console.error("Error details:", error.response?.data || error.message);
+      alert("시나리오 생성 중 오류가 발생했습니다: " + (error.response?.data?.detail || error.message));
     }
   };
 
@@ -279,6 +331,7 @@ function Select() {
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            required
           />
         </Label>
         <Label>장르를 선택하세요. (최대 3개)</Label>
@@ -352,25 +405,6 @@ function Select() {
           <option value="female">여성</option>
           <option value="mixed">혼성</option>
         </Select1>
-        <Label>등장인물 (콤마로 구분)</Label>
-        <TextArea
-          placeholder="예: 홍길동, 김철수, 이영희"
-          value={characters}
-          onChange={(e) => setCharacters(e.target.value)}
-        />
-        <Label>키워드 태그 (콤마로 구분)</Label>
-        <TextArea
-          placeholder="예: 모험, 우정, 성장"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-        />
-        <Label>요청사항</Label>
-        <TextArea
-          placeholder="GPT에게 요청할 사항을 적어주세요."
-          value={userRequest}
-          onChange={(e) => setUserRequest(e.target.value)}
-          height="300px"
-        />
         <CheckboxContainer>
           <Checkbox
             type="checkbox"
@@ -379,6 +413,52 @@ function Select() {
           />
           <Label>이 영화는 시리즈물입니까?</Label>
         </CheckboxContainer>
+        <Label>키워드를 입력하세요.</Label>
+        <div>
+          <TagInput
+            type="text"
+            value={currentKeyword}
+            onChange={(e) => setCurrentKeyword(e.target.value)}
+            placeholder="키워드 입력"
+          />
+          <AddTagButton onClick={handleAddKeyword}>추가</AddTagButton>
+        </div>
+        <TagContainer>
+          {keywords.map((keyword, index) => (
+            <Tag key={index}>
+              {keyword}
+              <RemoveTagButton onClick={() => handleRemoveKeyword(keyword)}>
+              ×
+              </RemoveTagButton>
+            </Tag>
+          ))}
+        </TagContainer>
+        <Label>등장인물을 입력하세요.</Label>
+        <div>
+          <TagInput
+            type="text"
+            value={currentCharacter}
+            onChange={(e) => setCurrentCharacter(e.target.value)}
+            placeholder="등장인물 입력"
+          />
+          <AddTagButton onClick={handleAddCharacter}>추가</AddTagButton>
+        </div>
+        <TagContainer>
+          {characters.map((character, index) => (
+            <Tag key={index}>
+              {character}
+              <RemoveTagButton onClick={() => handleRemoveCharacter(character)}>
+                ×
+              </RemoveTagButton>
+            </Tag>
+          ))}
+        </TagContainer>
+        <Label>gpt 요청사항을 입력하세요.</Label>
+        <TextArea
+          value={request}
+          onChange={(e) => setRequest(e.target.value)}
+          placeholder="시나리오에 대한 특별한 요청사항이 있다면 입력해주세요."
+        />
       </MovieDetails>
       <Actions>
         <PredictionButton onClick={handleSubmit}>다음 단계</PredictionButton>
