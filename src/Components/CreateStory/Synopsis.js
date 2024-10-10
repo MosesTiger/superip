@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from "react";
-import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
-import axios from 'axios';
-import { useAuth } from '../../context/AuthProvider';
+// Synopsis.js
 
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from "../../context/AuthProvider";
+
+// Styled Components
 const Section = styled.section`
   display: flex;
   flex-direction: column;
@@ -25,7 +28,7 @@ const TitleDisplay = styled.h2`
 
 const TextArea = styled.textarea`
   width: 100%;
-  height: ${(props) => props.height || "300px"};
+  height: 300px;
   margin-bottom: 15px;
   border-radius: 10px;
   border: 1px solid #ccc;
@@ -45,8 +48,8 @@ const ButtonContainer = styled.div`
 
 const Button = styled.button`
   padding: 10px 20px;
-  background-color: ${(props) => props.bgColor || "#007bff"};
-  color: ${(props) => props.color || "white"};
+  background-color: #007bff;
+  color: white;
   border: none;
   border-radius: 4px;
   font-size: 16px;
@@ -54,12 +57,16 @@ const Button = styled.button`
   margin-left: 10px;
 
   &:hover {
-    background-color: ${(props) => props.hoverBgColor || "#0056b3"};
+    background-color: #0056b3;
   }
 
   &:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
+
+    &:hover {
+      background-color: #cccccc;
+    }
   }
 `;
 
@@ -95,20 +102,39 @@ const Select = styled.select`
   font-size: 16px;
 `;
 
-const RefreshButton = styled(Button)`
-  background-color: #28a745;
+const RefreshButton = styled.button`
+  background-color: #f5f5f5;
+  color: black;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 10px;
+  width: 120px;
+`;
+
+const ExpectButton = styled(Button)`
+  background-color: #e0a800;
+  color: #000;
 
   &:hover {
-    background-color: #218838;
+    background-color: #cc9a04;
   }
 `;
 
 const CombinedButton = styled(Button)`
-  background-color: ${(props) => (props.isSynopsisComplete ? '#28a745' : '#007bff')};
+  background-color: ${(props) =>
+    props.isSynopsisComplete ? "#28a745" : "#E23A3A"};
 
   &:hover {
-    background-color: ${(props) => (props.isSynopsisComplete ? '#218838' : '#0056b3')};
+    background-color: ${(props) =>
+      props.isSynopsisComplete ? "#218838" : "#C53838"};
   }
+`;
+
+const LabelWrap = styled.div`
+  display: flex;
+  justify-content: space-between;
 `;
 
 function Synopsis() {
@@ -126,7 +152,16 @@ function Synopsis() {
 
   useEffect(() => {
     fetchUserScenarios();
+    // Cleanup function to close EventSource when component unmounts
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
+
+  const eventSourceRef = React.useRef(null);
 
   const fetchUserScenarios = async () => {
     try {
@@ -146,6 +181,12 @@ function Synopsis() {
     setSelectedScenarioTitle(selectedTitle);
     if (selectedTitle) {
       fetchScenarioDetails(selectedTitle);
+    } else {
+      // 선택 취소 시 상태 초기화
+      setTitle("");
+      setPlot("");
+      setIsSynopsisComplete(false);
+      setSuccessRate(null);
     }
   };
 
@@ -179,55 +220,49 @@ function Synopsis() {
       return;
     }
     setIsGenerating(true);
+    setPlot(""); // 기존 시놉시스 초기화
+    setSuccessRate(null); // 기존 예측 결과 초기화
+    setIsSynopsisComplete(false); // 시놉시스 완료 상태 초기화
+    setError(null);
+
     try {
       const scenarioId = userScenarios.find(s => s.title === selectedScenarioTitle)?.id;
       if (!scenarioId) {
         setError("선택된 시나리오의 ID를 찾을 수 없습니다.");
+        setIsGenerating(false);
         return;
       }
 
-      await axios.post(
-        `http://127.0.0.1:8000/api/v1/synopsis/generate-synopsis`,
-        { scenario_id: scenarioId },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
-      // 시놉시스 생성 상태 확인
-      await checkSynopsisStatus(scenarioId);
+      // EventSource를 사용하여 서버로부터 시놉시스 스트리밍 수신
+      const tokenParam = encodeURIComponent(token);
+      const url = `http://127.0.0.1:8000/api/v1/synopsis/generate-synopsis-stream/${scenarioId}?token=${tokenParam}`;
+      const eventSource = new EventSource(url);
+      eventSourceRef.current = eventSource;
+
+      eventSource.onmessage = (e) => {
+        setPlot(prev => prev + e.data);
+      };
+
+      eventSource.addEventListener('prediction', (e) => {
+        const data = JSON.parse(e.data);
+        setSuccessRate(data.first_predicted_rate);
+        setIsSynopsisComplete(true);
+        setIsGenerating(false);
+        eventSource.close();
+        eventSourceRef.current = null;
+      });
+
+      eventSource.addEventListener('error', (e) => {
+        console.error("EventSource failed:", e);
+        setError("시놉시스 생성 중 오류가 발생했습니다.");
+        setIsGenerating(false);
+        eventSource.close();
+        eventSourceRef.current = null;
+      });
+
     } catch (error) {
       handleApiError(error, "시놉시스 생성 중 오류가 발생했습니다.");
-    } finally {
       setIsGenerating(false);
-    }
-  };
-
-  const checkSynopsisStatus = async (scenarioId) => {
-    try {
-      while (true) {
-        const response = await axios.get(
-          `http://127.0.0.1:8000/api/v1/synopsis/synopsis-status/${scenarioId}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          }
-        );
-        if (response.data.status === 'complete') {
-          setPlot(response.data.synopsis);
-          setIsSynopsisComplete(true);
-          await fetchPrediction(scenarioId);
-          break;
-        } else if (response.data.status === 'error') {
-          setError("시놉시스 생성 중 오류가 발생했습니다.");
-          break;
-        }
-        await new Promise(resolve => setTimeout(resolve, 5000)); // 5초 대기
-      }
-    } catch (error) {
-      handleApiError(error, "시놉시스 상태 확인 중 오류가 발생했습니다.");
     }
   };
 
@@ -321,7 +356,6 @@ function Synopsis() {
             placeholder="시놉시스를 생성하려면 '시놉시스 생성' 버튼을 클릭하세요."
             value={plot}
             onChange={(e) => setPlot(e.target.value)}
-            height="300px"
             readOnly={true}
           />
           {isSynopsisComplete && (
@@ -348,6 +382,8 @@ function Synopsis() {
                 ? "생성 중..."
                 : isSynopsisComplete
                 ? "시나리오 생성"
+                : successRate
+                ? `예상 흥행률: ${successRate}`
                 : "시놉시스 생성"}
             </CombinedButton>
           </ButtonContainer>
