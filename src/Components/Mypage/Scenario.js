@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import SceneCard from "./SceneCard";
 import axios from 'axios';
-import { useAuth } from '../../context/AuthProvider';
+import { useAuth } from '../../context/AutoProvider';
 import { useNavigate } from 'react-router-dom';
 
 // 시나리오 그리드 스타일 정의

@@ -15,7 +15,7 @@ import FindIDRes from "./Components/User/FindIDRes";
 import FindPW from "./Components/User/FindPW";
 import FindPWRes from "./Components/User/FindPWRes";
 import PageNotFound from "./Pages/PageNotFound";
-import { AuthProvider, useAuth } from "./context/AuthProvider";
+import { AutoProvider, useAuth } from './context/AutoProvider';
 import Select from "./Components/CreateStory/Select";
 import Synopsis from "./Components/CreateStory/Synopsis";
 import Script from "./Components/CreateStory/Script";
@@ -26,10 +26,14 @@ import FAQ from "./Components/Info/FAQ";
 import QnA from "./Components/Info/QnA";
 import Inquiry from "./Components/Info/Inquiry";
 import InquiryDetail from "./Components/Info/InquiryDetail";
+import ExampleStory from "./Pages/ExampleStory";
+import ExampleScript from "./Components/ExampleStory/ExampleScript";
+import ExampleSelect from "./Components/ExampleStory/ExampleSelect";
+import ExampleSynopsis from "./Components/ExampleStory/ExampleSynopsis";
 
 function App() {
   return (
-    <AuthProvider>
+    <AutoProvider>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<User />}>
@@ -53,6 +57,11 @@ function App() {
           <Route path="script" element={<Script />} />
           <Route path="show" element={<Show />} />
           <Route path="predict" element={<Show />} />
+        </Route>
+        <Route path="/example/:id" element={<ExampleStory />}>
+          <Route path="select" element={<ExampleSelect />} />
+          <Route path="synopsis" element={<ExampleSynopsis />} />
+          <Route path="script" element={<ExampleScript />} />
         </Route>
         <Route
           path="/mypage"
@@ -90,7 +99,7 @@ function App() {
         <Route path="/detail/:id" element={<Detail />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
-    </AuthProvider>
+    </AutoProvider>
   );
 }
 

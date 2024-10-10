@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 // ExampleCard styled component
@@ -67,9 +68,17 @@ const ExampleDescription = styled.p`
 `;
 
 // ExampleCard component
-const ExampleCard = ({ title, genre, image }) => {
+const ExampleCard = ({ id, title, genre, image }) => {
+  const navigate = useNavigate();
+
+  const exampleId = id;
+
+  const handleClick = () => {
+    navigate(`/example/${exampleId}/select`);
+  };
+
   return (
-    <ExampleCardContainer>
+    <ExampleCardContainer onClick={handleClick}>
       <ExampleImage src={image} alt={title} />
       <GradientOverlay />
       <ExampleTitle>{title}</ExampleTitle>

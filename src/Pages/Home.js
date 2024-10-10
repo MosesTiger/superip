@@ -6,6 +6,7 @@ import "../stylefile/Main.css";
 import styled, { keyframes } from "styled-components";
 import ExampleCard from "../Components/Home/ExampleCard";
 import { IoIosArrowDropright, IoIosArrowDropleft } from "react-icons/io";
+import { exampleData } from "../Components/ExampleStory/exampleData";
 
 const slideAnimation = keyframes`
   0% {
@@ -36,9 +37,9 @@ const FilmContainer = styled.div`
 const FilmRow = styled.div`
   display: flex;
   margin: 10px 0; /* 위아래 간격 */
-  width: 200%; /* 두 배로 설정해 반복되도록 만듦 */
+  width: 400%; /* 두 배로 설정해 반복되도록 만듦 */
   gap: 40px;
-  animation: ${slideAnimation} 5s linear infinite; /* 15초 동안 왼쪽으로 이동, 무한 반복 */
+  animation: ${slideAnimation} 10s linear infinite; /* 15초 동안 왼쪽으로 이동, 무한 반복 */
 `;
 
 const FilmWhite = styled.div`
@@ -200,33 +201,6 @@ function Home() {
     },
   ];
 
-  const exampleData = [
-    {
-      id: 1,
-      title: "Story 1",
-      genre: "SF, 전쟁",
-      image: "/추천시나리오1.png",
-    },
-    {
-      id: 2,
-      title: "Story 2",
-      genre: "범죄, 스릴러",
-      image: "/추천시나리오2.png",
-    },
-    {
-      id: 3,
-      title: "Story 3",
-      genre: "판타지",
-      image: "/추천시나리오3.png",
-    },
-    {
-      id: 4,
-      title: "Story 4",
-      genre: "액션, 무협",
-      image: "/추천시나리오4.png",
-    },
-  ];
-
   const exampleSectionRef = useRef(null);
   const scrollToExampleSection = () => {
     if (exampleSectionRef.current) {
@@ -264,36 +238,9 @@ function Home() {
       <Wrapper>
         <FilmContainer>
           <FilmRow>
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
+            {Array.from({ length: 60 }).map((_, index) => (
+              <FilmWhite key={index} />
+            ))}
           </FilmRow>
           <div className="card-container">
             {cardData.map((card) => (
@@ -310,36 +257,9 @@ function Home() {
             ))}
           </div>
           <FilmRow>
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
-            <FilmWhite />
+            {Array.from({ length: 60 }).map((_, index) => (
+              <FilmWhite key={index} />
+            ))}
           </FilmRow>
         </FilmContainer>
       </Wrapper>
@@ -348,12 +268,12 @@ function Home() {
           <ExampleTitle>EXAMPLE STORY</ExampleTitle>
           <CardWrapper>
             <CardRow scrollPosition={scrollPosition}>
-              {exampleData.map((story) => (
+              {exampleData.map((item) => (
                 <ExampleCard
-                  key={story.id}
-                  title={story.title}
-                  genre={story.genre}
-                  image={story.image}
+                  id={item.id}
+                  title={item.title}
+                  genre={item.genre}
+                  image={item.image}
                 />
               ))}
             </CardRow>

@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from 'axios';
 import { useAuth } from '../../context/AuthProvider';
-
 const Section = styled.section`
   display: flex;
   flex-direction: column;

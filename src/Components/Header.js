@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import "../stylefile/Header.css";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthProvider";
+import { useAuth } from "../context/AutoProvider";
 import { readXlsxFile } from "../context/xlsxReader"; // xlsxReader 가져오기
 import styled from "styled-components";
 import { PiUserCircleBold } from "react-icons/pi";
@@ -177,9 +177,9 @@ const Header = () => {
             }
           />
           <div className="profile-info">
-          <span className="profile-name" style={{ fontFamily: "조선굴림체" }}>
-            {user?.name || "User"} 님
-          </span>
+            <span className="profile-name" style={{ fontFamily: "조선굴림체" }}>
+              {user?.name || "User"} 님
+            </span>
             <button className="logout-button" onClick={logout} style={{ fontFamily: "조선굴림체" }}>
               LOGOUT
             </button>

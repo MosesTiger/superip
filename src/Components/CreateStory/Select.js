@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from '../../context/AuthProvider';
+import { useAuth } from '../../context/AutoProvider';
 import axios from 'axios';
+
 
 const Section = styled.section`
   display: flex;
@@ -49,23 +50,74 @@ const GenreSelection = styled.div`
 `;
 
 const GenreOption = styled.div`
-  padding: 8px 16px;
-  margin: 5px;
-  border-radius: 20px;
-  background-color: ${(props) => (props.selected ? "#007bff" : "#e0e0e0")};
-  color: ${(props) => (props.selected ? "#ffffff" : "#000000")};
+  margin: 8px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 4px;
+  background-color: ${(props) => (props.selected ? "#e23a3a" : "#cdcdcd")};
+  color: ${(props) => (props.selected ? "#fff" : "#000")};
   cursor: pointer;
-  transition: all 0.3s ease;
 
   &:hover {
-    background-color: ${(props) => (props.selected ? "#0056b3" : "#d0d0d0")};
+    background-color: #e23a3a;
+    color: #fff;
+  }
+  &:active {
+    background-color: #be3232;
+    color: #fff;
   }
 `;
 
-const Label = styled.label`
-  font-weight: bold;
-  margin-top: 20px;
-  margin-bottom: 10px;
+const GenreLabel = styled.div`
+  font-weight: 500;
+  text-align: center;
+`;
+
+const Label = styled.div`
+  font-size: 16px;
+  color: #000;
+  margin: -5px 0;
+`;
+
+const Select1 = styled.select`
+  width: 268px;
+  height: 45px;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+  border: 1px solid #cdcdcd;
+  padding: 8px;
+  font-size: 16px;
+  color: #000;
+  margin: 10px 0;
+  margin-top: -5px;
+`;
+
+const CheckboxContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
+  margin: 10px 0;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  margin-top: -5px;
+`;
+
+const Checkbox = styled.input`
+  width: 25px;
+  height: 25px;
+  margin: 0;
+  accent-color: ${(props) => (props.checked ? "#E23A3A" : "#859AA5")};
+`;
+
+const MovieDetails = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  border-bottom: 1px solid #ccc;
 `;
 
 const DurationControl = styled.div`
@@ -80,18 +132,17 @@ const DurationButton = styled.button`
   width: 30px;
   height: 30px;
   border: none;
-  background-color: #007bff;
-  color: white;
+  background-color:#f5f5f5;
+  color: black;
   font-size: 20px;
   cursor: pointer;
-  border-radius: 50%;
 
   &:hover {
-    background-color: #0056b3;
+    color: #1e1e1e;
   }
 
   &:disabled {
-    background-color: #cccccc;
+    color: #cccccc;
     cursor: not-allowed;
   }
 `;
@@ -99,34 +150,6 @@ const DurationButton = styled.button`
 const DurationDisplay = styled.span`
   font-size: 18px;
   font-weight: bold;
-`;
-
-const Select1 = styled.select`
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-`;
-
-const CheckboxContainer = styled.div`
-  display: flex;
-  align-items: center;
-  margin-top: 20px;
-`;
-
-const Checkbox = styled.input`
-  margin-right: 10px;
-`;
-
-const MovieDetails = styled.div`
-  margin-top: 20px;
-`;
-
-const GenreLabel = styled.div`
-  font-weight: 500;
-  text-align: center;
 `;
 
 const Actions = styled.div`
@@ -137,15 +160,15 @@ const Actions = styled.div`
 
 const PredictionButton = styled.button`
   padding: 10px 20px;
-  background-color: #007bff;
+  background-color: #E23A3A;
   color: white;
   border: none;
   border-radius: 4px;
-  font-size: 16px;
+  font-size: 20px;
   cursor: pointer;
 
   &:hover {
-    background-color: #0056b3;
+    background-color: #be3232;
   }
 `;
 
@@ -351,7 +374,7 @@ function Select() {
             </GenreOption>
           ))}
         </GenreSelection>
-        <small style={{color: "red"}}>
+        <small style={{ color: "red" }}>
           {selectedGenres.length >= 3 ? "최대 3개의 장르만 선택할 수 있습니다." : ""}
         </small>
         <Label>영화 상영 시간을 선택하세요.</Label>
