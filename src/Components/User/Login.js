@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AutoProvider";
+import { useAuth } from "../../context/AuthProvider";
 
 // 스타일드 컴포넌트 정의
 const LoginText = styled.div`
@@ -149,11 +149,11 @@ function Login() {
         />
       </InputContainer>
       <LoginButton onClick={handleLogin}>Login</LoginButton>
-      <OAuthButton className="kakao" onClick={() => handleOAuthLogin('kakao')}>
+      <OAuthButton className="kakao" onClick={() => handleOAuthLogin("kakao")}>
         <img src="/카카오.png" alt="Ka Logo" />
         카카오톡 로그인
       </OAuthButton>
-      <OAuthButton className="naver" onClick={() => handleOAuthLogin('naver')}>
+      <OAuthButton className="naver" onClick={() => handleOAuthLogin("naver")}>
         <img src="/네이버.png" alt="Naver Logo" />
         네이버 로그인
       </OAuthButton>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import "../stylefile/Header.css";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AutoProvider";
+import { useAuth } from "../context/AuthProvider";
 import { readXlsxFile } from "../context/xlsxReader"; // xlsxReader 가져오기
 import styled from "styled-components";
 import { PiUserCircleBold } from "react-icons/pi";
@@ -65,7 +65,7 @@ const LoginButton = styled.button`
   text-decoration: none;
   font-family: "조선굴림체";
   font-size: 25px;
-  font-weight:100;
+  font-weight: 100;
   padding: 0px 5px;
   background-color: #f5f5f5;
   color: black;
@@ -180,7 +180,11 @@ const Header = () => {
             <span className="profile-name" style={{ fontFamily: "조선굴림체" }}>
               {user?.name || "User"} 님
             </span>
-            <button className="logout-button" onClick={logout} style={{ fontFamily: "조선굴림체" }}>
+            <button
+              className="logout-button"
+              onClick={logout}
+              style={{ fontFamily: "조선굴림체" }}
+            >
               LOGOUT
             </button>
           </div>

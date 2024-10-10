@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import SceneCard from "./SceneCard";
-import axios from 'axios';
-import { useAuth } from '../../context/AutoProvider';
-import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+import { useAuth } from "../../context/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 // 시나리오 그리드 스타일 정의
 const ScenarioGrid = styled.div`
@@ -25,17 +25,20 @@ export default function Scenario() {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
 
     const fetchScenarios = async () => {
       try {
-        const response = await axios.get(`http://3.36.168.204/api/v1/scenario/user/${user.id}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
+        const response = await axios.get(
+          `http://3.36.168.204/api/v1/scenario/user/${user.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
-        });
+        );
         setScenarios(response.data);
       } catch (error) {
         console.error("시나리오를 불러오는 데 실패했습니다:", error);

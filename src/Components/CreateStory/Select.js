@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from '../../context/AutoProvider';
-import axios from 'axios';
-
+import { useAuth } from "../../context/AuthProvider";
+import axios from "axios";
 
 const Section = styled.section`
   display: flex;
@@ -132,7 +131,7 @@ const DurationButton = styled.button`
   width: 30px;
   height: 30px;
   border: none;
-  background-color:#f5f5f5;
+  background-color: #f5f5f5;
   color: black;
   font-size: 20px;
   cursor: pointer;
@@ -160,7 +159,7 @@ const Actions = styled.div`
 
 const PredictionButton = styled.button`
   padding: 10px 20px;
-  background-color: #E23A3A;
+  background-color: #e23a3a;
   color: white;
   border: none;
   border-radius: 4px;
@@ -318,29 +317,36 @@ function Select() {
       chapter_count: Math.ceil(duration / 10),
       characters: characters,
       keywords: keywords,
-      user_request: request.trim()
+      user_request: request.trim(),
     };
     console.log("Sending scenario data:", scenarioData);
     console.log("Type of genre:", typeof scenarioData.genre);
     console.log("Is genre an array:", Array.isArray(scenarioData.genre));
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/v1/scenario/create', scenarioData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/v1/scenario/create",
+        scenarioData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
-      });
+      );
 
       console.log("Response received:", response.data);
 
       if (response.status === 201) {
         const scenarioId = response.data.id;
-        navigate("/create/synopsis", {state: {scenarioId}});
+        navigate("/create/synopsis", { state: { scenarioId } });
       }
     } catch (error) {
       console.error("Error details:", error.response?.data || error.message);
-      alert("시나리오 생성 중 오류가 발생했습니다: " + (error.response?.data?.detail || error.message));
+      alert(
+        "시나리오 생성 중 오류가 발생했습니다: " +
+          (error.response?.data?.detail || error.message)
+      );
     }
   };
 
@@ -360,10 +366,37 @@ function Select() {
         <Label>장르를 선택하세요. (최대 3개)</Label>
         <GenreSelection>
           {[
-            "드라마", "액션", "코메디", "범죄", "스릴러", "미스터리", "시대극/사극",
-            "전쟁", "가족", "멜로/로맨스", "어드벤쳐", "판타지", "공포", "스포츠",
-            "SF", "느와르", "반공/분단", "첩보", "인물", "재난", "전기", "하이틴",
-            "역사", "갱스터", "사회물(경향)", "뮤직", "청춘", "활극", "뮤지컬", "신파", "무협"
+            "드라마",
+            "액션",
+            "코메디",
+            "범죄",
+            "스릴러",
+            "미스터리",
+            "시대극/사극",
+            "전쟁",
+            "가족",
+            "멜로/로맨스",
+            "어드벤쳐",
+            "판타지",
+            "공포",
+            "스포츠",
+            "SF",
+            "느와르",
+            "반공/분단",
+            "첩보",
+            "인물",
+            "재난",
+            "전기",
+            "하이틴",
+            "역사",
+            "갱스터",
+            "사회물(경향)",
+            "뮤직",
+            "청춘",
+            "활극",
+            "뮤지컬",
+            "신파",
+            "무협",
           ].map((genre) => (
             <GenreOption
               key={genre}
@@ -375,7 +408,9 @@ function Select() {
           ))}
         </GenreSelection>
         <small style={{ color: "red" }}>
-          {selectedGenres.length >= 3 ? "최대 3개의 장르만 선택할 수 있습니다." : ""}
+          {selectedGenres.length >= 3
+            ? "최대 3개의 장르만 선택할 수 있습니다."
+            : ""}
         </small>
         <Label>영화 상영 시간을 선택하세요.</Label>
         <DurationControl>
@@ -451,7 +486,7 @@ function Select() {
             <Tag key={index}>
               {keyword}
               <RemoveTagButton onClick={() => handleRemoveKeyword(keyword)}>
-              ×
+                ×
               </RemoveTagButton>
             </Tag>
           ))}
