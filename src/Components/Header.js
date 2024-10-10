@@ -178,7 +178,7 @@ const Header = () => {
           />
           <div className="profile-info">
             <span className="profile-name" style={{ fontFamily: "조선굴림체" }}>
-              {user?.name || "User"} 님
+              {user.full_name || "User"} 님
             </span>
             <button
               className="logout-button"

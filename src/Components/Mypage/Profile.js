@@ -87,7 +87,7 @@ const Profile = () => {
         </ProfileImageSection>
         <ProfileDetails>
           <ProfileName>
-            {user?.name || "AI키드"}
+            {user.full_name || "User"}
             <EditNickname href="/change-nickname">닉네임 변경</EditNickname>
           </ProfileName>
           <ProfileEmail>
