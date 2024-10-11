@@ -5,6 +5,17 @@ import TextContent from "./TextContent";
 import Graph from "./Graph";
 import BoxofficeSection from "./BoxofficeSection";
 
+const Section = styled.section`
+  display: flex;
+  padding: 20px;
+  width: 95%;
+  margin: 0 auto;
+  font-size: 16px;
+  color: #000;
+  align-items: center;
+  justify-content: center;
+`;
+
 const DashboardContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -13,7 +24,7 @@ const DashboardContainer = styled.div`
   min-height: calc(100vh - 70px);
   width: 95vw;
   box-sizing: border-box;
-  background-color: #1e1e1e;
+  background-color: #f5f5f5;
   transform: translateX(-50px);
 `;
 
@@ -253,7 +264,7 @@ function Show() {
   const isPopupOpen = isAnalysisPopupOpen || isBoxofficePopupOpen;
 
   return (
-    <>
+    <Section>
       <DashboardContainer>
         {isPopupOpen && (
           <Overlay
@@ -409,7 +420,7 @@ function Show() {
           </div>
         </Popup>
       )}
-    </>
+    </Section>
   );
 }
 
