@@ -120,7 +120,7 @@ function Script() {
 
   // Create an axios instance with baseURL and interceptors for authorization
   const axiosInstance = axios.create({
-    baseURL: "43.200.111.65/api/v1",
+    baseURL: "http://43.200.111.65/api/v1",
   });
 
   // Add a request interceptor to include the Authorization header
@@ -214,7 +214,7 @@ function Script() {
     setChapterContent(""); // 새로운 생성 시작 시 기존 내용 초기화
     try {
       const response = await fetch(
-        `43.200.111.65/api/v1/scenario/${selectedScenarioId}/chapters/${currentChapter}/generate`,
+        `http://43.200.111.65/api/v1/scenario/${selectedScenarioId}/chapters/${currentChapter}/generate`,
         {
           method: "POST",
           headers: {
@@ -356,7 +356,7 @@ function Script() {
               피드백 저장
             </Button>
           </ButtonWrap>
-
+          {/* 
           {currentChapter === chapterCount && (
             <ButtonWrap>
               <PredictButton onClick={handlePrediction} disabled={isGenerating}>
@@ -364,10 +364,9 @@ function Script() {
               </PredictButton>
             </ButtonWrap>
           )}
+                */}
         </>
       )}
-
-      {error && <ErrorMessage>{error}</ErrorMessage>}
     </Section>
   );
 }

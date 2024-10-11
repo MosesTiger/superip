@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
 
 const Section = styled.section`
@@ -125,7 +125,7 @@ const CombinedButton = styled(Button)`
 
   &:hover {
     background-color: ${(props) =>
-    props.isSynopsisComplete ? "#218838" : "#C53838"};
+      props.isSynopsisComplete ? "#218838" : "#C53838"};
   }
 `;
 
@@ -162,11 +162,14 @@ function Synopsis() {
 
   const fetchUserScenarios = async () => {
     try {
-      const response = await axios.get('43.200.111.65/api/v1/scenario/user-scenarios', {
-        headers: {
-          'Authorization': `Bearer ${token}`
+      const response = await axios.get(
+        "http://43.200.111.65/api/v1/scenario/user-scenarios",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
+      );
       setUserScenarios(response.data);
     } catch (error) {
       handleApiError(error, "시나리오 목록을 가져오는 중 오류가 발생했습니다.");
@@ -190,7 +193,7 @@ function Synopsis() {
   const fetchScenarioDetails = async (title) => {
     try {
       const encodedTitle = encodeURIComponent(title);
-      const url = `43.200.111.65/api/v1/synopsis/by-title/${encodedTitle}`;
+      const url = `http://43.200.111.65/api/v1/synopsis/by-title/${encodedTitle}`;
       const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -223,7 +226,9 @@ function Synopsis() {
     setError(null);
 
     try {
-      const scenarioId = userScenarios.find(s => s.title === selectedScenarioTitle)?.id;
+      const scenarioId = userScenarios.find(
+        (s) => s.title === selectedScenarioTitle
+      )?.id;
       if (!scenarioId) {
         setError("선택된 시나리오의 ID를 찾을 수 없습니다.");
         setIsGenerating(false);
@@ -232,15 +237,15 @@ function Synopsis() {
 
       // EventSource를 사용하여 서버로부터 시놉시스 스트리밍 수신
       const tokenParam = encodeURIComponent(token);
-      const url = `43.200.111.65/api/v1/synopsis/generate-synopsis-stream/${scenarioId}?token=${tokenParam}`;
+      const url = `http://43.200.111.65/api/v1/synopsis/generate-synopsis-stream/${scenarioId}?token=${tokenParam}`;
       const eventSource = new EventSource(url);
       eventSourceRef.current = eventSource;
 
       eventSource.onmessage = (e) => {
-        setPlot(prev => prev + e.data);
+        setPlot((prev) => prev + e.data);
       };
 
-      eventSource.addEventListener('prediction', (e) => {
+      eventSource.addEventListener("prediction", (e) => {
         const data = JSON.parse(e.data);
         setSuccessRate(data.first_predicted_rate);
         setIsSynopsisComplete(true);
@@ -249,14 +254,13 @@ function Synopsis() {
         eventSourceRef.current = null;
       });
 
-      eventSource.addEventListener('error', (e) => {
+      eventSource.addEventListener("error", (e) => {
         console.error("EventSource failed:", e);
         setError("시놉시스 생성 중 오류가 발생했습니다.");
         setIsGenerating(false);
         eventSource.close();
         eventSourceRef.current = null;
       });
-
     } catch (error) {
       handleApiError(error, "시놉시스 생성 중 오류가 발생했습니다.");
       setIsGenerating(false);
@@ -266,7 +270,7 @@ function Synopsis() {
   const fetchPrediction = async (scenarioId) => {
     try {
       const response = await axios.get(
-        `43.200.111.65/api/v1/synopsis/prediction/${scenarioId}`,
+        `http://43.200.111.65/api/v1/synopsis/prediction/${scenarioId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -290,14 +294,16 @@ function Synopsis() {
     }
 
     try {
-      const scenarioId = userScenarios.find(s => s.title === selectedScenarioTitle)?.id;
+      const scenarioId = userScenarios.find(
+        (s) => s.title === selectedScenarioTitle
+      )?.id;
       if (!scenarioId) {
         setError("선택된 시나리오의 ID를 찾을 수 없습니다.");
         return;
       }
 
       await axios.put(
-        `43.200.111.65/api/v1/scenario/${scenarioId}/user-request`,
+        `http://43.200.111.65/api/v1/scenario/${scenarioId}/user-request`,
         { user_request: gptRequest },
         {
           headers: {
@@ -310,7 +316,10 @@ function Synopsis() {
         replace: true,
       });
     } catch (error) {
-      handleApiError(error, "시나리오 생성 페이지로 이동 중 오류가 발생했습니다.");
+      handleApiError(
+        error,
+        "시나리오 생성 페이지로 이동 중 오류가 발생했습니다."
+      );
     }
   };
 
@@ -322,7 +331,9 @@ function Synopsis() {
         logout();
         navigate("/login");
       } else if (error.response.status === 422) {
-        errorMessage = `데이터 형식이 올바르지 않습니다. 오류 메시지: ${JSON.stringify(error.response.data)}`;
+        errorMessage = `데이터 형식이 올바르지 않습니다. 오류 메시지: ${JSON.stringify(
+          error.response.data
+        )}`;
       } else if (error.response.data && error.response.data.detail) {
         errorMessage = error.response.data.detail;
       }
@@ -360,30 +371,27 @@ function Synopsis() {
           {isSynopsisComplete && (
             <>
               {successRate && (
-                <SuccessRateDisplay>예상 흥행률: {successRate}</SuccessRateDisplay>
+                <SuccessRateDisplay>
+                  예상 흥행률: {successRate}
+                </SuccessRateDisplay>
               )}
-              <Label>수정 요청사항</Label>
-              <TextArea
-                placeholder="GPT에게 수정을 요청할 사항을 적어주세요."
-                value={gptRequest}
-                onChange={(e) => setGptRequest(e.target.value)}
-                height="150px"
-              />
             </>
           )}
           <ButtonContainer>
             <CombinedButton
-              onClick={isSynopsisComplete ? handleCreateScenario : generateSynopsis}
+              onClick={
+                isSynopsisComplete ? handleCreateScenario : generateSynopsis
+              }
               disabled={isGenerating}
               isSynopsisComplete={isSynopsisComplete}
             >
               {isGenerating
                 ? "생성 중..."
                 : isSynopsisComplete
-                  ? "시나리오 생성"
-                  : successRate
-                    ? `예상 흥행률: ${successRate}`
-                    : "시놉시스 생성"}
+                ? "시나리오 생성"
+                : successRate
+                ? `예상 흥행률: ${successRate}`
+                : "시놉시스 생성"}
             </CombinedButton>
           </ButtonContainer>
         </>

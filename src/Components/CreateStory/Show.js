@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styled from "styled-components";
-import { useAuth } from '../../context/AuthProvider'; // 적절한 경로로 수정해주세요
+import { useAuth } from "../../context/AuthProvider"; // 적절한 경로로 수정해주세요
 import {
   RadarChart,
   PolarGrid,
@@ -9,8 +9,8 @@ import {
   PolarRadiusAxis,
   Radar,
   Legend,
-  ResponsiveContainer
-} from 'recharts';
+  ResponsiveContainer,
+} from "recharts";
 
 const Section = styled.section`
   display: flex;
@@ -128,7 +128,9 @@ const Divtitle = styled.div`
 const DivContent = styled.div`
   width: 100%;
   font-size: ${(props) =>
-    props.content === "star" || props.content === "first" || props.content === "second"
+    props.content === "star" ||
+    props.content === "first" ||
+    props.content === "second"
       ? "30px"
       : "40px"};
   font-weight: bold;
@@ -282,7 +284,7 @@ const BoxofficeSection = ({
   countryScore,
   onMoreClick,
 }) => (
-  <div style={{ width: '100%' }}>
+  <div style={{ width: "100%" }}>
     <Sectiontitlewrap>
       <Sectiontitle>1차 흥행도 분석표</Sectiontitle>
       <MoreButton onClick={onMoreClick}>분석 더보기</MoreButton>
@@ -317,7 +319,7 @@ function Show() {
   const fetchUserScenarios = async () => {
     try {
       const response = await axios.get(
-        "43.200.111.65/api/v1/scenario/user-scenarios",
+        "http://43.200.111.65/api/v1/scenario/user-scenarios",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -341,7 +343,7 @@ function Show() {
     if (scenarioId) {
       try {
         const response = await axios.get(
-          `43.200.111.65/api/v1/scenario/${scenarioId}`,
+          `http://43.200.111.65/api/v1/scenario/${scenarioId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -362,14 +364,14 @@ function Show() {
   const fetchPredictionData = async (scenarioId) => {
     try {
       const response = await axios.post(
-        "43.200.111.65/api/v1/success_rate/final_predict",
+        "http://43.200.111.65/api/v1/success_rate/final_predict",
         {
           scenario_id: scenarioId,
         },
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         }
       );
@@ -409,11 +411,13 @@ function Show() {
           <Titleposter src="/영화 포스터 예제 1.svg" alt="영화 포스터" />
           <Plot>
             <TitleContent>
-              Title: {selectedScenario ? selectedScenario.title : "시나리오 제목"}
+              Title:{" "}
+              {selectedScenario ? selectedScenario.title : "시나리오 제목"}
             </TitleContent>
             <TextContent>
               {selectedScenario
-                ? selectedScenario.synopsis || "시놉시스 내용이 여기에 표시됩니다."
+                ? selectedScenario.synopsis ||
+                  "시놉시스 내용이 여기에 표시됩니다."
                 : "시놉시스 내용이 여기에 표시됩니다."}
             </TextContent>
             <Select
@@ -492,11 +496,13 @@ function Show() {
           <div>
             {predictionData && predictionData["완성도 점수"] && (
               <ul>
-                {Object.entries(predictionData["완성도 점수"]).map(([key, value]) => (
-                  <li key={key}>
-                    {key}: {value}
-                  </li>
-                ))}
+                {Object.entries(predictionData["완성도 점수"]).map(
+                  ([key, value]) => (
+                    <li key={key}>
+                      {key}: {value}
+                    </li>
+                  )
+                )}
               </ul>
             )}
           </div>
@@ -511,11 +517,13 @@ function Show() {
           <div>
             {predictionData && predictionData.detailed_scores && (
               <ul>
-                {Object.entries(predictionData.detailed_scores).map(([key, value]) => (
-                  <li key={key}>
-                    {key}: {value}
-                  </li>
-                ))}
+                {Object.entries(predictionData.detailed_scores).map(
+                  ([key, value]) => (
+                    <li key={key}>
+                      {key}: {value}
+                    </li>
+                  )
+                )}
               </ul>
             )}
           </div>
