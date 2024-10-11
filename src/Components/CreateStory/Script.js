@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
 import { GoChevronRight, GoChevronLeft } from "react-icons/go";
+import { useAuth } from '../../context/AuthProvider';
 
 const Section = styled.section`
   display: flex;
@@ -33,23 +34,7 @@ const ChapterNavigation = styled.div`
   width: 20%;
 `;
 
-const NavRightButton = styled(GoChevronRight)`
-  padding: 10px 20px;
-  font-size: 20px;
-  color: black;
-  background-color: #f5f5f5;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-
-  &:disabled {
-    color: #f5f5f5;
-    cursor: not-allowed;
-  }
-`;
-
-const NavLeftButton = styled(GoChevronLeft)`
+const NavButton = styled.button`
   padding: 10px 20px;
   font-size: 20px;
   color: black;
@@ -135,24 +120,33 @@ function Script() {
   const [error, setError] = useState(null);
   const [chapterCount, setChapterCount] = useState(0);
 
+  // Create an axios instance with baseURL and interceptors for authorization
+  const axiosInstance = axios.create({
+    baseURL: "43.200.111.65/api/v1",
+  });
+
+  // Add a request interceptor to include the Authorization header
+  axiosInstance.interceptors.request.use(
+    (config) => {
+      if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error) => Promise.reject(error)
+  );
+
   useEffect(() => {
     fetchUserScenarios();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchUserScenarios = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/scenario/user-scenarios", {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch user scenarios");
-      }
-      const data = await response.json();
-      setUserScenarios(data);
-    } catch (error) {
-      console.error("시나리오를 가져오는 중 오류 발생:", error);
+      const response = await axiosInstance.get("/scenario/user-scenarios");
+      setUserScenarios(response.data);
+    } catch (err) {
+      console.error("시나리오를 가져오는 중 오류 발생:", err);
       setError("시나리오를 가져오는 데 실패했습니다.");
     }
   };
@@ -192,18 +186,10 @@ function Script() {
 
   const fetchChapterContent = async (scenarioId, chapterNumber) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/v1/scenario/${scenarioId}/chapters/${chapterNumber}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch chapter content");
-      }
-      const data = await response.json();
-      setChapterContent(data.content || "");
-    } catch (error) {
-      console.error("챕터 내용을 가져오는 중 오류 발생:", error);
+      const response = await axiosInstance.get(`/scenario/${scenarioId}/chapters/${chapterNumber}`);
+      setChapterContent(response.data.content || "");
+    } catch (err) {
+      console.error("챕터 내용을 가져오는 중 오류 발생:", err);
       setError("챕터 내용을 가져오는 데 실패했습니다.");
       setChapterContent("");
     }
@@ -211,18 +197,10 @@ function Script() {
 
   const fetchFeedback = async (scenarioId, chapterNumber) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/v1/scenario/${scenarioId}/chapters/${chapterNumber}/feedback`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch feedback");
-      }
-      const data = await response.json();
-      setFeedback(data.content || "");
-    } catch (error) {
-      console.error("피드백을 가져오는 중 오류 발생:", error);
+      const response = await axiosInstance.get(`/scenario/${scenarioId}/chapters/${chapterNumber}/feedback`);
+      setFeedback(response.data.content || "");
+    } catch (err) {
+      console.error("피드백을 가져오는 중 오류 발생:", err);
       setError("피드백을 가져오는 데 실패했습니다.");
       setFeedback("");
     }
@@ -234,7 +212,7 @@ function Script() {
     setChapterContent(""); // 새로운 생성 시작 시 기존 내용 초기화
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/v1/scenario/${selectedScenarioId}/chapters/${currentChapter}/generate`,
+        `43.200.111.65/api/v1/scenario/${selectedScenarioId}/chapters/${currentChapter}/generate`,
         {
           method: 'POST',
           headers: {
@@ -249,24 +227,28 @@ function Script() {
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder('utf-8');
-      let done = false;
+      let doneReading = false;
 
-      while (!done) {
-        const { value, done: doneReading } = await reader.read();
-        done = doneReading;
+      while (!doneReading) {
+        const { value, done } = await reader.read();
+        doneReading = done;
         if (value) {
-          const chunk = decoder.decode(value);
+          const chunk = decoder.decode(value, { stream: true });
           const lines = chunk.split('\n').filter(line => line.trim() !== '');
           for (const line of lines) {
             if (line.startsWith('data: ')) {
               const dataStr = line.slice(6);
               if (dataStr === '[DONE]') {
-                done = true;
+                doneReading = true;
                 break;
               } else {
-                const data = JSON.parse(dataStr);
-                if (data.type === 'content') {
-                  setChapterContent(prev => prev + data.content);
+                try {
+                  const data = JSON.parse(dataStr);
+                  if (data.type === 'content') {
+                    setChapterContent(prev => prev + data.content);
+                  }
+                } catch (parseError) {
+                  console.error("데이터 파싱 오류:", parseError);
                 }
               }
             }
@@ -276,8 +258,8 @@ function Script() {
 
       // 챕터 생성 후 업데이트된 내용 가져오기
       await fetchChapterContent(selectedScenarioId, currentChapter);
-    } catch (error) {
-      console.error("챕터 생성 중 오류 발생:", error);
+    } catch (err) {
+      console.error("챕터 생성 중 오류 발생:", err);
       setError("챕터 생성에 실패했습니다.");
     } finally {
       setIsGenerating(false);
@@ -286,40 +268,28 @@ function Script() {
 
   const saveFeedback = async () => {
     try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/api/v1/scenario/${selectedScenarioId}/chapters/${currentChapter}/feedback`,
+      await axiosInstance.post(
+        `/scenario/${selectedScenarioId}/chapters/${currentChapter}/feedback`,
+        { content: feedback },
         {
-          method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ content: feedback }),
         }
       );
-      if (!response.ok) {
-        throw new Error("Failed to save feedback");
-      }
       alert("피드백이 저장되었습니다.");
-    } catch (error) {
-      console.error("피드백 저장 중 오류:", error);
+    } catch (err) {
+      console.error("피드백 저장 중 오류:", err);
       setError("피드백 저장에 실패했습니다.");
     }
   };
 
   const handlePrediction = async () => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/v1/scenario/prediction/${selectedScenarioId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Failed to predict success rate");
-      }
+      await axiosInstance.get(`/scenario/prediction/${selectedScenarioId}`);
       alert("흥행도 예측이 완료되었습니다.");
-    } catch (error) {
-      console.error("흥행도 예측 중 오류 발생:", error);
+    } catch (err) {
+      console.error("흥행도 예측 중 오류 발생:", err);
       setError("흥행도 예측에 실패했습니다.");
     }
   };
@@ -338,17 +308,21 @@ function Script() {
       {selectedScenarioId && (
         <>
           <ChapterNavigation>
-            <NavLeftButton
+            <NavButton
               onClick={handlePreviousChapter}
               disabled={currentChapter === 1 || isGenerating}
-            />
+            >
+              <GoChevronLeft />
+            </NavButton>
             <ChapterInfo>
               챕터 {currentChapter} / {chapterCount}
             </ChapterInfo>
-            <NavRightButton
+            <NavButton
               onClick={handleNextChapter}
               disabled={currentChapter === chapterCount || isGenerating}
-            />
+            >
+              <GoChevronRight />
+            </NavButton>
           </ChapterNavigation>
 
           <TextArea
