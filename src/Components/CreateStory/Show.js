@@ -264,7 +264,7 @@ function Show() {
           />
         )}
         <TitleSection>
-          <Titleposter src="/영화 포스터 예제 1.svg" />
+          <Titleposter />
           <Plot>
             <TitleContent>Title:범죄도시 5</TitleContent>
             <TextContent content={longText} />
