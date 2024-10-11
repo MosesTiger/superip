@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { GoChevronRight, GoChevronLeft } from "react-icons/go";
-import { useAuth } from '../../context/AuthProvider';
-
+import { useAuth } from "../../context/AuthProvider";
+import axios from "axios";
 
 const Section = styled.section`
   display: flex;
@@ -127,7 +127,7 @@ function Script() {
   axiosInstance.interceptors.request.use(
     (config) => {
       if (token) {
-        config.headers['Authorization'] = `Bearer ${token}`;
+        config.headers["Authorization"] = `Bearer ${token}`;
       }
       return config;
     },
@@ -184,7 +184,9 @@ function Script() {
 
   const fetchChapterContent = async (scenarioId, chapterNumber) => {
     try {
-      const response = await axiosInstance.get(`/scenario/${scenarioId}/chapters/${chapterNumber}`);
+      const response = await axiosInstance.get(
+        `/scenario/${scenarioId}/chapters/${chapterNumber}`
+      );
       setChapterContent(response.data.content || "");
     } catch (err) {
       console.error("챕터 내용을 가져오는 중 오류 발생:", err);
@@ -195,7 +197,9 @@ function Script() {
 
   const fetchFeedback = async (scenarioId, chapterNumber) => {
     try {
-      const response = await axiosInstance.get(`/scenario/${scenarioId}/chapters/${chapterNumber}/feedback`);
+      const response = await axiosInstance.get(
+        `/scenario/${scenarioId}/chapters/${chapterNumber}/feedback`
+      );
       setFeedback(response.data.content || "");
     } catch (err) {
       console.error("피드백을 가져오는 중 오류 발생:", err);
@@ -212,19 +216,19 @@ function Script() {
       const response = await fetch(
         `43.200.111.65/api/v1/scenario/${selectedScenarioId}/chapters/${currentChapter}/generate`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error("Network response was not ok");
       }
 
       const reader = response.body.getReader();
-      const decoder = new TextDecoder('utf-8');
+      const decoder = new TextDecoder("utf-8");
       let doneReading = false;
 
       while (!doneReading) {
@@ -232,18 +236,18 @@ function Script() {
         doneReading = done;
         if (value) {
           const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split('\n').filter(line => line.trim() !== '');
+          const lines = chunk.split("\n").filter((line) => line.trim() !== "");
           for (const line of lines) {
-            if (line.startsWith('data: ')) {
+            if (line.startsWith("data: ")) {
               const dataStr = line.slice(6);
-              if (dataStr === '[DONE]') {
+              if (dataStr === "[DONE]") {
                 doneReading = true;
                 break;
               } else {
                 try {
                   const data = JSON.parse(dataStr);
-                  if (data.type === 'content') {
-                    setChapterContent(prev => prev + data.content);
+                  if (data.type === "content") {
+                    setChapterContent((prev) => prev + data.content);
                   }
                 } catch (parseError) {
                   console.error("데이터 파싱 오류:", parseError);
@@ -271,7 +275,7 @@ function Script() {
         { content: feedback },
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         }
       );
@@ -331,8 +335,15 @@ function Script() {
           />
 
           <ButtonWrap>
-            <Button onClick={generateChapter} disabled={isGenerating || chapterContent}>
-              {isGenerating ? "생성 중..." : chapterContent ? "재생성" : "챕터 생성"}
+            <Button
+              onClick={generateChapter}
+              disabled={isGenerating || chapterContent}
+            >
+              {isGenerating
+                ? "생성 중..."
+                : chapterContent
+                ? "재생성"
+                : "챕터 생성"}
             </Button>
           </ButtonWrap>
           <TextArea
