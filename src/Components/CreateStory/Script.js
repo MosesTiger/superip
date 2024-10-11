@@ -83,13 +83,6 @@ const TextArea = styled.textarea`
   resize: vertical;
 `;
 
-const ButtonWrap = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-bottom: 15px;
-  width: 100%;
-`;
-
 const Button = styled.button`
   padding: 10px 20px;
   font-size: 16px;
@@ -107,14 +100,6 @@ const Button = styled.button`
   &:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
-  }
-`;
-
-const PredictButton = styled(Button)`
-  background-color: #17a2b8;
-
-  &:hover {
-    background-color: #138496;
   }
 `;
 
