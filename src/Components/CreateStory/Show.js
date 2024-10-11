@@ -408,7 +408,7 @@ function Show() {
           />
         )}
         <TitleSection>
-          <Titleposter src="/영화 포스터 예제 1.svg" alt="영화 포스터" />
+          <Titleposter alt="영화 포스터" />
           <Plot>
             <TitleContent>
               Title:{" "}
@@ -416,8 +416,7 @@ function Show() {
             </TitleContent>
             <TextContent>
               {selectedScenario
-                ? selectedScenario.synopsis ||
-                  "시놉시스 내용이 여기에 표시됩니다."
+                ? selectedScenario.synopsis
                 : "시놉시스 내용이 여기에 표시됩니다."}
             </TextContent>
             <Select
