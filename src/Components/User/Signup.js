@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate, Link } from "react-router-dom";
-import { MdOutlineKeyboardArrowDown, MdOutlineKeyboardArrowUp } from "react-icons/md";
-import axios from 'axios';
+import {
+  MdOutlineKeyboardArrowDown,
+  MdOutlineKeyboardArrowUp,
+} from "react-icons/md";
+import axios from "axios";
 
 // 스타일드 컴포넌트 정의
 const SignupText = styled.div`
@@ -14,7 +17,7 @@ const SignupText = styled.div`
 const InputContainer = styled.div`
   position: relative;
   width: 80%;
-  transform: translateX(-8%); 
+  transform: translateX(-8%);
 `;
 
 const Input = styled.input`
@@ -139,10 +142,30 @@ function Signup() {
   const navigate = useNavigate();
 
   const data = [
-    { id: 0, title: '이용약관 동의', contents: '이용약관 내용...', status: '(필수)' },
-    { id: 1, title: '개인정보 수집 및 이용 동의', contents: '개인정보 수집 및 이용 내용...', status: '(필수)' },
-    { id: 2, title: '마케팅 정보 수신 동의', contents: '마케팅 정보 수신 내용...', status: '(선택)' },
-    { id: 3, title: '이벤트 정보 수신 동의', contents: '이벤트 정보 수신 내용...', status: '(선택)' },
+    {
+      id: 0,
+      title: "이용약관 동의",
+      contents: "이용약관 내용...",
+      status: "(필수)",
+    },
+    {
+      id: 1,
+      title: "개인정보 수집 및 이용 동의",
+      contents: "개인정보 수집 및 이용 내용...",
+      status: "(필수)",
+    },
+    {
+      id: 2,
+      title: "마케팅 정보 수신 동의",
+      contents: "마케팅 정보 수신 내용...",
+      status: "(선택)",
+    },
+    {
+      id: 3,
+      title: "이벤트 정보 수신 동의",
+      contents: "이벤트 정보 수신 내용...",
+      status: "(선택)",
+    },
   ];
 
   const togglePasswordVisibility = () => {
@@ -161,7 +184,7 @@ function Signup() {
 
   const selectChecked = (checked, id) => {
     if (checked) {
-      setCheckItems(prev => [...prev, id]);
+      setCheckItems((prev) => [...prev, id]);
     } else {
       setCheckItems(checkItems.filter((el) => el !== id));
     }
@@ -174,48 +197,55 @@ function Signup() {
 
   const handleSignUp = async () => {
     if (!allInputsFilled) {
-      alert('모든 필드를 입력해 주세요.');
+      alert("모든 필드를 입력해 주세요.");
       return;
     }
 
     if (!allRequiredChecked) {
-      alert('필수 약관에 동의해 주세요.');
+      alert("필수 약관에 동의해 주세요.");
       return;
     }
 
     if (!isPasswordMatch) {
-      alert('비밀번호가 일치하지 않습니다.');
+      alert("비밀번호가 일치하지 않습니다.");
       return;
     }
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/v1/auth/register', {
-        email: email,
-        password: password,
-        full_name: name,
-        username: email,
-        social_provider: "LOCAL",
-        social_id: null
-      });
+      const response = await axios.post(
+        "http://43.200.111.65/api/v1/auth/register",
+        {
+          email: email,
+          password: password,
+          full_name: name,
+          username: email,
+          social_provider: "LOCAL",
+          social_id: null,
+        }
+      );
 
       if (response.status === 201) {
-        alert('회원가입이 완료되었습니다.');
-        navigate('/login');
+        alert("회원가입이 완료되었습니다.");
+        navigate("/login");
       }
     } catch (error) {
-      console.error('회원가입 중 오류 발생:', error);
+      console.error("회원가입 중 오류 발생:", error);
       if (error.response) {
         if (error.response.status === 400) {
           alert(`회원가입 실패: ${error.response.data.detail}`);
         } else if (error.response.status === 500) {
-          alert('서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+          alert("서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
         } else {
-          alert(`회원가입 실패: ${error.response.data.detail || '알 수 없는 오류가 발생했습니다.'}`);
+          alert(
+            `회원가입 실패: ${
+              error.response.data.detail || "알 수 없는 오류가 발생했습니다."
+            }`
+          );
         }
       } else if (error.request) {
-        alert('서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.');
+        alert("서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.");
       } else {
-        alert('회원가입 요청 중 오류가 발생했습니다.');
+        alert("회원가입 요청 중 오류가 발생했습니다.");
       }
     }
   };
@@ -228,35 +258,37 @@ function Signup() {
           type="email"
           placeholder="예) abc@gmail.com"
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
         />
       </InputContainer>
       <InputContainer>
         <Input
-          type={showPassword ? 'text' : 'password'}
+          type={showPassword ? "text" : "password"}
           placeholder="영문, 숫자 조합 8-16자"
           value={password}
-          onChange={e => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
         />
         <EyeButton onClick={togglePasswordVisibility}>
-          {showPassword ? '👁️' : '👁️‍🗨️'}
+          {showPassword ? "👁️" : "👁️‍🗨️"}
         </EyeButton>
       </InputContainer>
       <InputContainer>
         <Input
-          type={showPassword ? 'text' : 'password'}
+          type={showPassword ? "text" : "password"}
           placeholder="비밀번호를 한 번 더 입력해주세요."
           value={confirmPassword}
-          onChange={e => setConfirmPassword(e.target.value)}
+          onChange={(e) => setConfirmPassword(e.target.value)}
         />
         <EyeButton onClick={togglePasswordVisibility}>
-          {showPassword ? '👁️' : '👁️‍🗨️'}
+          {showPassword ? "👁️" : "👁️‍🗨️"}
         </EyeButton>
       </InputContainer>
-      <div style={{ minHeight: '15px' }}>
+      <div style={{ minHeight: "15px" }}>
         {confirmPassword && (
-          <Passwordcheck style={{ color: isPasswordMatch ? 'green' : 'red' }}>
-            {isPasswordMatch ? '비밀번호가 일치합니다.' : '비밀번호가 일치하지 않습니다.'}
+          <Passwordcheck style={{ color: isPasswordMatch ? "green" : "red" }}>
+            {isPasswordMatch
+              ? "비밀번호가 일치합니다."
+              : "비밀번호가 일치하지 않습니다."}
           </Passwordcheck>
         )}
       </div>
@@ -265,14 +297,14 @@ function Signup() {
           type="text"
           placeholder="이름 입력"
           value={name}
-          onChange={e => setName(e.target.value)}
+          onChange={(e) => setName(e.target.value)}
         />
       </InputContainer>
       <CheckboxContainer>
         <CheckboxLabelBold>
           <input
-            type='checkbox'
-            name='all-checked'
+            type="checkbox"
+            name="all-checked"
             onChange={(e) => allChecked(e.target.checked)}
             checked={checkItems.length === data.length}
           />
@@ -283,34 +315,40 @@ function Signup() {
             <CheckboxLabel>
               <label>
                 <input
-                  type='checkbox'
-                  name='select-checked'
+                  type="checkbox"
+                  name="select-checked"
                   onChange={(e) => selectChecked(e.target.checked, item.id)}
                   checked={checkItems.includes(item.id)}
                 />
-                <span style={{ marginRight: '5px', color: item.status === '(필수)' ? 'red' : 'gray' }}>
+                <span
+                  style={{
+                    marginRight: "5px",
+                    color: item.status === "(필수)" ? "red" : "gray",
+                  }}
+                >
                   {item.status}
                 </span>
                 {item.title}
               </label>
-              {eval(`open${index}`) ?
+              {eval(`open${index}`) ? (
                 <MdOutlineKeyboardArrowUp
                   size={30}
-                  color='gray'
-                  onClick={() => eval(`setOpen${index}(!open${index})`)}
-                /> :
-                <MdOutlineKeyboardArrowDown
-                  size={30}
-                  color='gray'
+                  color="gray"
                   onClick={() => eval(`setOpen${index}(!open${index})`)}
                 />
-              }
+              ) : (
+                <MdOutlineKeyboardArrowDown
+                  size={30}
+                  color="gray"
+                  onClick={() => eval(`setOpen${index}(!open${index})`)}
+                />
+              )}
             </CheckboxLabel>
-            {eval(`open${index}`) &&
+            {eval(`open${index}`) && (
               <ContentsWrap>
                 <p>{item.contents}</p>
               </ContentsWrap>
-            }
+            )}
           </React.Fragment>
         ))}
       </CheckboxContainer>

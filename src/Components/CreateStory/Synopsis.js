@@ -1,12 +1,9 @@
-// Synopsis.js
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from "../../context/AuthProvider";
 
-// Styled Components
 const Section = styled.section`
   display: flex;
   flex-direction: column;
@@ -196,8 +193,8 @@ function Synopsis() {
       const url = `http://127.0.0.1:8000/api/v1/synopsis/by-title/${encodedTitle}`;
       const response = await axios.get(url, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       const data = response.data;
       setTitle(data.title);
@@ -272,8 +269,8 @@ function Synopsis() {
         `http://127.0.0.1:8000/api/v1/synopsis/prediction/${scenarioId}`,
         {
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       setSuccessRate(response.data.first_predicted_rate);
@@ -304,8 +301,8 @@ function Synopsis() {
         { user_request: gptRequest },
         {
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       navigate("/create/script", {
@@ -323,7 +320,7 @@ function Synopsis() {
       if (error.response.status === 401) {
         errorMessage = "인증 토큰이 만료되었습니다. 다시 로그인해주세요.";
         logout();
-        navigate('/login');
+        navigate("/login");
       } else if (error.response.status === 422) {
         errorMessage = `데이터 형식이 올바르지 않습니다. 오류 메시지: ${JSON.stringify(error.response.data)}`;
       } else if (error.response.data && error.response.data.detail) {
@@ -335,8 +332,11 @@ function Synopsis() {
 
   return (
     <Section>
-      <Label>시나리오 선택</Label>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <LabelWrap>
+        <Label>시나리오 선택</Label>
+        <RefreshButton onClick={fetchUserScenarios}>새로고침</RefreshButton>
+      </LabelWrap>
+      <div style={{ display: "flex", alignItems: "center" }}>
         <Select value={selectedScenarioTitle} onChange={handleScenarioChange}>
           <option value="">시나리오를 선택하세요</option>
           {userScenarios.map((scenario, index) => (
@@ -345,12 +345,11 @@ function Synopsis() {
             </option>
           ))}
         </Select>
-        <RefreshButton onClick={fetchUserScenarios}>새로고침</RefreshButton>
       </div>
       {error && <ErrorMessage>{error}</ErrorMessage>}
       {selectedScenarioTitle && (
         <>
-          <TitleDisplay>{title}</TitleDisplay>
+          <TitleDisplay>제목 : {title}</TitleDisplay>
           <Label>시놉시스</Label>
           <TextArea
             placeholder="시놉시스를 생성하려면 '시놉시스 생성' 버튼을 클릭하세요."

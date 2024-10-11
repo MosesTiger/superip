@@ -182,28 +182,37 @@ const TextArea = styled.textarea`
   resize: vertical;
 `;
 
+const TagWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+`;
+
 const TagInput = styled.input`
-  width: calc(100% - 70px);
+  width: 95%;
   padding: 10px;
   margin-top: 5px;
   border: 1px solid #ccc;
   border-radius: 4px 0 0 4px;
   font-size: 16px;
+  background-color: #f5f5f5;
+`;
+
+const AddButtonWrap = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
 `;
 
 const AddTagButton = styled.button`
   width: 70px;
   padding: 10px;
-  background-color: #007bff;
-  color: white;
+  background-color: #f5f5f5;
+  color: black;
   border: none;
   border-radius: 0 4px 4px 0;
   font-size: 16px;
   cursor: pointer;
-
-  &:hover {
-    background-color: #0056b3;
-  }
 `;
 
 const TagContainer = styled.div`
@@ -325,7 +334,7 @@ function Select() {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/v1/scenario/create",
+        "http://43.200.111.65/api/v1/scenario/create",
         scenarioData,
         {
           headers: {
@@ -336,11 +345,8 @@ function Select() {
       );
 
       console.log("Response received:", response.data);
-
-      if (response.status === 201) {
-        const scenarioId = response.data.id;
-        navigate("/create/synopsis", { state: { scenarioId } });
-      }
+      const scenarioId = response.data.id;
+      navigate("/create/synopsis", { state: { scenarioId } });
     } catch (error) {
       console.error("Error details:", error.response?.data || error.message);
       alert(
@@ -472,15 +478,22 @@ function Select() {
           <Label>이 영화는 시리즈물입니까?</Label>
         </CheckboxContainer>
         <Label>키워드를 입력하세요.</Label>
-        <div>
+        <TagWrap>
           <TagInput
             type="text"
             value={currentKeyword}
             onChange={(e) => setCurrentKeyword(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleAddKeyword();
+              }
+            }}
             placeholder="키워드 입력"
           />
-          <AddTagButton onClick={handleAddKeyword}>추가</AddTagButton>
-        </div>
+          <AddButtonWrap>
+            <AddTagButton onClick={handleAddKeyword}>추가</AddTagButton>
+          </AddButtonWrap>
+        </TagWrap>
         <TagContainer>
           {keywords.map((keyword, index) => (
             <Tag key={index}>
@@ -492,15 +505,22 @@ function Select() {
           ))}
         </TagContainer>
         <Label>등장인물을 입력하세요.</Label>
-        <div>
+        <TagWrap>
           <TagInput
             type="text"
             value={currentCharacter}
             onChange={(e) => setCurrentCharacter(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleAddCharacter();
+              }
+            }}
             placeholder="등장인물 입력"
           />
-          <AddTagButton onClick={handleAddCharacter}>추가</AddTagButton>
-        </div>
+          <AddButtonWrap>
+            <AddTagButton onClick={handleAddCharacter}>추가</AddTagButton>
+          </AddButtonWrap>
+        </TagWrap>
         <TagContainer>
           {characters.map((character, index) => (
             <Tag key={index}>

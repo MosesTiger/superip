@@ -60,6 +60,12 @@ function StoryNav() {
         >
           시나리오
         </NavLink>
+        <NavLink
+          to="/create/show"
+          isActive={location.pathname === "/create/show"}
+        >
+          흥행도 예측
+        </NavLink>
       </NavLinkWrap>
     </Nav>
   );

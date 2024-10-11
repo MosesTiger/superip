@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useAuth } from "../../context/AuthProvider";
+import axios from "axios";
 import { GoChevronRight, GoChevronLeft } from "react-icons/go";
 
 const Section = styled.section`
@@ -30,10 +30,10 @@ const ChapterNavigation = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  width: 100%;
+  width: 20%;
 `;
 
-const NavButton = styled.button`
+const NavRightButton = styled(GoChevronRight)`
   padding: 10px 20px;
   font-size: 20px;
   color: black;
@@ -41,9 +41,26 @@ const NavButton = styled.button`
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.3s;
 
   &:disabled {
-    color: #ccc;
+    color: #f5f5f5;
+    cursor: not-allowed;
+  }
+`;
+
+const NavLeftButton = styled(GoChevronLeft)`
+  padding: 10px 20px;
+  font-size: 20px;
+  color: black;
+  background-color: #f5f5f5;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:disabled {
+    color: #f5f5f5;
     cursor: not-allowed;
   }
 `;
@@ -104,6 +121,22 @@ const PredictButton = styled(Button)`
 const ErrorMessage = styled.div`
   color: red;
   margin-top: 10px;
+`;
+
+const ButtonWrap = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+`;
+
+const PredictButton = styled(Button)`
+  background-color: #e23a3a;
+  color: black;
+  font-weight: bold;
+
+  &:hover {
+    background-color: #cb3737;
+  }
 `;
 
 function Script() {
@@ -320,21 +353,17 @@ function Script() {
       {selectedScenarioId && (
         <>
           <ChapterNavigation>
-            <NavButton
+            <NavLeftButton
               onClick={handlePreviousChapter}
               disabled={currentChapter === 1 || isGenerating}
-            >
-              <GoChevronLeft />
-            </NavButton>
+            />
             <ChapterInfo>
               챕터 {currentChapter} / {chapterCount}
             </ChapterInfo>
-            <NavButton
+            <NavRightButton
               onClick={handleNextChapter}
               disabled={currentChapter === chapterCount || isGenerating}
-            >
-              <GoChevronRight />
-            </NavButton>
+            />
           </ChapterNavigation>
 
           <TextArea
@@ -349,7 +378,6 @@ function Script() {
               {isGenerating ? "생성 중..." : chapterContent ? "재생성" : "챕터 생성"}
             </Button>
           </ButtonWrap>
-
           <TextArea
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
