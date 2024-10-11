@@ -334,7 +334,7 @@ function Select() {
 
     try {
       const response = await axios.post(
-        "http://43.200.111.65/api/v1/scenario/create",
+        "43.200.111.65/api/v1/scenario/create",
         scenarioData,
         {
           headers: {

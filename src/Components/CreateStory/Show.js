@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from "react";
-import styled from "styled-components";
 import axios from "axios";
-import TextContent from "./TextContent";
-import Graph from "./Graph";
-import BoxofficeSection from "./BoxofficeSection";
+import styled from "styled-components";
+import { useAuth } from '../../context/AuthProvider'; // 적절한 경로로 수정해주세요
+import {
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
 
 const Section = styled.section`
   display: flex;
@@ -15,7 +22,6 @@ const Section = styled.section`
   align-items: center;
   justify-content: center;
 `;
-
 const DashboardContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -27,36 +33,13 @@ const DashboardContainer = styled.div`
   background-color: #f5f5f5;
 `;
 
-const ResultContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  height: 100%;
-  width: 67%; /* 가로 크기 확실히 지정 */
-`;
-
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  transform: translateX(-20px);
-`;
-
-const DashboardSection = styled.div`
+const TitleSection = styled.div`
   display: flex;
   flex-direction: column;
   padding: 15px;
   border-radius: 8px;
   background-color: #f5f5f5;
-  box-shadow: 4px 4px 10px rgba(0, 0, 0, 1); /* 오른쪽과 아래쪽에 섀도우 추가 */
-`;
-
-const TitleSection = styled(DashboardSection)`
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 1);
   height: 480px;
   width: 30%;
 `;
@@ -87,10 +70,37 @@ const TitleContent = styled.div`
   position: relative;
 `;
 
-const PenaltySection = styled(DashboardSection)`
+const TextContent = styled.p`
+  font-size: 14px;
+  line-height: 1.5;
+  color: black;
+`;
+
+const Select = styled.select`
+  margin-top: 10px;
+  padding: 5px;
+  font-size: 16px;
+  width: 100%;
+`;
+
+const ResultContainer = styled.div`
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  height: 100%;
+  width: 67%;
+`;
+
+const PenaltySection = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #f5f5f5;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 1);
   justify-content: flex-start;
-  gap: 10px; /* 각 div 간격 */
+  gap: 10px;
   color: white;
   width: 90%;
   height: 130px;
@@ -100,7 +110,7 @@ const PenaltyContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  gap: 10px; /* 각 div 간격 */
+  gap: 10px;
   align-items: center;
   color: white;
   width: 100%;
@@ -118,18 +128,16 @@ const Divtitle = styled.div`
 const DivContent = styled.div`
   width: 100%;
   font-size: ${(props) =>
-    props.content === "star" ||
-    props.content === "first" ||
-    props.content === "second"
+    props.content === "star" || props.content === "first" || props.content === "second"
       ? "30px"
       : "40px"};
   font-weight: bold;
   text-align: right;
   padding-right: 30px;
   display: flex;
-  justify-content: flex-end; /* 수평 방향 오른쪽 정렬 */
-  align-items: center; /* 수직 방향 중앙 정렬 */
-  height: 100%; /* 부모 높이에 맞추기 */
+  justify-content: flex-end;
+  align-items: center;
+  height: 100%;
 `;
 
 const Div1 = styled.div`
@@ -167,7 +175,13 @@ const Sectiontitle = styled.div`
   color: black;
 `;
 
-const AnalysisSection = styled(DashboardSection)`
+const AnalysisSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #f5f5f5;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 1);
   width: 90%;
   height: 300px;
   align-items: center;
@@ -181,6 +195,17 @@ const MoreButton = styled.button`
   border: none;
   border-radius: 4px;
   cursor: pointer;
+`;
+
+const Overlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  transform: translateX(-20px);
 `;
 
 const Popup = styled.div`
@@ -212,44 +237,162 @@ const CloseButton = styled.button`
   cursor: pointer;
 `;
 
+const ErrorMessage = styled.p`
+  color: red;
+  margin-top: 10px;
+`;
+
+// 그래프 컴포넌트 구현
+const Graph = ({ data }) => {
+  if (!data || data.length === 0) {
+    return <p>데이터가 없습니다.</p>;
+  }
+
+  const graphData = Object.entries(data)
+    .filter(([key]) => key.endsWith("_점수"))
+    .map(([key, value]) => ({
+      subject: key.replace("_점수", ""),
+      A: parseFloat(value),
+      fullMark: 100,
+    }));
+
+  return (
+    <ResponsiveContainer width="100%" height={250}>
+      <RadarChart data={graphData}>
+        <PolarGrid />
+        <PolarAngleAxis dataKey="subject" />
+        <PolarRadiusAxis angle={30} domain={[0, 100]} />
+        <Radar
+          name="점수"
+          dataKey="A"
+          stroke="#8884d8"
+          fill="#8884d8"
+          fillOpacity={0.6}
+        />
+        <Legend />
+      </RadarChart>
+    </ResponsiveContainer>
+  );
+};
+
+const BoxofficeSection = ({
+  genreScore,
+  runtimeScore,
+  ratingScore,
+  countryScore,
+  onMoreClick,
+}) => (
+  <div style={{ width: '100%' }}>
+    <Sectiontitlewrap>
+      <Sectiontitle>1차 흥행도 분석표</Sectiontitle>
+      <MoreButton onClick={onMoreClick}>분석 더보기</MoreButton>
+    </Sectiontitlewrap>
+    {/* 박스오피스 분석표 */}
+    <div>
+      <p>장르 점수: {genreScore}</p>
+      <p>러닝타임 점수: {runtimeScore}</p>
+      <p>등급 점수: {ratingScore}</p>
+      <p>국가 점수: {countryScore}</p>
+    </div>
+  </div>
+);
+
 function Show() {
-  const longText = `
-    도시의 어두운 밤, 범죄가 만연한 거리에서 정의를 추구하는 한 남자의 이야기가 시작된다. 전직 형사였던 주인공은 가족을 잃은 후 범죄 조직에 대한 복수를 결심한다. 한편, 도시를 장악한 범죄 조직의 보스는 주인공의 끈질긴 추적에 맞서 싸울 준비를 한다. 고독한 싸움 속에서 주인공은 자신의 신념과 정의를 지키기 위해
-    `;
+  const { token } = useAuth(); // 토큰 가져오기
 
   const [isAnalysisPopupOpen, setIsAnalysisPopupOpen] = useState(false);
   const [isBoxofficePopupOpen, setIsBoxofficePopupOpen] = useState(false);
   const [predictionData, setPredictionData] = useState(null);
 
+  const [userScenarios, setUserScenarios] = useState([]);
+  const [selectedScenarioId, setSelectedScenarioId] = useState("");
+  const [selectedScenario, setSelectedScenario] = useState(null);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
-    fetchPredictionData();
+    fetchUserScenarios();
   }, []);
 
-  const fetchPredictionData = async () => {
+  // 사용자 시나리오 가져오기
+  const fetchUserScenarios = async () => {
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/v1/success-rate/first_predict",
+      const response = await axios.get(
+        "43.200.111.65/api/v1/scenario/user-scenarios",
         {
-          keyword: "범죄도시 5",
-          genre: "액션",
-          runtime: 120,
-          gender: "남성",
-          rating: "15세 이상",
-          theme: "범죄",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
-      setPredictionData(response.data.evaluation);
+      setUserScenarios(response.data);
     } catch (error) {
-      console.error("Error fetching prediction data:", error);
+      console.error("Error fetching user scenarios:", error);
+      setError("시나리오를 가져오는 데 실패했습니다.");
     }
   };
 
+  // 시나리오 선택 처리
+  const handleScenarioSelect = async (e) => {
+    const scenarioId = e.target.value;
+    setSelectedScenarioId(scenarioId);
+    setSelectedScenario(null);
+    setError(null);
+
+    if (scenarioId) {
+      try {
+        const response = await axios.get(
+          `43.200.111.65/api/v1/scenario/${scenarioId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setSelectedScenario(response.data);
+        // 선택된 시나리오 기반으로 예측 데이터 가져오기
+        fetchPredictionData(scenarioId);
+      } catch (error) {
+        console.error("Error fetching scenario details:", error);
+        setError("시나리오 정보를 가져오는 데 실패했습니다.");
+      }
+    }
+  };
+
+  // 예측 데이터 가져오기
+  const fetchPredictionData = async (scenarioId) => {
+    try {
+      const response = await axios.post(
+        "43.200.111.65/api/v1/success_rate/final_predict",
+        {
+          scenario_id: scenarioId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      setPredictionData(response.data);
+    } catch (error) {
+      console.error("Error fetching prediction data:", error);
+      // 에러 상태를 설정할 수 있습니다.
+    }
+  };
+
+  // 팝업 토글 함수
   const toggleAnalysisPopup = () =>
     setIsAnalysisPopupOpen(!isAnalysisPopupOpen);
   const toggleBoxofficePopup = () =>
     setIsBoxofficePopupOpen(!isBoxofficePopupOpen);
 
   const isPopupOpen = isAnalysisPopupOpen || isBoxofficePopupOpen;
+
+  // 예측 데이터에서 필요한 점수 추출
+  const genreScore = predictionData?.detailed_scores?.genre_score || 85;
+  const runtimeScore = predictionData?.detailed_scores?.runtime_score || 70;
+  const ratingScore = predictionData?.detailed_scores?.rating_score || 50;
+  const countryScore = predictionData?.detailed_scores?.country_score || 90;
 
   return (
     <Section>
@@ -263,10 +406,28 @@ function Show() {
           />
         )}
         <TitleSection>
-          <Titleposter />
+          <Titleposter src="/영화 포스터 예제 1.svg" alt="영화 포스터" />
           <Plot>
-            <TitleContent>Title:범죄도시 5</TitleContent>
-            <TextContent content={longText} />
+            <TitleContent>
+              Title: {selectedScenario ? selectedScenario.title : "시나리오 제목"}
+            </TitleContent>
+            <TextContent>
+              {selectedScenario
+                ? selectedScenario.synopsis || "시놉시스 내용이 여기에 표시됩니다."
+                : "시놉시스 내용이 여기에 표시됩니다."}
+            </TextContent>
+            <Select
+              onChange={handleScenarioSelect}
+              value={selectedScenarioId || ""}
+            >
+              <option value="">시나리오를 선택하세요</option>
+              {userScenarios.map((scenario) => (
+                <option key={scenario.id} value={scenario.id}>
+                  {scenario.title}
+                </option>
+              ))}
+            </Select>
+            {error && <ErrorMessage>{error}</ErrorMessage>}
           </Plot>
         </TitleSection>
         <ResultContainer>
@@ -275,7 +436,9 @@ function Show() {
             <PenaltyContainer>
               <Div1>
                 <Divtitle>예상 흥행 등급</Divtitle>
-                <DivContent content="rating">A</DivContent>
+                <DivContent content="rating">
+                  {predictionData ? predictionData["최종 흥행도"] : "-"}
+                </DivContent>
               </Div1>
               <Div2>
                 <Divtitle>예상 별점</Divtitle>
@@ -289,19 +452,24 @@ function Show() {
                       marginBottom: "5px",
                     }}
                   />
-                  {/*{predictionData && (
-                  <p>{predictionData["최종 흥행도"].average_score.toFixed(1)}</p>
-                )}*/}
-                  3.0 / 4.5
+                  {predictionData
+                    ? `${predictionData.predicted_rating} / 5`
+                    : "- / 5"}
                 </DivContent>
               </Div2>
               <Div3>
                 <Divtitle>1차 흥행도 예측</Divtitle>
-                <DivContent content="first">A</DivContent>
+                <DivContent content="first">
+                  {predictionData ? predictionData.first_success_rate : "-"}
+                </DivContent>
               </Div3>
               <Div4>
                 <Divtitle>시나리오 완성도</Divtitle>
-                <DivContent content="second">70%</DivContent>
+                <DivContent content="second">
+                  {predictionData
+                    ? `${predictionData.completion_score}%`
+                    : "-%"}
+                </DivContent>
               </Div4>
             </PenaltyContainer>
           </PenaltySection>
@@ -310,7 +478,7 @@ function Show() {
               <Sectiontitle>시나리오 완성도 분석표</Sectiontitle>
               <MoreButton onClick={toggleAnalysisPopup}>분석 더보기</MoreButton>
             </Sectiontitlewrap>
-            <Graph />
+            <Graph data={predictionData?.["완성도 점수"]} />
           </AnalysisSection>
           <BoxofficeSection onMoreClick={toggleBoxofficePopup} />
         </ResultContainer>
@@ -320,64 +488,17 @@ function Show() {
         <Popup>
           <CloseButton onClick={toggleAnalysisPopup}>닫기</CloseButton>
           <h2>시나리오 완성도 분석표 자세히 보기</h2>
-          {/* Add detailed analysis content here */}
+          {/* 완성도 점수 상세 내용 표시 */}
           <div>
-            <p>1. 개연성</p>
-            <p>
-              평가: 70%
-              <br />
-              강점: 시나리오의 주요 사건들(주인공의 학창 시절, 사랑과 갈등,
-              결혼식까지의 여정 등)은 현실적이고 이해 가능한 맥락 속에서
-              전개됩니다. 특히 주인공이 재수를 통해 대학에 입학하고, 과거 사랑을
-              다시 만나는 과정은 감정적으로 공감할 수 있는 부분이 많습니다.
-              <br />
-              약점: 일부 장면에서 등장인물의 행동 동기가 불분명하거나 갑작스럽게
-              느껴집니다. 예를 들어, 주인공과 상대 캐릭터 간의 대화나 행동이
-              때때로 다소 과장되거나 비현실적으로 느껴질 수 있습니다. 이는
-              독자가 이야기 속에 몰입하는 데 방해가 될 수 있습니다.
-            </p>
-
-            <p>2. 기승전결</p>
-            <p>
-              평가: 75%
-              <br />
-              강점: 시나리오는 명확한 기승전결 구조를 가지고 있습니다. 시작
-              부분에서는 주인공의 과거와 현재 상황을 잘 소개하고, 중반부에서는
-              갈등과 사건들이 적절히 쌓이면서 긴장감을 유지합니다. 결말 부분에서
-              갈등이 해소되면서 전체적인 스토리가 마무리됩니다.
-              <br />
-              약점: 결말로 갈수록 급작스러운 사건 전개나 해결이 이루어지는
-              부분이 있습니다. 갈등의 해소가 다소 성급하게 이루어지는 느낌을
-              주며, 독자가 충분히 감정을 따라가고 이해할 수 있는 시간을 주지
-              않는 경우가 있습니다.
-            </p>
-
-            <p>3. 흐름</p>
-            <p>
-              평가: 80%
-              <br />
-              시나리오의 전반적인 흐름은 비교적 자연스럽고, 사건들이 시간의
-              흐름에 따라 논리적으로 연결됩니다. 관객이 인물들의 감정 변화와
-              사건 전개에 쉽게 몰입할 수 있으며, 중간중간 발생하는 갈등과
-              사건들이 흥미를 유지시키는 데 효과적입니다. 다만, 후반부로 갈수록
-              약간의 전개 속도 조절이 필요할 수 있습니다.
-            </p>
-
-            <p>4. 시나리오 완성도</p>
-            <p>
-              평가: 85%
-              <br />
-              강점: 전체적인 시나리오의 완성도는 높으며, 주요 사건과 캐릭터 간의
-              상호작용이 잘 구성되어 있습니다. 특히 각 캐릭터의 성격과 동기들이
-              잘 드러나며, 이를 통해 감정적인 공감대가 형성됩니다. 플롯의
-              일관성과 주제 전달력이 뛰어나며, 전체적인 스토리 라인이 매끄럽게
-              이어집니다.
-              <br />
-              약점: 다만, 일부 세부적인 사건의 전개에서 조금 더 깊이 있는
-              설명이나 배경 정보가 제공되었으면 좋았을 부분이 있습니다. 예를
-              들어, 특정 인물의 과거 또는 행동 동기를 더 구체적으로 다뤘다면 더
-              설득력 있는 이야기가 되었을 것입니다.
-            </p>
+            {predictionData && predictionData["완성도 점수"] && (
+              <ul>
+                {Object.entries(predictionData["완성도 점수"]).map(([key, value]) => (
+                  <li key={key}>
+                    {key}: {value}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </Popup>
       )}
@@ -386,56 +507,17 @@ function Show() {
         <Popup>
           <CloseButton onClick={toggleBoxofficePopup}>닫기</CloseButton>
           <h2>1차 흥행도 분석표 자세히 보기</h2>
-          {/* Add detailed boxoffice analysis content here */}
+          {/* 상세 흥행 분석 내용 표시 */}
           <div>
-            <p>1. 장르</p>
-            <p>
-              평가: Good
-              <br />
-              코멘트: 로맨스/드라마 장르는 전 세계적으로 많은 히트작을
-              배출했습니다. 대표적인 예로 "타이타닉", "노트북", "라라랜드" 등이
-              있으며, 이들 영화는 전 세계적인 흥행을 기록했습니다. 로맨스와
-              드라마가 결합된 장르는 다양한 연령층에게 감동을 주고, 꾸준한
-              흥행력을 보여왔습니다. 따라서 이 장르 선택은 긍정적입니다.
-            </p>
-
-            <p>2. 상영시간</p>
-            <p>
-              평가: Excellent
-              <br />
-              코멘트: 가장 흥행한 영화들의 상영시간은 보통 2시간 내외입니다.
-              "타이타닉", "아바타", "어벤져스" 시리즈 등 대부분의 흥행작들은
-              2시간 30분 정도의 러닝타임을 가지고 있습니다. 이 시나리오도 1시간
-              30분에서 2시간 사이의 상영시간을 가지게 될 것으로 보이므로, 이는
-              일반적으로 흥행에 유리한 상영시간입니다.
-            </p>
-
-            <p>3. 관람등급</p>
-            <p>
-              평가: Normal
-              <br />
-              코멘트: 역대 흥행작 중 대부분의 영화는 PG-13(미국 기준, 한국에서는
-              12세 또는 15세) 등급을 가지고 있습니다. 이는 광범위한 연령층을
-              대상으로 하며, 관객층을 넓게 설정할 수 있습니다. 그러나 R등급(19세
-              관람가) 영화들도 성인 관객을 타겟으로 하여 큰 성공을 거둔 사례가
-              있습니다. 이 시나리오의 예상 등급(12세 또는 15세)은 관객층을 넓게
-              설정할 수 있는 장점이 있지만, 특출난 요소가 없다면 흥행이 평범하게
-              그칠 가능성도 있습니다.
-            </p>
-
-            <p>4. 배경국가</p>
-            <p>
-              평가: Good
-              <br />
-              코멘트: 이 영화의 주요 배경국가는 한국이며, 한국 영화 산업은 최근
-              몇 년 동안 급격히 성장했습니다. 특히 "기생충"과 같은 작품은
-              아카데미에서 큰 성공을 거두었고, 세계적인 인정을 받았습니다.
-              한국의 역사, 문화, 도시 풍경 등은 글로벌 관객들에게도 신선하게
-              다가올 수 있는 요소가 많습니다. 또한, 영화 배경이 한국이면서도
-              보편적인 감정을 다루는 이야기는 국내외에서 흥행할 가능성을
-              높여줍니다. 다만, 해외 시장을 타겟으로 할 경우, 지역적 특수성을
-              고려한 마케팅이 필요할 것입니다.
-            </p>
+            {predictionData && predictionData.detailed_scores && (
+              <ul>
+                {Object.entries(predictionData.detailed_scores).map(([key, value]) => (
+                  <li key={key}>
+                    {key}: {value}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </Popup>
       )}
