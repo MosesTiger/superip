@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
-import styled from "styled-components";
-import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from "../../context/AuthProvider";
+
 const Section = styled.section`
   display: flex;
   flex-direction: column;
@@ -147,178 +148,156 @@ function Synopsis() {
   const { token, logout } = useAuth();
 
   useEffect(() => {
-    console.log("Synopsis 컴포넌트가 마운트되었습니다.");
     fetchUserScenarios();
+    // Cleanup function to close EventSource when component unmounts
     return () => {
-      console.log("Synopsis 컴포넌트가 언마운트되었습니다.");
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
+  const eventSourceRef = React.useRef(null);
+
   const fetchUserScenarios = async () => {
-    console.log("fetchUserScenarios 함수 시작");
     try {
-      console.log("사용자 시나리오 목록 API 호출 중...");
-      const response = await axios.get(
-        "http://43.200.111.65/api/v1/scenario/user-scenarios",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await axios.get('http://127.0.0.1:8000/api/v1/scenario/user-scenarios', {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-      );
-      console.log("API 응답 받음:", response.data);
+      });
       setUserScenarios(response.data);
-      setError(null);
     } catch (error) {
-      console.error("사용자 시나리오 목록 가져오기 실패:", error);
       handleApiError(error, "시나리오 목록을 가져오는 중 오류가 발생했습니다.");
     }
-    console.log("fetchUserScenarios 함수 종료");
   };
 
   const handleScenarioChange = (e) => {
     const selectedTitle = e.target.value;
-    console.log("선택된 시나리오:", selectedTitle);
     setSelectedScenarioTitle(selectedTitle);
     if (selectedTitle) {
       fetchScenarioDetails(selectedTitle);
+    } else {
+      // 선택 취소 시 상태 초기화
+      setTitle("");
+      setPlot("");
+      setIsSynopsisComplete(false);
+      setSuccessRate(null);
     }
   };
 
   const fetchScenarioDetails = async (title) => {
-    console.log(`fetchScenarioDetails 함수 시작. 제목: ${title}`);
     try {
-      console.log("시나리오 상세 정보 API 호출 중...");
       const encodedTitle = encodeURIComponent(title);
-      const url = `http://43.200.111.65/api/v1/synopsis/by-title/${encodedTitle}`;
-      console.log(`API URL: ${url}`);
+      const url = `http://127.0.0.1:8000/api/v1/synopsis/by-title/${encodedTitle}`;
       const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("API 응답 받음:", response.data);
       const data = response.data;
       setTitle(data.title);
       setPlot(data.synopsis || "");
       setIsSynopsisComplete(!!data.synopsis);
       setError(null);
+
+      if (data.synopsis) {
+        // 시놉시스가 이미 존재하는 경우, 예측 결과 가져오기
+        await fetchPrediction(data.id);
+      }
     } catch (error) {
-      console.error("시나리오 정보 가져오기 실패:", error);
       handleApiError(error, "시나리오 정보를 가져오는 중 오류가 발생했습니다.");
     }
-    console.log("fetchScenarioDetails 함수 종료");
   };
 
   const generateSynopsis = async () => {
-    console.log("generateSynopsis 함수 시작");
     if (!selectedScenarioTitle) {
-      console.log("시나리오가 선택되지 않았습니다.");
       setError("시나리오를 선택해주세요.");
       return;
     }
     setIsGenerating(true);
-    try {
-      console.log("시놉시스 생성 API 호출 중...");
-      const response = await axios.post(
-        "http://43.200.111.65/api/synopsis/generate-synopsis",
-        { scenario_id: selectedScenarioTitle },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log("API 응답 받음:", response.data);
+    setPlot(""); // 기존 시놉시스 초기화
+    setSuccessRate(null); // 기존 예측 결과 초기화
+    setIsSynopsisComplete(false); // 시놉시스 완료 상태 초기화
+    setError(null);
 
-      // 시놉시스 생성 상태 확인
-      await checkSynopsisStatus(selectedScenarioTitle);
-    } catch (error) {
-      console.error("시놉시스 생성 중 오류:", error);
-      handleApiError(error, "시놉시스 생성 중 오류가 발생했습니다.");
-    } finally {
-      setIsGenerating(false);
-      console.log("generateSynopsis 함수 종료");
-    }
-  };
-
-  const checkSynopsisStatus = async (scenarioId) => {
-    console.log(`checkSynopsisStatus 함수 시작. 시나리오 ID: ${scenarioId}`);
     try {
-      while (true) {
-        const response = await axios.get(
-          `http://43.200.111.65/api/synopsis/synopsis-status/${scenarioId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log("상태 확인 응답:", response.data);
-        if (response.data.status === "complete") {
-          setPlot(response.data.synopsis);
-          setIsSynopsisComplete(true);
-          await fetchPrediction(scenarioId);
-          break;
-        }
-        await new Promise((resolve) => setTimeout(resolve, 5000)); // 5초 대기
+      const scenarioId = userScenarios.find(s => s.title === selectedScenarioTitle)?.id;
+      if (!scenarioId) {
+        setError("선택된 시나리오의 ID를 찾을 수 없습니다.");
+        setIsGenerating(false);
+        return;
       }
+
+      // EventSource를 사용하여 서버로부터 시놉시스 스트리밍 수신
+      const tokenParam = encodeURIComponent(token);
+      const url = `http://127.0.0.1:8000/api/v1/synopsis/generate-synopsis-stream/${scenarioId}?token=${tokenParam}`;
+      const eventSource = new EventSource(url);
+      eventSourceRef.current = eventSource;
+
+      eventSource.onmessage = (e) => {
+        setPlot(prev => prev + e.data);
+      };
+
+      eventSource.addEventListener('prediction', (e) => {
+        const data = JSON.parse(e.data);
+        setSuccessRate(data.first_predicted_rate);
+        setIsSynopsisComplete(true);
+        setIsGenerating(false);
+        eventSource.close();
+        eventSourceRef.current = null;
+      });
+
+      eventSource.addEventListener('error', (e) => {
+        console.error("EventSource failed:", e);
+        setError("시놉시스 생성 중 오류가 발생했습니다.");
+        setIsGenerating(false);
+        eventSource.close();
+        eventSourceRef.current = null;
+      });
+
     } catch (error) {
-      console.error("시놉시스 상태 확인 중 오류:", error);
-      handleApiError(error, "시놉시스 상태 확인 중 오류가 발생했습니다.");
+      handleApiError(error, "시놉시스 생성 중 오류가 발생했습니다.");
+      setIsGenerating(false);
     }
-    console.log("checkSynopsisStatus 함수 종료");
   };
 
   const fetchPrediction = async (scenarioId) => {
-    console.log(`fetchPrediction 함수 시작. 시나리오 ID: ${scenarioId}`);
     try {
       const response = await axios.get(
-        `http://43.200.111.65/api/synopsis/prediction/${scenarioId}`,
+        `http://127.0.0.1:8000/api/v1/synopsis/prediction/${scenarioId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      console.log("예측 결과:", response.data);
-      setSuccessRate(response.data["1차 흥행도"]);
+      setSuccessRate(response.data.first_predicted_rate);
     } catch (error) {
-      console.error("예측 결과 가져오기 실패:", error);
       handleApiError(error, "예측 결과를 가져오는 중 오류가 발생했습니다.");
     }
-    console.log("fetchPrediction 함수 종료");
-  };
-
-  const handlePredictionClick = async () => {
-    console.log("handlePredictionClick 함수 시작");
-    if (!successRate) {
-      console.log("흥행도가 아직 예측되지 않았습니다.");
-      setError("먼저 시놉시스를 생성해주세요.");
-    } else {
-      console.log("현재 예측된 흥행도:", successRate);
-    }
-    console.log("handlePredictionClick 함수 종료");
   };
 
   const handleCreateScenario = async () => {
-    console.log("handleCreateScenario 함수 시작");
     if (!selectedScenarioTitle) {
-      console.log("시나리오가 선택되지 않았습니다.");
       setError("시나리오를 선택해주세요.");
       return;
     }
     if (!plot) {
-      console.log("시놉시스가 생성되지 않았습니다.");
       setError("시놉시스를 먼저 생성해주세요.");
       return;
     }
 
     try {
-      console.log("수정 요청사항 업데이트 중...");
-      console.log("요청 데이터:", { user_request: gptRequest });
+      const scenarioId = userScenarios.find(s => s.title === selectedScenarioTitle)?.id;
+      if (!scenarioId) {
+        setError("선택된 시나리오의 ID를 찾을 수 없습니다.");
+        return;
+      }
+
       await axios.put(
-        `http://43.200.111.65/api/v1/scenarios/by-title/${selectedScenarioTitle}/user-request`,
+        `http://127.0.0.1:8000/api/v1/scenario/${scenarioId}/user-request`,
         { user_request: gptRequest },
         {
           headers: {
@@ -326,36 +305,26 @@ function Synopsis() {
           },
         }
       );
-      console.log("수정 요청사항 업데이트 완료");
-
-      console.log("스크립트 생성 페이지로 이동 중...");
       navigate("/create/script", {
-        state: { scenarioTitle: selectedScenarioTitle, autoStart: true },
+        state: { scenarioId: scenarioId, autoStart: true },
         replace: true,
       });
     } catch (error) {
-      console.error("시나리오 생성 중 오류:", error);
-      handleApiError(
-        error,
-        "시나리오 생성 페이지로 이동 중 오류가 발생했습니다."
-      );
+      handleApiError(error, "시나리오 생성 페이지로 이동 중 오류가 발생했습니다.");
     }
-    console.log("handleCreateScenario 함수 종료");
   };
 
   const handleApiError = (error, defaultMessage) => {
-    console.log("에러 상세 정보:", error.response || error.message);
     let errorMessage = defaultMessage;
     if (error.response) {
-      console.log("서버 응답:", error.response);
       if (error.response.status === 401) {
         errorMessage = "인증 토큰이 만료되었습니다. 다시 로그인해주세요.";
         logout();
         navigate("/login");
       } else if (error.response.status === 422) {
-        errorMessage = `데이터 형식이 올바르지 않습니다. 오류 메시지: ${JSON.stringify(
-          error.response.data
-        )}`;
+        errorMessage = `데이터 형식이 올바르지 않습니다. 오류 메시지: ${JSON.stringify(error.response.data)}`;
+      } else if (error.response.data && error.response.data.detail) {
+        errorMessage = error.response.data.detail;
       }
     }
     setError(errorMessage);
@@ -386,34 +355,25 @@ function Synopsis() {
             placeholder="시놉시스를 생성하려면 '시놉시스 생성' 버튼을 클릭하세요."
             value={plot}
             onChange={(e) => setPlot(e.target.value)}
-            height="300px"
-            readOnly={isGenerating}
+            readOnly={true}
           />
           {isSynopsisComplete && (
             <>
+              {successRate && (
+                <SuccessRateDisplay>예상 흥행률: {successRate}</SuccessRateDisplay>
+              )}
               <Label>수정 요청사항</Label>
               <TextArea
                 placeholder="GPT에게 수정을 요청할 사항을 적어주세요."
                 value={gptRequest}
                 onChange={(e) => setGptRequest(e.target.value)}
-                height="300px"
+                height="150px"
               />
             </>
           )}
-          {successRate && (
-            <SuccessRateDisplay>예상 흥행률: {successRate}%</SuccessRateDisplay>
-          )}
           <ButtonContainer>
-            <ExpectButton
-              onClick={handlePredictionClick}
-              disabled={!isSynopsisComplete}
-            >
-              흥행도 예측
-            </ExpectButton>
             <CombinedButton
-              onClick={
-                isSynopsisComplete ? handleCreateScenario : generateSynopsis
-              }
+              onClick={isSynopsisComplete ? handleCreateScenario : generateSynopsis}
               disabled={isGenerating}
               isSynopsisComplete={isSynopsisComplete}
             >
@@ -421,6 +381,8 @@ function Synopsis() {
                 ? "생성 중..."
                 : isSynopsisComplete
                 ? "시나리오 생성"
+                : successRate
+                ? `예상 흥행률: ${successRate}`
                 : "시놉시스 생성"}
             </CombinedButton>
           </ButtonContainer>

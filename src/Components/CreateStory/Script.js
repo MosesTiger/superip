@@ -1,7 +1,8 @@
+// Script.js
+
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
-import { useAuth } from "../../context/AuthProvider";
 import { GoChevronRight, GoChevronLeft } from "react-icons/go";
 
 const Section = styled.section`
@@ -82,6 +83,13 @@ const TextArea = styled.textarea`
   resize: vertical;
 `;
 
+const ButtonWrap = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+  width: 100%;
+`;
+
 const Button = styled.button`
   padding: 10px 20px;
   font-size: 16px;
@@ -90,8 +98,7 @@ const Button = styled.button`
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s;
-  margin-bottom: 15px;
+  margin-right: 10px;
 
   &:hover {
     background-color: #218838;
@@ -103,9 +110,17 @@ const Button = styled.button`
   }
 `;
 
-const ErrorMessage = styled.p`
-  color: #dc3545;
-  font-weight: bold;
+const PredictButton = styled(Button)`
+  background-color: #17a2b8;
+
+  &:hover {
+    background-color: #138496;
+  }
+`;
+
+const ErrorMessage = styled.div`
+  color: red;
+  margin-top: 10px;
 `;
 
 const ButtonWrap = styled.div`
@@ -127,128 +142,155 @@ const PredictButton = styled(Button)`
 function Script() {
   const { token } = useAuth();
   const [userScenarios, setUserScenarios] = useState([]);
-  const [selectedScenarioId, setSelectedScenarioId] = useState(null);
+  const [selectedScenarioId, setSelectedScenarioId] = useState("");
   const [currentChapter, setCurrentChapter] = useState(1);
   const [chapterContent, setChapterContent] = useState("");
   const [feedback, setFeedback] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState(null);
+  const [chapterCount, setChapterCount] = useState(0);
 
   useEffect(() => {
-    const fetchUserScenarios = async () => {
-      try {
-        const response = await axios.get(
-          "http://43.200.111.65/api/v1/scenario/user-scenarios",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        setUserScenarios(response.data);
-      } catch (error) {
-        console.error("시나리오 목록을 가져오는 중 오류 발생:", error);
-        setError("시나리오 목록을 가져오는데 실패했습니다.");
-      }
-    };
-
     fetchUserScenarios();
-  }, [token]);
+  }, []);
 
-  const handleScenarioSelect = (event) => {
-    setSelectedScenarioId(event.target.value);
+  const fetchUserScenarios = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/v1/scenario/user-scenarios", {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch user scenarios");
+      }
+      const data = await response.json();
+      setUserScenarios(data);
+    } catch (error) {
+      console.error("시나리오를 가져오는 중 오류 발생:", error);
+      setError("시나리오를 가져오는 데 실패했습니다.");
+    }
+  };
+
+  const handleScenarioSelect = async (e) => {
+    const scenarioId = e.target.value;
+    setSelectedScenarioId(scenarioId);
     setCurrentChapter(1);
     setChapterContent("");
     setFeedback("");
+    setError(null);
+    if (scenarioId) {
+      const scenario = userScenarios.find((s) => s.id === parseInt(scenarioId));
+      setChapterCount(scenario.chapter_count);
+      await fetchChapterContent(scenarioId, 1);
+      await fetchFeedback(scenarioId, 1);
+    }
   };
 
-  const handlePreviousChapter = () => {
+  const handlePreviousChapter = async () => {
     if (currentChapter > 1) {
-      setCurrentChapter((prev) => prev - 1);
-      fetchChapterContent(currentChapter - 1);
+      const newChapter = currentChapter - 1;
+      setCurrentChapter(newChapter);
+      await fetchChapterContent(selectedScenarioId, newChapter);
+      await fetchFeedback(selectedScenarioId, newChapter);
     }
   };
 
-  const handleNextChapter = () => {
-    const selectedScenario = userScenarios.find(
-      (s) => s.id === parseInt(selectedScenarioId)
-    );
-    if (currentChapter < selectedScenario.chapter_count) {
-      setCurrentChapter((prev) => prev + 1);
-      fetchChapterContent(currentChapter + 1);
+  const handleNextChapter = async () => {
+    if (currentChapter < chapterCount) {
+      const newChapter = currentChapter + 1;
+      setCurrentChapter(newChapter);
+      await fetchChapterContent(selectedScenarioId, newChapter);
+      await fetchFeedback(selectedScenarioId, newChapter);
     }
   };
 
-  const fetchChapterContent = async (chapterNumber) => {
+  const fetchChapterContent = async (scenarioId, chapterNumber) => {
     try {
-      const response = await axios.get(
-        `http://43.200.111.65/api/v1/scenario/${selectedScenarioId}/chapters/${chapterNumber}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setChapterContent(response.data.content);
-      fetchFeedback(chapterNumber);
+      const response = await fetch(`http://127.0.0.1:8000/api/v1/scenario/${scenarioId}/chapters/${chapterNumber}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch chapter content");
+      }
+      const data = await response.json();
+      setChapterContent(data.content || "");
     } catch (error) {
       console.error("챕터 내용을 가져오는 중 오류 발생:", error);
-      setError("챕터 내용을 가져오는데 실패했습니다.");
+      setError("챕터 내용을 가져오는 데 실패했습니다.");
+      setChapterContent("");
     }
   };
 
-  const fetchFeedback = async (chapterNumber) => {
+  const fetchFeedback = async (scenarioId, chapterNumber) => {
     try {
-      const response = await axios.get(
-        `http://43.200.111.65/api/v1/scenario/${selectedScenarioId}/feedbacks?chapter_id=${chapterNumber}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (response.data.length > 0) {
-        setFeedback(response.data[0].content);
-      } else {
-        setFeedback("");
+      const response = await fetch(`http://127.0.0.1:8000/api/v1/scenario/${scenarioId}/chapters/${chapterNumber}/feedback`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch feedback");
       }
+      const data = await response.json();
+      setFeedback(data.content || "");
     } catch (error) {
       console.error("피드백을 가져오는 중 오류 발생:", error);
-      setError("피드백을 가져오는데 실패했습니다.");
+      setError("피드백을 가져오는 데 실패했습니다.");
+      setFeedback("");
     }
   };
 
   const generateChapter = async () => {
     setIsGenerating(true);
     setError(null);
+    setChapterContent(""); // 새로운 생성 시작 시 기존 내용 초기화
     try {
-      const response = await axios.post(
-        `http://43.200.111.65/api/v1/scenario/${selectedScenarioId}/chapters/${currentChapter}/generate`,
-        {},
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/v1/scenario/${selectedScenarioId}/chapters/${currentChapter}/generate`,
         {
+          method: 'POST',
           headers: {
-            Authorization: `Bearer ${token}`,
+            'Authorization': `Bearer ${token}`,
           },
         }
       );
 
-      const reader = response.data.getReader();
-      let result = "";
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        result += new TextDecoder().decode(value);
-        const lines = result.split("\n");
-        for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            const data = JSON.parse(line.slice(6));
-            if (data.type === "content") {
-              setChapterContent((prev) => prev + data.content);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let done = false;
+
+      while (!done) {
+        const { value, done: doneReading } = await reader.read();
+        done = doneReading;
+        if (value) {
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n').filter(line => line.trim() !== '');
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const dataStr = line.slice(6);
+              if (dataStr === '[DONE]') {
+                done = true;
+                break;
+              } else {
+                const data = JSON.parse(dataStr);
+                if (data.type === 'content') {
+                  setChapterContent(prev => prev + data.content);
+                }
+              }
             }
           }
         }
       }
+
+      // 챕터 생성 후 업데이트된 내용 가져오기
+      await fetchChapterContent(selectedScenarioId, currentChapter);
     } catch (error) {
       console.error("챕터 생성 중 오류 발생:", error);
       setError("챕터 생성에 실패했습니다.");
@@ -259,19 +301,41 @@ function Script() {
 
   const saveFeedback = async () => {
     try {
-      await axios.post(
-        `http://43.200.111.65/api/v1/scenario/${selectedScenarioId}/chapters/${currentChapter}/feedback`,
-        { content: feedback },
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/v1/scenario/${selectedScenarioId}/chapters/${currentChapter}/feedback`,
         {
+          method: 'POST',
           headers: {
-            Authorization: `Bearer ${token}`,
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
           },
+          body: JSON.stringify({ content: feedback }),
         }
       );
+      if (!response.ok) {
+        throw new Error("Failed to save feedback");
+      }
       alert("피드백이 저장되었습니다.");
     } catch (error) {
       console.error("피드백 저장 중 오류:", error);
       setError("피드백 저장에 실패했습니다.");
+    }
+  };
+
+  const handlePrediction = async () => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/v1/scenario/prediction/${selectedScenarioId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to predict success rate");
+      }
+      alert("흥행도 예측이 완료되었습니다.");
+    } catch (error) {
+      console.error("흥행도 예측 중 오류 발생:", error);
+      setError("흥행도 예측에 실패했습니다.");
     }
   };
 
@@ -291,22 +355,14 @@ function Script() {
           <ChapterNavigation>
             <NavLeftButton
               onClick={handlePreviousChapter}
-              disabled={currentChapter === 1}
+              disabled={currentChapter === 1 || isGenerating}
             />
             <ChapterInfo>
-              챕터 {currentChapter} /{" "}
-              {
-                userScenarios.find((s) => s.id === parseInt(selectedScenarioId))
-                  ?.chapter_count
-              }
+              챕터 {currentChapter} / {chapterCount}
             </ChapterInfo>
             <NavRightButton
               onClick={handleNextChapter}
-              disabled={
-                currentChapter ===
-                userScenarios.find((s) => s.id === parseInt(selectedScenarioId))
-                  ?.chapter_count
-              }
+              disabled={currentChapter === chapterCount || isGenerating}
             />
           </ChapterNavigation>
 
@@ -314,12 +370,12 @@ function Script() {
             value={chapterContent}
             onChange={(e) => setChapterContent(e.target.value)}
             placeholder="챕터 내용"
-            readOnly={isGenerating}
+            readOnly={true}
           />
 
           <ButtonWrap>
-            <Button onClick={generateChapter} disabled={isGenerating}>
-              {isGenerating ? "생성 중..." : "챕터 생성"}
+            <Button onClick={generateChapter} disabled={isGenerating || chapterContent}>
+              {isGenerating ? "생성 중..." : chapterContent ? "재생성" : "챕터 생성"}
             </Button>
           </ButtonWrap>
           <TextArea
@@ -328,15 +384,14 @@ function Script() {
             placeholder="피드백을 입력하세요"
           />
           <ButtonWrap>
-            <Button onClick={saveFeedback}>피드백 저장</Button>
+            <Button onClick={saveFeedback} disabled={isGenerating}>
+              피드백 저장
+            </Button>
           </ButtonWrap>
 
-          {/* 마지막 챕터일 때만 흥행도 예측 버튼을 보여줌 */}
-          {currentChapter ===
-            userScenarios.find((s) => s.id === parseInt(selectedScenarioId))
-              ?.chapter_count && (
+          {currentChapter === chapterCount && (
             <ButtonWrap>
-              <PredictButton onClick={() => alert("흥행도 예측 실행")}>
+              <PredictButton onClick={handlePrediction} disabled={isGenerating}>
                 흥행도 예측
               </PredictButton>
             </ButtonWrap>
