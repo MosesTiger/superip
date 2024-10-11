@@ -12,17 +12,25 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-// 스타일 컴포넌트 정의
+const Section = styled.section`
+  display: flex;
+  padding: 10px 0;
+  width: 95%;
+  margin: 0 auto;
+  font-size: 16px;
+  color: #000;
+  align-items: center;
+  justify-content: center;
+`;
 const DashboardContainer = styled.div`
   display: flex;
   justify-content: center;
   gap: 20px;
-  padding: 20px;
-  min-height: calc(100vh - 70px);
-  width: 95vw;
+  padding: 0;
+  min-height: 100%;
+  width: 100%;
   box-sizing: border-box;
-  background-color: #1e1e1e;
-  transform: translateX(-50px);
+  background-color: #f5f5f5;
 `;
 
 const TitleSection = styled.div`
@@ -144,7 +152,7 @@ const Div1 = styled.div`
 `;
 
 const Div2 = styled(Div1)`
-  width: 20%;
+  width: 30%;
 `;
 
 const Div3 = styled(Div1)`
@@ -387,7 +395,7 @@ function Show() {
   const countryScore = predictionData?.detailed_scores?.country_score || 90;
 
   return (
-    <>
+    <Section>
       <DashboardContainer>
         {isPopupOpen && (
           <Overlay
@@ -472,13 +480,7 @@ function Show() {
             </Sectiontitlewrap>
             <Graph data={predictionData?.["완성도 점수"]} />
           </AnalysisSection>
-          <BoxofficeSection
-            genreScore={genreScore}
-            runtimeScore={runtimeScore}
-            ratingScore={ratingScore}
-            countryScore={countryScore}
-            onMoreClick={toggleBoxofficePopup}
-          />
+          <BoxofficeSection onMoreClick={toggleBoxofficePopup} />
         </ResultContainer>
       </DashboardContainer>
 
@@ -519,7 +521,7 @@ function Show() {
           </div>
         </Popup>
       )}
-    </>
+    </Section>
   );
 }
 

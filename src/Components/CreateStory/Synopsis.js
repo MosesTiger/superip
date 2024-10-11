@@ -73,7 +73,7 @@ const ErrorMessage = styled.div`
 `;
 
 const SuccessRateDisplay = styled.div`
-  font-size: 18px;
+  font-size: 20px;
   margin-top: 10px;
   color: #4a4a4a;
   font-weight: bold;
@@ -125,7 +125,7 @@ const CombinedButton = styled(Button)`
 
   &:hover {
     background-color: ${(props) =>
-      props.isSynopsisComplete ? "#218838" : "#C53838"};
+    props.isSynopsisComplete ? "#218838" : "#C53838"};
   }
 `;
 
@@ -380,10 +380,10 @@ function Synopsis() {
               {isGenerating
                 ? "생성 중..."
                 : isSynopsisComplete
-                ? "시나리오 생성"
-                : successRate
-                ? `예상 흥행률: ${successRate}`
-                : "시놉시스 생성"}
+                  ? "시나리오 생성"
+                  : successRate
+                    ? `예상 흥행률: ${successRate}`
+                    : "시놉시스 생성"}
             </CombinedButton>
           </ButtonContainer>
         </>
