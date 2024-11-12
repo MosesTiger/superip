@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
-
-// 스타일드 컴포넌트 정의
+import axios from 'axios'
 
 const LoginText = styled.div`
   font-size: 40px;
@@ -95,7 +94,7 @@ const LinkContainer = styled.div`
   justify-content: space-between;
   width: 280px;
   margin-top: 10px;
-  gap 10px;
+  gap: 10px;
 `;
 
 const LinkButton = styled(Link)`
@@ -112,44 +111,25 @@ const LinkButton = styled(Link)`
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useAuth(); // login 함수 가져오기
-  const navigate = useNavigate(); // 페이지 이동을 위한 useNavigate 훅
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
+    console.log("Login attempt:", username, password); 
     try {
-      // 백엔드 요청 주석 처리
-      /*
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: username, password }),
-      });
-
-      if (!response.ok) {
-        throw new Error('로그인 실패: 이메일 또는 비밀번호가 일치하지 않습니다.');
-      }
-
-      const data = await response.json();
-      */
-      //----------------------------------------------------
-      // 주석 처리된 부분을 로컬 스토리지와 비교하는 부분으로 대체
-      const savedUser = JSON.parse(localStorage.getItem('user'));
-
-      console.log("Saved user:", savedUser);
-
-      if (savedUser && savedUser.email === username && savedUser.password === password) {
-        login(username, password); // 인증 상태 변경 및 사용자 정보 저장
-        navigate("/"); // 로그인 후 홈 페이지로 이동
-      } else {
-        throw new Error('로그인 실패: 이메일 또는 비밀번호가 일치하지 않습니다.');
-      }
-      //----------------------------------------------------
+      await login(username, password);
+      navigate("/");
     } catch (error) {
       console.error('로그인 중 오류 발생:', error);
-      alert('로그인 중 오류가 발생했습니다.');
+      alert(error.message || '로그인 중 오류가 발생했습니다.');
     }
+  };
+  const API_KEY = process.env.REACT_APP_API_KEY;
+  const redirect_uri = process.env.REACT_APP_REDIRECT_URI;
+  
+  const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${API_KEY}&redirect_uri=${redirect_uri}&response_type=code`;
+  const handleKakaoLogin = () => {
+    window.location.href = kakaoURL;
   };
 
   return (
@@ -165,7 +145,7 @@ function Login() {
         />
       </InputContainer>
       <InputContainer>
-        <InputImage src="/비밀번호.svg " alt="pass Icon" />
+        <InputImage src="/비밀번호.svg" alt="pass Icon" />
         <Input
           type="password"
           placeholder="비밀번호"
@@ -174,7 +154,7 @@ function Login() {
         />
       </InputContainer>
       <LoginButton onClick={handleLogin}>Login</LoginButton>
-      <OAuthButton className="kakao">
+      <OAuthButton className="kakao" onClick={handleKakaoLogin}>
         <img src="/카카오.png" alt="Ka Logo" />
         카카오톡 로그인
       </OAuthButton>

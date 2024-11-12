@@ -1,260 +1,300 @@
 import React, { useState, useEffect } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthProvider";
 
-const TitleInput = styled.textarea`
-  width: 100%;
-  border: 0;
-  background-color: #EDF6F6;
-  height: 1000px;
-  border-radius: 8px;
-  padding: 8px 16px;
-  box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
-  font-weight: 500;
-  font-size: 16px;
-  min-width: 250px;
-  z-index: 3;
-  margin-bottom: 20px;
-  resize: none;
+const spin = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 `;
 
-const PaginationContainer = styled.div`
+const PageContainer = styled.div`
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  background-color: #EDF6F6;
-  margin-top: 15px;
-  border-radius: 8px;
-  position: relative;
+  flex-direction: column;
+  height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #f0f0f0;
+  position: relative; /* To position the loading message at the bottom */
 `;
 
-const PageButton = styled.button`
-  padding: 0;
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
+const ScenarioContainer = styled.div`
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  overflow: hidden;
 `;
 
-const ArrowIcon = styled.img`
-  width: 40px; /* 화살표 크기 조정 */
-  height: 40px;
-
-  &:hover:enabled {
-    opacity: 0.8;
-  }
+const ChapterTitle = styled.h2`
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
 `;
 
-const PageInfo = styled.span`
+const ScenarioText = styled.pre`
+  flex-grow: 1;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: "Courier New", Courier, monospace;
   font-size: 16px;
-  font-weight:bold;
-  color: #000;
-  margin: 0 10px;
-  cursor: pointer;
+  line-height: 1.6;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  display: ${(props) => (props.isGenerating ? "none" : "block")};
 `;
 
-const SaveButton = styled.button`
-  position: fixed;
-  bottom: 100px;
-  right: 100px;
+const Input = styled.textarea`
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  font-family: "Noto Sans KR", sans-serif;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  resize: vertical;
+  margin-bottom: 20px;
+`;
+
+const Button = styled.button`
   padding: 10px 20px;
-  background-color: #859aa5;
+  background-color: #ff4136;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
-  z-index: 1000;  // 버튼이 항상 맨 위에 위치하도록 설정
+  margin-right: 10px;
 
-  &:hover {
-    background-color: #697A82;
+  &:disabled {
+    background-color: #ffcccb;
+    cursor: not-allowed;
   }
 `;
 
-const DropdownMenu = styled.ul`
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-start;
+`;
+
+const PredictionButton = styled(Button)`
+  background-color: #75c96e;
+`;
+
+const Spinner = styled.div`
+  border: 16px solid #f3f3f3;
+  border-top: 16px solid #3498db;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: ${spin} 2s linear infinite;
+  display: ${(props) => (props.isGenerating ? "block" : "none")};
+  margin: auto;
+`;
+
+const LoadingMessage = styled.div`
   position: absolute;
-  top: -50%;
-  right: 50%;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  max-height: 200px;
-  overflow-y: scroll;
-  width: 80px;
-  padding: 10px;
-  list-style: none;
-  z-index: 1001;
-`;
-
-const DropdownItem = styled.li`
-  padding: 5px;
-  cursor: pointer;
-  &:hover {
-    background-color: #f0f0f0;
-  }
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  font-size: 16px;
+  color: #333;
+  display: ${(props) => (props.isGenerating ? "block" : "none")};
 `;
 
 function Script() {
-  // 예시로 씬 데이터 배열
-  const [scenes, setScenes] = useState(() => {
-    const savedScenes = localStorage.getItem('scenes');
-    return savedScenes ? JSON.parse(savedScenes) : [
-      "씬 1 내용 /br",
-      "씬 2 내용",
-      "씬 4 내용",
-      // ...
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
+  const [scenarioContent, setScenarioContent] = useState("");
+  const [currentChapter, setCurrentChapter] = useState(1);
+  const [scenarioId, setScenarioId] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [userInput, setUserInput] = useState("");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuthenticated, token } = useAuth();
 
-    ];
-  });
-  // 데이터 초기화 함수
-  const resetScenes = () => {
-    localStorage.removeItem('scenes');
-    setScenes([
-      "씬 1 내용 /br",
-      "씬 2 내용",
-      "씬 4 내용",
-      // ...
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-      "씬 120 내용",
-    ]);
-  };
+  const totalChapters = Math.ceil(location.state?.scenarioData.duration / 10); // 10분당 1챕터
 
   useEffect(() => {
-    localStorage.setItem('scenes', JSON.stringify(scenes));
-  }, [scenes]);
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
 
-  const [currentPage, setCurrentPage] = useState(0); // 현재 페이지 상태
-  const [dropdownVisible, setDropdownVisible] = useState(false);
+    if (location.state?.scenarioData) {
+      generateScenario(location.state.scenarioData);
+    }
+  }, [isAuthenticated, location.state, navigate]);
 
-  const handleNextPage = () => {
-    if (currentPage < scenes.length - 1) {
-      setCurrentPage(currentPage + 1);
+  const generateScenario = async (data) => {
+    setIsGenerating(true);
+    setScenarioContent("");
+
+    const url = `http://localhost:8000/api/v1/scenario/generate`;
+
+    const charactersArray = Array.isArray(data.characters)
+      ? data.characters
+      : data.characters
+      ? data.characters.split(",").map((char) => char.trim())
+      : [];
+
+    const requestData = {
+      title: data.title,
+      keyword: data.keyword,
+      genre: data.genre,
+      theme: data.theme,
+      characters: charactersArray,
+      scenario_content: data.scenario_content || "",
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let content = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split("\n\n");
+
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            const rawContent = line.slice(5).trim();
+            if (rawContent === "[DONE]") {
+              setIsGenerating(false);
+              break;
+            }
+            try {
+              const jsonData = JSON.parse(rawContent);
+              if (jsonData.type === "content") {
+                content += jsonData.content;
+              } else if (jsonData.type === "id") {
+                setScenarioId(jsonData.id);
+              }
+            } catch (e) {
+              console.error("Failed to parse JSON:", rawContent);
+            }
+          }
+        }
+      }
+      setScenarioContent(content);
+    } catch (error) {
+      console.error("Error:", error);
+      setIsGenerating(false);
     }
   };
 
-  const handlePreviousPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
+  const handleContinueChapter = async () => {
+    setIsGenerating(true);
+    try {
+      const response = await fetch(
+        `http://localhost:8000/api/v1/scenario/${scenarioId}/continue`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ user_input: userInput }),
+        }
+      );
 
-  const handleSceneChange = (e) => {
-    const updatedScenes = [...scenes];
-    updatedScenes[currentPage] = e.target.value;
-    setScenes(updatedScenes);
-    localStorage.setItem('scenes', JSON.stringify(updatedScenes)); // 로컬 스토리지에 저장
+      const result = await response.json();
+      setScenarioContent((prev) => prev + "\n\n" + result.content);
+      setCurrentChapter((prev) => prev + 1);
+      setUserInput("");
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleSave = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/save-scenario', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(scenes), // 현재 모든 씬 데이터를 전송
-      });
+      const response = await fetch(
+        `http://localhost:8000/api/v1/scenario/${scenarioId}/revise`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            feedback: "User edited",
+            user_input: scenarioContent,
+          }),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('저장 실패');
+        throw new Error("Failed to save the scenario");
       }
 
-      alert('시나리오가 성공적으로 저장되었습니다.');
+      alert("Scenario saved successfully.");
     } catch (error) {
-      console.error('저장 중 오류 발생:', error);
-      alert('시나리오 저장 중 오류가 발생했습니다.');
+      console.error("Error:", error);
     }
   };
 
-  const toggleDropdown = () => {
-    setDropdownVisible(!dropdownVisible);
+  const handlePredictionClick = () => {
+    navigate("/create/show");
   };
-
-  const selectPage = (pageIndex) => {
-    setCurrentPage(pageIndex);
-    setDropdownVisible(false);
-  };
-
-  
 
   return (
-    <>
-    {/*
-    <SaveButton onClick={handleSave}>저장</SaveButton>
-    */}
-    <SaveButton onClick={resetScenes}>리셋</SaveButton>
-      <PaginationContainer>
-        <PageButton onClick={handlePreviousPage} disabled={currentPage === 0}>
-          <ArrowIcon src="/씬페이지왼쪽화살표.svg" alt="Previous Page" />
-        </PageButton>
-        <PageInfo onClick={toggleDropdown}>
-          {currentPage + 1} / {scenes.length}
-          {dropdownVisible && (
-            <DropdownMenu>
-              {scenes.map((_, index) => (
-                <DropdownItem
-                  key={index}
-                  onClick={() => selectPage(index)}
-                >
-                  {index + 1}
-                </DropdownItem>
-              ))}
-            </DropdownMenu>
+    <PageContainer>
+      <ScenarioContainer>
+        <ChapterTitle>
+          Chapter {currentChapter} / {totalChapters}
+        </ChapterTitle>
+        <Spinner isGenerating={isGenerating} />
+        <ScenarioText isGenerating={isGenerating}>
+          {scenarioContent}
+        </ScenarioText>
+        <Input
+          value={userInput}
+          onChange={(e) => setUserInput(e.target.value)}
+          placeholder="다음 챕터에 대한 의견이나 조언을 주세요"
+        />
+        <ButtonContainer>
+          {currentChapter < totalChapters ? (
+            <Button
+              onClick={handleContinueChapter}
+              disabled={isGenerating || !scenarioId}
+            >
+              {isGenerating ? "생성 중..." : "다음 챕터 작성"}
+            </Button>
+          ) : (
+            <PredictionButton onClick={handlePredictionClick}>
+              최종 흥행도 예측
+            </PredictionButton>
           )}
-        </PageInfo>
-        <PageButton
-          onClick={handleNextPage}
-          disabled={currentPage === scenes.length - 1}
-        >
-          <ArrowIcon src="/씬페이지오른쪽화살표.svg" alt="Next Page" />
-        </PageButton>
-      </PaginationContainer>
-      <TitleInput value={scenes[currentPage]} onChange={handleSceneChange} />
-    </>
+          <Button onClick={handleSave} disabled={isGenerating || !scenarioId}>
+            Save
+          </Button>
+        </ButtonContainer>
+        <LoadingMessage isGenerating={isGenerating}>
+          시나리오 생성 중입니다!
+        </LoadingMessage>
+      </ScenarioContainer>
+    </PageContainer>
   );
 }
 

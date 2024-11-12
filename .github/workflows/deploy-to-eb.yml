@@ -1,0 +1,64 @@
+name: Deploy React App to S3 and EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v3
+      
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'  # 또는 프로젝트에서 사용하는 Node.js 버전
+        
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.OS }}-node-
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build React app
+      run: npm run build
+      env:
+        CI: false  # 경고를 에러로 처리하지 않도록 설정
+      
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+        
+    - name: Deploy to S3
+      run: |
+        aws s3 sync build/ s3://${{ secrets.S3_BUCKET_NAME }} --delete
+
+    - name: Set execute permissions for deploy.sh
+      run: chmod +x deploy.sh
+
+    - name: Zip files for deployment
+      run: zip -r dist.zip build appspec.yml deploy.sh
+
+    - name: Upload zip to S3
+      run: |
+        aws s3 cp dist.zip s3://${{ secrets.S3_BUCKET_NAME }}/dist.zip
+
+    - name: Deploy to EC2
+      run: |
+        aws deploy create-deployment \
+          --application-name front-deploy \
+          --deployment-config-name CodeDeployDefault.AllAtOnce \
+          --deployment-group-name front_deploy \
+          --s3-location "bucket=${{ secrets.S3_BUCKET_NAME }},key=dist.zip,bundleType=zip"
