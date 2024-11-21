@@ -162,7 +162,7 @@ function Synopsis() {
 
   const fetchUserScenarios = async () => {
     try {
-      const response = await axios.get('43.200.111.65/api/v1/scenario/user-scenarios', {
+      const response = await axios.get('http://43.200.111.65/api/v1/scenario/user-scenarios', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -190,7 +190,7 @@ function Synopsis() {
   const fetchScenarioDetails = async (title) => {
     try {
       const encodedTitle = encodeURIComponent(title);
-      const url = `43.200.111.65/api/v1/synopsis/by-title/${encodedTitle}`;
+      const url = `http://43.200.111.65/api/v1/synopsis/by-title/${encodedTitle}`;
       const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -232,7 +232,7 @@ function Synopsis() {
 
       // EventSource를 사용하여 서버로부터 시놉시스 스트리밍 수신
       const tokenParam = encodeURIComponent(token);
-      const url = `43.200.111.65/api/v1/synopsis/generate-synopsis-stream/${scenarioId}?token=${tokenParam}`;
+      const url = `http://43.200.111.65/api/v1/synopsis/generate-synopsis-stream/${scenarioId}?token=${tokenParam}`;
       const eventSource = new EventSource(url);
       eventSourceRef.current = eventSource;
 
@@ -266,7 +266,7 @@ function Synopsis() {
   const fetchPrediction = async (scenarioId) => {
     try {
       const response = await axios.get(
-        `43.200.111.65/api/v1/synopsis/prediction/${scenarioId}`,
+        `http://43.200.111.65/api/v1/synopsis/prediction/${scenarioId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -297,7 +297,7 @@ function Synopsis() {
       }
 
       await axios.put(
-        `43.200.111.65/api/v1/scenario/${scenarioId}/user-request`,
+        `http://43.200.111.65/api/v1/scenario/${scenarioId}/user-request`,
         { user_request: gptRequest },
         {
           headers: {
