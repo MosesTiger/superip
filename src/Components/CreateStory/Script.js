@@ -5,6 +5,7 @@ import styled from "styled-components";
 import axios from "axios";
 import { GoChevronRight, GoChevronLeft } from "react-icons/go";
 import { useAuth } from '../../context/AuthProvider';
+import { useLocation } from 'react-router-dom';
 
 const Section = styled.section`
   display: flex;
@@ -119,10 +120,12 @@ function Script() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState(null);
   const [chapterCount, setChapterCount] = useState(0);
+  const location = useLocation();
+  const {scenarioId: initialScenarioId, fromMyPage} = location.state || {};
 
   // Create an axios instance with baseURL and interceptors for authorization
   const axiosInstance = axios.create({
-    baseURL: "43.200.111.65/api/v1",
+    baseURL: "http://127.0.0.1:8000/api/v1",
   });
 
   // Add a request interceptor to include the Authorization header
@@ -138,8 +141,21 @@ function Script() {
 
   useEffect(() => {
     fetchUserScenarios();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (fromMyPage && initialScenarioId) {
+      setSelectedScenarioId(initialScenarioId.toString());
+    }
   }, []);
+
+  useEffect(() => {
+    if (selectedScenarioId) {
+      const scenario = userScenarios.find((s) => s.id === parseInt(selectedScenarioId));
+      if (scenario) {
+        setChapterCount(scenario.chapter_count);
+        fetchChapterContent(selectedScenarioId, 1); 
+        fetchFeedback(selectedScenarioId, 1);
+      }
+    }
+  }, [selectedScenarioId, userScenarios]);
 
   const fetchUserScenarios = async () => {
     try {
@@ -212,7 +228,7 @@ function Script() {
     setChapterContent(""); // 새로운 생성 시작 시 기존 내용 초기화
     try {
       const response = await fetch(
-        `43.200.111.65/api/v1/scenario/${selectedScenarioId}/chapters/${currentChapter}/generate`,
+        `http://127.0.0.1:8000/api/v1/scenario/${selectedScenarioId}/chapters/${currentChapter}/generate`,
         {
           method: 'POST',
           headers: {

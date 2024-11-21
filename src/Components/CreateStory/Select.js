@@ -241,66 +241,72 @@ const RemoveTagButton = styled.button`
 `;
 
 function Select() {
-  const [duration, setDuration] = useState(120);
-  const [selectedGenres, setSelectedGenres] = useState([]);
-  const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
   const [title, setTitle] = useState("");
+  const [selectedGenres, setSelectedGenres] = useState([]);
+  const [duration, setDuration] = useState(90);
   const [rating, setRating] = useState("all");
   const [country, setCountry] = useState("korea");
   const [mainCharacterGender, setMainCharacterGender] = useState("male");
+  const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
   const [keywords, setKeywords] = useState([]);
   const [currentKeyword, setCurrentKeyword] = useState("");
-  const [request, setRequest] = useState("");
   const [characters, setCharacters] = useState([]);
   const [currentCharacter, setCurrentCharacter] = useState("");
-  const { token, user } = useAuth();
+  const [request, setRequest] = useState("");
+
   const navigate = useNavigate();
+  const { token } = useAuth();
 
   const handleGenreClick = (genre) => {
-    setSelectedGenres((prev) =>
-      prev.includes(genre)
-        ? prev.filter((g) => g !== genre)
-        : [...prev, genre].slice(0, 3)
-    );
+    if (selectedGenres.includes(genre)) {
+      setSelectedGenres(selectedGenres.filter((g) => g !== genre));
+    } else if (selectedGenres.length < 3) {
+      setSelectedGenres([...selectedGenres, genre]);
+    }
+  };
+
+  const increaseDuration = () => {
+    if (duration < 180) {
+      setDuration(duration + 10);
+    }
+  };
+
+  const decreaseDuration = () => {
+    if (duration > 60) {
+      setDuration(duration - 10);
+    }
   };
 
   const handleCheckboxChange = () => {
     setIsCheckboxChecked(!isCheckboxChecked);
   };
 
-  const increaseDuration = () => {
-    setDuration((prev) => Math.min(prev + 10, 120));
-  };
-
-  const decreaseDuration = () => {
-    setDuration((prev) => Math.max(prev - 10, 10));
-  };
-
   const handleAddKeyword = () => {
-    if (currentKeyword && !keywords.includes(currentKeyword)) {
-      setKeywords([...keywords, currentKeyword]);
+    if (currentKeyword.trim() && !keywords.includes(currentKeyword.trim())) {
+      setKeywords([...keywords, currentKeyword.trim()]);
       setCurrentKeyword("");
     }
   };
 
-  const handleRemoveKeyword = (keyword) => {
-    setKeywords(keywords.filter((k) => k !== keyword));
+  const handleRemoveKeyword = (keywordToRemove) => {
+    setKeywords(keywords.filter((keyword) => keyword !== keywordToRemove));
   };
 
   const handleAddCharacter = () => {
-    if (currentCharacter && !characters.includes(currentCharacter)) {
-      setCharacters([...characters, currentCharacter]);
+    if (currentCharacter.trim() && !characters.includes(currentCharacter.trim())) {
+      setCharacters([...characters, currentCharacter.trim()]);
       setCurrentCharacter("");
     }
   };
 
-  const handleRemoveCharacter = (character) => {
-    setCharacters(characters.filter((c) => c !== character));
+  const handleRemoveCharacter = (characterToRemove) => {
+    setCharacters(characters.filter((character) => character !== characterToRemove));
   };
 
   const handleSubmit = async () => {
+    // Validation checks
     if (!title.trim()) {
-      alert("영화 제목을 입력해주세요.");
+      alert("제목을 입력해주세요.");
       return;
     }
 
@@ -309,32 +315,35 @@ function Select() {
       return;
     }
 
-    if (!user) {
-      alert("로그인이 필요합니다.");
-      navigate("/login");
+    if (keywords.length === 0) {
+      alert("최소 한 개의 키워드를 입력해주세요.");
+      return;
+    }
+
+    if (characters.length === 0) {
+      alert("최소 한 명의 등장인물을 입력해주세요.");
       return;
     }
 
     const scenarioData = {
       title: title.trim(),
-      genre: selectedGenres,
+      genre: selectedGenres,  // JSON.stringify 제거
       runtime: duration,
       rating: rating,
       theme: country,
       gender: mainCharacterGender,
       is_series: isCheckboxChecked,
       chapter_count: Math.ceil(duration / 10),
-      characters: characters,
-      keywords: keywords,
+      characters: characters,  // JSON.stringify 제거
+      keywords: keywords,      // JSON.stringify 제거
       user_request: request.trim(),
     };
+
     console.log("Sending scenario data:", scenarioData);
-    console.log("Type of genre:", typeof scenarioData.genre);
-    console.log("Is genre an array:", Array.isArray(scenarioData.genre));
 
     try {
       const response = await axios.post(
-        "43.200.111.65/api/v1/scenario/create",
+        "http://127.0.0.1:8000/api/v1/scenario/create",
         scenarioData,
         {
           headers: {
@@ -348,6 +357,7 @@ function Select() {
       const scenarioId = response.data.id;
       navigate("/create/synopsis", { state: { scenarioId } });
     } catch (error) {
+      console.error("Error creating scenario:", error);
       console.error("Error details:", error.response?.data || error.message);
       alert(
         "시나리오 생성 중 오류가 발생했습니다: " +
@@ -359,50 +369,21 @@ function Select() {
   return (
     <Section>
       <MovieDetails>
-        <Label>
-          영화 제목을 입력하세요.
-          <TitleInput
-            placeholder="Ex) 범죄도시5"
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </Label>
+        <Label>영화 제목을 입력하세요.</Label>
+        <TitleInput
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="영화 제목"
+        />
         <Label>장르를 선택하세요. (최대 3개)</Label>
         <GenreSelection>
           {[
-            "드라마",
-            "액션",
-            "코메디",
-            "범죄",
-            "스릴러",
-            "미스터리",
-            "시대극/사극",
-            "전쟁",
-            "가족",
-            "멜로/로맨스",
-            "어드벤쳐",
-            "판타지",
-            "공포",
-            "스포츠",
-            "SF",
-            "느와르",
-            "반공/분단",
-            "첩보",
-            "인물",
-            "재난",
-            "전기",
-            "하이틴",
-            "역사",
-            "갱스터",
-            "사회물(경향)",
-            "뮤직",
-            "청춘",
-            "활극",
-            "뮤지컬",
-            "신파",
-            "무협",
+            "드라마", "액션", "코메디", "범죄", "스릴러", "미스터리",
+            "시대극/사극", "전쟁", "가족", "멜로/로맨스", "어드벤쳐",
+            "판타지", "공포", "스포츠", "SF", "느와르", "반공/분단",
+            "첩보", "인물", "재난", "전기", "하이틴", "역사", "갱스터",
+            "사회물(경향)", "뮤직", "청춘", "활극", "뮤지컬", "신파", "무협"
           ].map((genre) => (
             <GenreOption
               key={genre}
@@ -414,20 +395,20 @@ function Select() {
           ))}
         </GenreSelection>
         <small style={{ color: "red" }}>
-          {selectedGenres.length >= 3
-            ? "최대 3개의 장르만 선택할 수 있습니다."
-            : ""}
+          {selectedGenres.length >= 3 ? "최대 3개의 장르만 선택할 수 있습니다." : ""}
         </small>
+
         <Label>영화 상영 시간을 선택하세요.</Label>
         <DurationControl>
-          <DurationButton onClick={decreaseDuration} disabled={duration <= 10}>
+          <DurationButton onClick={decreaseDuration} disabled={duration <= 60}>
             -
           </DurationButton>
           <DurationDisplay>{duration}분</DurationDisplay>
-          <DurationButton onClick={increaseDuration} disabled={duration >= 120}>
+          <DurationButton onClick={increaseDuration} disabled={duration >= 180}>
             +
           </DurationButton>
         </DurationControl>
+
         <Label>관람 등급을 선택하세요.</Label>
         <Select1 value={rating} onChange={(e) => setRating(e.target.value)}>
           <option value="all">전체 관람가</option>
@@ -435,31 +416,21 @@ function Select() {
           <option value="15">15세 이상 관람가</option>
           <option value="19">청소년 관람불가</option>
         </Select1>
+
         <Label>국가를 선택하세요.</Label>
         <Select1 value={country} onChange={(e) => setCountry(e.target.value)}>
           <option value="korea">한국</option>
-          <option value="china">중국</option>
           <option value="us">미국</option>
           <option value="uk">영국</option>
           <option value="japan">일본</option>
+          <option value="china">중국</option>
           <option value="france">프랑스</option>
           <option value="germany">독일</option>
-          <option value="india">인도</option>
-          <option value="brazil">브라질</option>
-          <option value="australia">호주</option>
-          <option value="canada">캐나다</option>
-          <option value="mexico">멕시코</option>
           <option value="italy">이탈리아</option>
           <option value="spain">스페인</option>
-          <option value="netherlands">네덜란드</option>
-          <option value="sweden">스웨덴</option>
-          <option value="norway">노르웨이</option>
-          <option value="denmark">덴마크</option>
-          <option value="austria">오스트리아</option>
-          <option value="switzerland">스위스</option>
-          <option value="poland">폴란드</option>
-          <option value="portugal">포르투갈</option>
+          <option value="india">인도</option>
         </Select1>
+
         <Label>메인 주인공의 성별을 선택하세요.</Label>
         <Select1
           value={mainCharacterGender}
@@ -469,6 +440,7 @@ function Select() {
           <option value="female">여성</option>
           <option value="mixed">혼성</option>
         </Select1>
+
         <CheckboxContainer>
           <Checkbox
             type="checkbox"
@@ -477,6 +449,7 @@ function Select() {
           />
           <Label>이 영화는 시리즈물입니까?</Label>
         </CheckboxContainer>
+
         <Label>키워드를 입력하세요.</Label>
         <TagWrap>
           <TagInput
@@ -504,6 +477,7 @@ function Select() {
             </Tag>
           ))}
         </TagContainer>
+
         <Label>등장인물을 입력하세요.</Label>
         <TagWrap>
           <TagInput
@@ -531,7 +505,8 @@ function Select() {
             </Tag>
           ))}
         </TagContainer>
-        <Label>gpt 요청사항을 입력하세요.</Label>
+
+        <Label>GPT 요청사항을 입력하세요.</Label>
         <TextArea
           value={request}
           onChange={(e) => setRequest(e.target.value)}

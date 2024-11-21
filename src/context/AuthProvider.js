@@ -25,7 +25,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (token) {
       axios
-        .get("43.200.111.65/api/v1/auth/profile", {
+        .get("http://127.0.0.1:8000/api/v1/auth/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -48,7 +48,7 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     try {
       const response = await axios.post(
-        "43.200.111.65/api/v1/auth/token",
+        "http://127.0.0.1:8000/api/v1/auth/token",
         {
           username: email,
           password: password,
@@ -82,7 +82,7 @@ export function AuthProvider({ children }) {
   const register = async (email, password, fullName, username) => {
     try {
       const response = await axios.post(
-        "http://43.200.111.65/api/v1/auth/register",
+        "http://http://127.0.0.1:8000/api/v1/auth/register",
         {
           email,
           password,

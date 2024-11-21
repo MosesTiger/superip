@@ -124,7 +124,7 @@ function Login() {
   };
 
   const handleOAuthLogin = (provider) => {
-    window.location.href = `http://43.200.111.65/api/v1/auth/${provider}`;
+    window.location.href = `http://http://127.0.0.1:8000/api/v1/auth/${provider}`;
   };
 
   return (

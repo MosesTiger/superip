@@ -213,7 +213,7 @@ function Signup() {
 
     try {
       const response = await axios.post(
-        "http://43.200.111.65/api/v1/auth/register",
+        "http://http://127.0.0.1:8000/api/v1/auth/register",
         {
           email: email,
           password: password,
