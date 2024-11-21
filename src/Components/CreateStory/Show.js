@@ -309,7 +309,7 @@ function Show() {
   const fetchUserScenarios = async () => {
     try {
       const response = await axios.get(
-        "http://127.0.0.1:8000/api/v1/scenario/user-scenarios",
+        "43.200.111.65/api/v1/scenario/user-scenarios",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -333,7 +333,7 @@ function Show() {
     if (scenarioId) {
       try {
         const response = await axios.get(
-          `http://127.0.0.1:8000/api/v1/scenario/${scenarioId}`,
+          `43.200.111.65/api/v1/scenario/${scenarioId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -354,7 +354,7 @@ function Show() {
   const fetchPredictionData = async (scenarioId) => {
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/v1/success_rate/final_predict",
+        "43.200.111.65/api/v1/success_rate/final_predict",
         {
           scenario_id: scenarioId,
         },

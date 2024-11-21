@@ -187,7 +187,7 @@ function Scenario() {
         setError(null);
         
         const response = await axios.get(
-          `http://127.0.0.1:8000/api/v1/scenario/user/${user.id}`,
+          `43.200.111.65/api/v1/scenario/user/${user.id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
