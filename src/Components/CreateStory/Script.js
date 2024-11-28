@@ -101,15 +101,7 @@ const ButtonWrap = styled.div`
   margin: 10px 0;
 `;
 
-const PredictButton = styled(Button)`
-  background-color: #e23a3a;
-  color: white;
-  font-weight: bold;
 
-  &:hover {
-    background-color: #cb3737;
-  }
-`;
 
 const PreviousFeedback = styled.div`
   margin: 10px 0;
@@ -345,15 +337,7 @@ function Script() {
     }
   };
 
-  const handlePrediction = async () => {
-    try {
-      await axiosInstance.get(`/scenario/prediction/${selectedScenarioId}`);
-      alert("흥행도 예측이 완료되었습니다.");
-    } catch (err) {
-      console.error("흥행도 예측 중 오류 발생:", err);
-      setError("흥행도 예측에 실패했습니다.");
-    }
-  };
+
 
   const progress = (currentChapter / chapterCount) * 100;
 
@@ -426,13 +410,7 @@ function Script() {
             </Button>
           </ButtonWrap>
 
-          {currentChapter === chapterCount && (
-            <ButtonWrap>
-              <PredictButton onClick={handlePrediction} disabled={isGenerating}>
-                흥행도 예측
-              </PredictButton>
-            </ButtonWrap>
-          )}
+    
         </>
       )}
 

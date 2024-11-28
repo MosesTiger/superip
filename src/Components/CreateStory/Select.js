@@ -400,11 +400,11 @@ function Select() {
 
         <Label>영화 상영 시간을 선택하세요.</Label>
         <DurationControl>
-          <DurationButton onClick={decreaseDuration} disabled={duration <= 60}>
+          <DurationButton onClick={decreaseDuration} disabled={duration <= 20}>
             -
           </DurationButton>
           <DurationDisplay>{duration}분</DurationDisplay>
-          <DurationButton onClick={increaseDuration} disabled={duration >= 180}>
+          <DurationButton onClick={increaseDuration} disabled={duration >= 120}>
             +
           </DurationButton>
         </DurationControl>
@@ -419,16 +419,28 @@ function Select() {
 
         <Label>국가를 선택하세요.</Label>
         <Select1 value={country} onChange={(e) => setCountry(e.target.value)}>
-          <option value="korea">한국</option>
+        <option value="korea">한국</option>
+          <option value="china">중국</option>
           <option value="us">미국</option>
           <option value="uk">영국</option>
           <option value="japan">일본</option>
-          <option value="china">중국</option>
           <option value="france">프랑스</option>
           <option value="germany">독일</option>
+          <option value="india">인도</option>
+          <option value="brazil">브라질</option>
+          <option value="australia">호주</option>
+          <option value="canada">캐나다</option>
+          <option value="mexico">멕시코</option>
           <option value="italy">이탈리아</option>
           <option value="spain">스페인</option>
-          <option value="india">인도</option>
+          <option value="netherlands">네덜란드</option>
+          <option value="sweden">스웨덴</option>
+          <option value="norway">노르웨이</option>
+          <option value="denmark">덴마크</option>
+          <option value="austria">오스트리아</option>
+          <option value="switzerland">스위스</option>
+          <option value="poland">폴란드</option>
+          <option value="portugal">포르투갈</option>
         </Select1>
 
         <Label>메인 주인공의 성별을 선택하세요.</Label>
