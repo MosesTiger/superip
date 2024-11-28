@@ -266,13 +266,13 @@ function Select() {
   };
 
   const increaseDuration = () => {
-    if (duration < 180) {
+    if (duration < 120) {
       setDuration(duration + 10);
     }
   };
 
   const decreaseDuration = () => {
-    if (duration > 60) {
+    if (duration > 20) {
       setDuration(duration - 10);
     }
   };
@@ -419,7 +419,7 @@ function Select() {
 
         <Label>국가를 선택하세요.</Label>
         <Select1 value={country} onChange={(e) => setCountry(e.target.value)}>
-        <option value="korea">한국</option>
+          <option value="korea">한국</option>
           <option value="china">중국</option>
           <option value="us">미국</option>
           <option value="uk">영국</option>
