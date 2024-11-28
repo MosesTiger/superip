@@ -1,5 +1,3 @@
-// Script.js
-
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
@@ -46,7 +44,7 @@ const NavButton = styled.button`
   transition: background-color 0.3s;
 
   &:disabled {
-    color: #f5f5f5;
+    color: #ccc;
     cursor: not-allowed;
   }
 `;
@@ -67,6 +65,8 @@ const TextArea = styled.textarea`
   color: #000;
   background-color: #f5f5f5;
   resize: vertical;
+  white-space: pre-wrap;
+  line-height: 1.5;
 `;
 
 const Button = styled.button`
@@ -98,15 +98,48 @@ const ButtonWrap = styled.div`
   display: flex;
   justify-content: flex-end;
   width: 100%;
+  margin: 10px 0;
 `;
 
 const PredictButton = styled(Button)`
   background-color: #e23a3a;
-  color: black;
+  color: white;
   font-weight: bold;
 
   &:hover {
     background-color: #cb3737;
+  }
+`;
+
+const PreviousFeedback = styled.div`
+  margin: 10px 0;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  border-left: 3px solid #28a745;
+  width: 100%;
+`;
+
+const ChapterProgress = styled.div`
+  width: 100%;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #666;
+`;
+
+const ProgressBar = styled.div`
+  width: 100%;
+  height: 10px;
+  background-color: #eee;
+  border-radius: 5px;
+  margin-top: 5px;
+  overflow: hidden;
+
+  div {
+    height: 100%;
+    background-color: #28a745;
+    width: ${props => props.progress}%;
+    transition: width 0.3s ease;
   }
 `;
 
@@ -117,27 +150,20 @@ function Script() {
   const [currentChapter, setCurrentChapter] = useState(1);
   const [chapterContent, setChapterContent] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [previousFeedback, setPreviousFeedback] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState(null);
   const [chapterCount, setChapterCount] = useState(0);
   const location = useLocation();
-  const {scenarioId: initialScenarioId, fromMyPage} = location.state || {};
+  const { scenarioId: initialScenarioId, fromMyPage } = location.state || {};
 
-  // Create an axios instance with baseURL and interceptors for authorization
   const axiosInstance = axios.create({
-    baseURL: "http://43.200.111.65/api/v1",
-  });
-
-  // Add a request interceptor to include the Authorization header
-  axiosInstance.interceptors.request.use(
-    (config) => {
-      if (token) {
-        config.headers['Authorization'] = `Bearer ${token}`;
-      }
-      return config;
+    baseURL: 'http://43.200.111.65/api/v1',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
     },
-    (error) => Promise.reject(error)
-  );
+  });
 
   useEffect(() => {
     fetchUserScenarios();
@@ -151,132 +177,156 @@ function Script() {
       const scenario = userScenarios.find((s) => s.id === parseInt(selectedScenarioId));
       if (scenario) {
         setChapterCount(scenario.chapter_count);
-        fetchChapterContent(selectedScenarioId, 1); 
+        fetchChapterContent(selectedScenarioId, 1);
         fetchFeedback(selectedScenarioId, 1);
       }
     }
-  }, [selectedScenarioId, userScenarios]);
+  }, [selectedScenarioId]);
 
   const fetchUserScenarios = async () => {
     try {
-      const response = await axiosInstance.get("/scenario/user-scenarios");
+      const response = await axiosInstance.get('/scenario/user-scenarios');
       setUserScenarios(response.data);
     } catch (err) {
-      console.error("시나리오를 가져오는 중 오류 발생:", err);
-      setError("시나리오를 가져오는 데 실패했습니다.");
+      console.error("시나리오 목록 조회 중 오류:", err);
+      setError("시나리오 목록을 불러오는데 실패했습니다.");
     }
   };
 
-  const handleScenarioSelect = async (e) => {
-    const scenarioId = e.target.value;
-    setSelectedScenarioId(scenarioId);
-    setCurrentChapter(1);
-    setChapterContent("");
-    setFeedback("");
-    setError(null);
-    if (scenarioId) {
-      const scenario = userScenarios.find((s) => s.id === parseInt(scenarioId));
-      setChapterCount(scenario.chapter_count);
-      await fetchChapterContent(scenarioId, 1);
-      await fetchFeedback(scenarioId, 1);
-    }
-  };
-
-  const handlePreviousChapter = async () => {
-    if (currentChapter > 1) {
-      const newChapter = currentChapter - 1;
-      setCurrentChapter(newChapter);
-      await fetchChapterContent(selectedScenarioId, newChapter);
-      await fetchFeedback(selectedScenarioId, newChapter);
-    }
-  };
-
-  const handleNextChapter = async () => {
-    if (currentChapter < chapterCount) {
-      const newChapter = currentChapter + 1;
-      setCurrentChapter(newChapter);
-      await fetchChapterContent(selectedScenarioId, newChapter);
-      await fetchFeedback(selectedScenarioId, newChapter);
-    }
-  };
-
-  const fetchChapterContent = async (scenarioId, chapterNumber) => {
+  const fetchChapterContent = async (scenarioId, chapter) => {
     try {
-      const response = await axiosInstance.get(`/scenario/${scenarioId}/chapters/${chapterNumber}`);
+      const response = await axiosInstance.get(
+        `/scenario/${scenarioId}/chapters/${chapter}`
+      );
       setChapterContent(response.data.content || "");
     } catch (err) {
-      console.error("챕터 내용을 가져오는 중 오류 발생:", err);
-      setError("챕터 내용을 가져오는 데 실패했습니다.");
+      console.error("챕터 내용 조회 중 오류:", err);
       setChapterContent("");
     }
   };
 
-  const fetchFeedback = async (scenarioId, chapterNumber) => {
+  const fetchFeedback = async (scenarioId, chapter) => {
     try {
-      const response = await axiosInstance.get(`/scenario/${scenarioId}/chapters/${chapterNumber}/feedback`);
+      const response = await axiosInstance.get(
+        `/scenario/${scenarioId}/chapters/${chapter}/feedback`
+      );
       setFeedback(response.data.content || "");
     } catch (err) {
-      console.error("피드백을 가져오는 중 오류 발생:", err);
-      setError("피드백을 가져오는 데 실패했습니다.");
+      console.error("피드백 조회 중 오류:", err);
       setFeedback("");
+    }
+  };
+
+  const fetchPreviousFeedback = async (scenarioId, chapter) => {
+    if (chapter > 1) {
+      try {
+        const response = await axiosInstance.get(
+          `/scenario/${scenarioId}/chapters/${chapter - 1}/feedback`
+        );
+        setPreviousFeedback(response.data.content || "");
+      } catch (err) {
+        console.error("이전 챕터 피드백 조회 중 오류:", err);
+        setPreviousFeedback("");
+      }
+    } else {
+      setPreviousFeedback("");
+    }
+  };
+
+  const handleScenarioSelect = (event) => {
+    const newScenarioId = event.target.value;
+    setSelectedScenarioId(newScenarioId);
+    setCurrentChapter(1);
+    setChapterContent("");
+    setFeedback("");
+    setPreviousFeedback("");
+  };
+
+  const handleChapterChange = async (newChapter) => {
+    setCurrentChapter(newChapter);
+    await fetchChapterContent(selectedScenarioId, newChapter);
+    await fetchFeedback(selectedScenarioId, newChapter);
+    await fetchPreviousFeedback(selectedScenarioId, newChapter);
+  };
+
+  const handlePreviousChapter = () => {
+    if (currentChapter > 1) {
+      handleChapterChange(currentChapter - 1);
+    }
+  };
+
+  const handleNextChapter = () => {
+    if (currentChapter < chapterCount) {
+      handleChapterChange(currentChapter + 1);
     }
   };
 
   const generateChapter = async () => {
     setIsGenerating(true);
     setError(null);
-    setChapterContent(""); // 새로운 생성 시작 시 기존 내용 초기화
+    setChapterContent('');
+  
+    const controller = new AbortController();
+    let contentBuffer = '';
+  
     try {
-      const response = await fetch(
-        `http://43.200.111.65/api/v1/scenario/${selectedScenarioId}/chapters/${currentChapter}/generate`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        }
-      );
-
+      const response = await fetch(`http://43.200.111.65/api/v1/scenario/${selectedScenarioId}/chapters/${currentChapter}/generate`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'text/event-stream',
+          'Content-Type': 'application/json',
+        },
+        signal: controller.signal,
+      });
+  
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-
+  
       const reader = response.body.getReader();
-      const decoder = new TextDecoder('utf-8');
-      let doneReading = false;
-
-      while (!doneReading) {
+      const decoder = new TextDecoder();
+  
+      while (true) {
         const { value, done } = await reader.read();
-        doneReading = done;
-        if (value) {
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split('\n').filter(line => line.trim() !== '');
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const dataStr = line.slice(6);
-              if (dataStr === '[DONE]') {
-                doneReading = true;
-                break;
-              } else {
-                try {
-                  const data = JSON.parse(dataStr);
-                  if (data.type === 'content') {
-                    setChapterContent(prev => prev + data.content);
-                  }
-                } catch (parseError) {
-                  console.error("데이터 파싱 오류:", parseError);
-                }
+        if (done) break;
+  
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+  
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(5).trim();
+            
+            if (data === '[DONE]') {
+              console.log('Stream completed');
+              continue;
+            }
+  
+            try {
+              const parsedData = JSON.parse(data);
+              if (parsedData.type === 'content' && parsedData.content) {
+                contentBuffer += parsedData.content;
+                setChapterContent(contentBuffer);
               }
+            } catch (e) {
+              console.error('Error parsing SSE data:', e);
             }
           }
         }
       }
-
-      // 챕터 생성 후 업데이트된 내용 가져오기
-      await fetchChapterContent(selectedScenarioId, currentChapter);
+  
     } catch (err) {
       console.error("챕터 생성 중 오류 발생:", err);
-      setError("챕터 생성에 실패했습니다.");
+      if (err.name === 'AbortError') {
+        setError("요청이 취소되었습니다.");
+      } else if (err.response?.status === 404) {
+        setError("시나리오 또는 챕터를 찾을 수 없습니다.");
+      } else if (err.response?.status === 401) {
+        setError("인증이 필요합니다.");
+      } else {
+        setError("챕터 생성 중 오류가 발생했습니다. 다시 시도해주세요.");
+      }
     } finally {
       setIsGenerating(false);
     }
@@ -286,12 +336,7 @@ function Script() {
     try {
       await axiosInstance.post(
         `/scenario/${selectedScenarioId}/chapters/${currentChapter}/feedback`,
-        { content: feedback },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
+        { content: feedback }
       );
       alert("피드백이 저장되었습니다.");
     } catch (err) {
@@ -310,6 +355,8 @@ function Script() {
     }
   };
 
+  const progress = (currentChapter / chapterCount) * 100;
+
   return (
     <Section>
       <Select onChange={handleScenarioSelect} value={selectedScenarioId || ""}>
@@ -323,6 +370,13 @@ function Script() {
 
       {selectedScenarioId && (
         <>
+          <ChapterProgress>
+            진행률: {progress.toFixed(1)}%
+            <ProgressBar progress={progress}>
+              <div />
+            </ProgressBar>
+          </ChapterProgress>
+
           <ChapterNavigation>
             <NavButton
               onClick={handlePreviousChapter}
@@ -341,23 +395,31 @@ function Script() {
             </NavButton>
           </ChapterNavigation>
 
+          {currentChapter > 1 && previousFeedback && (
+            <PreviousFeedback>
+              <strong>이전 챕터 피드백:</strong>
+              <p>{previousFeedback}</p>
+            </PreviousFeedback>
+          )}
+
           <TextArea
             value={chapterContent}
-            onChange={(e) => setChapterContent(e.target.value)}
-            placeholder="챕터 내용"
-            readOnly={true}
+            readOnly
+            placeholder="챕터 내용이 여기에 표시됩니다."
           />
 
           <ButtonWrap>
-            <Button onClick={generateChapter} disabled={isGenerating || chapterContent}>
+            <Button onClick={generateChapter} disabled={isGenerating}>
               {isGenerating ? "생성 중..." : chapterContent ? "재생성" : "챕터 생성"}
             </Button>
           </ButtonWrap>
+
           <TextArea
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
-            placeholder="피드백을 입력하세요"
+            placeholder="이 챕터에 대한 피드백을 입력하세요"
           />
+
           <ButtonWrap>
             <Button onClick={saveFeedback} disabled={isGenerating}>
               피드백 저장
