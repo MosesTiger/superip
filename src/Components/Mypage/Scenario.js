@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { GoChevronLeft, GoChevronRight } from "react-icons/go";
 
-
+//빌드
 const fadeIn = keyframes`
   from {
     opacity: 0;
