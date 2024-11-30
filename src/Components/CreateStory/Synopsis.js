@@ -113,7 +113,6 @@ const LabelWrap = styled.div`
 function Synopsis() {
   const [plot, setPlot] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [successRate, setSuccessRate] = useState(null);
   const [selectedScenarioTitle, setSelectedScenarioTitle] = useState("");
   const [title, setTitle] = useState("");
   const [userScenarios, setUserScenarios] = useState([]);
@@ -152,7 +151,6 @@ function Synopsis() {
     } else {
       setTitle("");
       setPlot("");
-      setSuccessRate(null);
     }
   };
 
@@ -168,7 +166,6 @@ function Synopsis() {
       const data = response.data;
       setTitle(data.title);
       setPlot(data.synopsis || "");
-      setSuccessRate(data.first_prediction_rate || null);
       setError(null);
     } catch (error) {
       handleApiError(error, "시나리오 정보를 가져오는 중 오류가 발생했습니다.");
@@ -182,7 +179,6 @@ function Synopsis() {
     }
     setIsGenerating(true);
     setPlot("");
-    setSuccessRate(null);
     setError(null);
 
     try {
@@ -198,21 +194,27 @@ function Synopsis() {
       const eventSource = new EventSource(url);
       eventSourceRef.current = eventSource;
 
+      let synopsisText = "";
+      let predictionRate = "";
+
       eventSource.onmessage = (e) => {
-        setPlot(prev => prev + e.data);
+        if (e.data.includes("예상 흥행률:")) {
+          predictionRate = e.data;
+        } else {
+          synopsisText += e.data;
+          setPlot(synopsisText + (predictionRate ? `\n\n${predictionRate}` : ""));
+        }
       };
 
-      eventSource.addEventListener('prediction', (e) => {
-        const data = JSON.parse(e.data);
-        setSuccessRate(data.first_prediction_rate);
+      eventSource.addEventListener('error', (e) => {
+        console.error("EventSource failed:", e);
+        setError("시놉시스 생성 중 오류가 발생했습니다.");
         setIsGenerating(false);
         eventSource.close();
         eventSourceRef.current = null;
       });
 
-      eventSource.addEventListener('error', (e) => {
-        console.error("EventSource failed:", e);
-        setError("시놉시스 생성 중 오류가 발생했습니다.");
+      eventSource.addEventListener('complete', () => {
         setIsGenerating(false);
         eventSource.close();
         eventSourceRef.current = null;
@@ -265,9 +267,6 @@ function Synopsis() {
             value={plot}
             readOnly={true}
           />
-          {successRate && (
-            <SuccessRateDisplay>예상 흥행률: {successRate}</SuccessRateDisplay>
-          )}
           <ButtonContainer>
             <Button
               onClick={generateSynopsis}
