@@ -144,6 +144,22 @@ function Synopsis() {
     }
   };
 
+  const fetchSuccessRate = async (scenarioId) => {
+    try {
+      const response = await axios.get(
+        `http://43.200.111.65/api/v1/success_rate/scenario/${scenarioId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setSuccessRate(response.data.first_predicted_rate);
+    } catch (error) {
+      console.error("Error fetching success rate:", error);
+    }
+  };
+
   const handleScenarioChange = (e) => {
     const selectedTitle = e.target.value;
     setSelectedScenarioTitle(selectedTitle);
@@ -200,20 +216,8 @@ function Synopsis() {
       let synopsisText = "";
 
       eventSource.onmessage = (e) => {
-        try {
-          // 데이터가 JSON 형식인지 확인
-          const data = JSON.parse(e.data);
-          if (data.first_prediction_rate) {
-            setSuccessRate(data.first_prediction_rate);
-          } else {
-            synopsisText += e.data;
-            setPlot(synopsisText);
-          }
-        } catch {
-          // JSON이 아닌 경우 일반 텍스트로 처리
-          synopsisText += e.data;
-          setPlot(synopsisText);
-        }
+        synopsisText += e.data;
+        setPlot(synopsisText);
       };
 
       eventSource.addEventListener('error', (e) => {
@@ -228,6 +232,8 @@ function Synopsis() {
         setIsGenerating(false);
         eventSource.close();
         eventSourceRef.current = null;
+        // 시놉시스 생성이 완료되면 1차 흥행률을 가져옴
+        fetchSuccessRate(scenarioId);
       });
 
     } catch (error) {
