@@ -144,7 +144,7 @@ function Synopsis() {
     }
   };
 
-  const fetchSuccessRate = async (scenarioId) => {
+  const fetchSuccessRate = async (scenarioId, retryCount = 0) => {
     try {
       const response = await axios.get(
         `http://43.200.111.65/api/v1/success_rate/scenario/${scenarioId}`,
@@ -156,9 +156,20 @@ function Synopsis() {
       );
       if (response.data && response.data.first_predicted_rate) {
         setSuccessRate(response.data.first_predicted_rate);
+      } else if (retryCount < 3) { // 최대 3번까지 재시도
+        // 1초 후에 다시 시도
+        setTimeout(() => {
+          fetchSuccessRate(scenarioId, retryCount + 1);
+        }, 1000);
       }
     } catch (error) {
-      console.error("Error fetching success rate:", error);
+      if (retryCount < 3) { // 에러가 발생해도 3번까지 재시도
+        setTimeout(() => {
+          fetchSuccessRate(scenarioId, retryCount + 1);
+        }, 1000);
+      } else {
+        console.error("Error fetching success rate:", error);
+      }
     }
   };
 
@@ -203,6 +214,7 @@ function Synopsis() {
     }
     setIsGenerating(true);
     setPlot("");
+    setSuccessRate(null);
     setError(null);
 
     try {
@@ -237,8 +249,10 @@ function Synopsis() {
         setIsGenerating(false);
         eventSource.close();
         eventSourceRef.current = null;
-        // 시놉시스 생성이 완료되면 1차 흥행률을 가져옴
-        await fetchSuccessRate(scenarioId);
+        // 시놉시스 생성이 완료되면 약간의 지연 후 1차 흥행률을 가져옴
+        setTimeout(() => {
+          fetchSuccessRate(scenarioId);
+        }, 2000); // 2초 후에 첫 시도
       });
 
     } catch (error) {
