@@ -47,67 +47,67 @@ const Button = styled.button`
   background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 4px;
-  font-size: 16px;
+  border-radius: 5px;
   cursor: pointer;
-  margin-left: 10px;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-
+  font-size: 16px;
   &:disabled {
-    background-color: #cccccc;
+    background-color: #ccc;
     cursor: not-allowed;
   }
-`;
-
-const ErrorMessage = styled.div`
-  color: red;
-  margin-top: 10px;
-`;
-
-const SuccessRateDisplay = styled.div`
-  font-size: 18px;
-  margin-top: 10px;
-  color: #4a4a4a;
-  font-weight: bold;
-  padding: 10px;
-  background-color: #f0f0f0;
-  border-radius: 5px;
-  text-align: center;
+  &:hover:not(:disabled) {
+    background-color: #0056b3;
+  }
 `;
 
 const Label = styled.label`
-  font-weight: bold;
-  margin-top: 20px;
+  font-size: 16px;
+  color: #4a4a4a;
   margin-bottom: 10px;
   display: block;
 `;
 
 const Select = styled.select`
   width: 100%;
-  padding: 10px;
-  margin-top: 5px;
+  padding: 8px;
+  margin-bottom: 20px;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 16px;
 `;
 
-const RefreshButton = styled.button`
-  background-color: #f5f5f5;
-  color: black;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  margin-left: 10px;
-  width: 120px;
+const ErrorMessage = styled.div`
+  color: red;
+  margin-bottom: 10px;
+`;
+
+const SuccessRateDisplay = styled.div`
+  font-size: 18px;
+  color: #28a745;
+  margin: 15px 0;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  text-align: center;
 `;
 
 const LabelWrap = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+`;
+
+const RefreshButton = styled.button`
+  padding: 5px 10px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  &:hover {
+    background-color: #5a6268;
+  }
 `;
 
 function Synopsis() {
@@ -159,7 +159,6 @@ function Synopsis() {
       }
     } catch (error) {
       console.error("Error fetching success rate:", error);
-      // 흥행률 조회 실패 시 에러 메시지를 표시하지 않고 조용히 처리
     }
   };
 
@@ -248,7 +247,20 @@ function Synopsis() {
     }
   };
 
-  // ... handleApiError 함수는 동일 ...
+  const handleApiError = (error, defaultMessage) => {
+    let errorMessage = defaultMessage;
+    if (error.response) {
+      if (error.response.status === 401) {
+        errorMessage = "인증 토큰이 만료되었습니다. 다시 로그인해주세요.";
+        logout();
+      } else if (error.response.status === 422) {
+        errorMessage = `데이터 형식이 올바르지 않습니다. 오류 메시지: ${JSON.stringify(error.response.data)}`;
+      } else if (error.response.data && error.response.data.detail) {
+        errorMessage = error.response.data.detail;
+      }
+    }
+    setError(errorMessage);
+  };
 
   return (
     <Section>
