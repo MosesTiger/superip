@@ -118,6 +118,7 @@ function Synopsis() {
   const [userScenarios, setUserScenarios] = useState([]);
   const [error, setError] = useState(null);
   const [successRate, setSuccessRate] = useState(null);
+  const [isPolling, setIsPolling] = useState(false);
   const { token, logout } = useAuth();
 
   useEffect(() => {
@@ -130,6 +131,7 @@ function Synopsis() {
   }, [token]);
 
   const eventSourceRef = React.useRef(null);
+  const pollingTimeoutRef = React.useRef(null);
 
   const fetchUserScenarios = async () => {
     try {
@@ -144,7 +146,45 @@ function Synopsis() {
     }
   };
 
-  const fetchSuccessRate = async (scenarioId, retryCount = 0) => {
+  const startPollingSuccessRate = (scenarioId) => {
+    setIsPolling(true);
+    let attempts = 0;
+    const maxAttempts = 10; // 최대 10번 시도
+    const pollInterval = 1000; // 1초마다 시도
+
+    const pollSuccessRate = async () => {
+      if (attempts >= maxAttempts) {
+        setIsPolling(false);
+        return;
+      }
+
+      try {
+        const response = await axios.get(
+          `http://43.200.111.65/api/v1/success_rate/scenario/${scenarioId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.data && response.data.first_predicted_rate) {
+          setSuccessRate(response.data.first_predicted_rate);
+          setIsPolling(false);
+        } else {
+          attempts++;
+          pollingTimeoutRef.current = setTimeout(pollSuccessRate, pollInterval);
+        }
+      } catch (error) {
+        attempts++;
+        pollingTimeoutRef.current = setTimeout(pollSuccessRate, pollInterval);
+      }
+    };
+
+    pollSuccessRate();
+  };
+
+  const fetchSuccessRate = async (scenarioId) => {
     try {
       const response = await axios.get(
         `http://43.200.111.65/api/v1/success_rate/scenario/${scenarioId}`,
@@ -156,20 +196,9 @@ function Synopsis() {
       );
       if (response.data && response.data.first_predicted_rate) {
         setSuccessRate(response.data.first_predicted_rate);
-      } else if (retryCount < 3) { // 최대 3번까지 재시도
-        // 1초 후에 다시 시도
-        setTimeout(() => {
-          fetchSuccessRate(scenarioId, retryCount + 1);
-        }, 1000);
       }
     } catch (error) {
-      if (retryCount < 3) { // 에러가 발생해도 3번까지 재시도
-        setTimeout(() => {
-          fetchSuccessRate(scenarioId, retryCount + 1);
-        }, 1000);
-      } else {
-        console.error("Error fetching success rate:", error);
-      }
+      console.error("Error fetching success rate:", error);
     }
   };
 
@@ -180,7 +209,7 @@ function Synopsis() {
       const scenario = userScenarios.find(s => s.title === selectedTitle);
       if (scenario) {
         fetchScenarioDetails(selectedTitle);
-        fetchSuccessRate(scenario.id);
+        fetchSuccessRate(scenario.id); // 기존 시나리오의 경우 바로 흥행률 조회
       }
     } else {
       setTitle("");
@@ -249,10 +278,8 @@ function Synopsis() {
         setIsGenerating(false);
         eventSource.close();
         eventSourceRef.current = null;
-        // 시놉시스 생성이 완료되면 약간의 지연 후 1차 흥행률을 가져옴
-        setTimeout(() => {
-          fetchSuccessRate(scenarioId);
-        }, 2000); // 2초 후에 첫 시도
+        // 시놉시스 생성이 완료되면 폴링 시작
+        startPollingSuccessRate(scenarioId);
       });
 
     } catch (error) {
@@ -275,6 +302,15 @@ function Synopsis() {
     }
     setError(errorMessage);
   };
+
+  // 컴포넌트가 언마운트될 때 정리
+  useEffect(() => {
+    return () => {
+      if (pollingTimeoutRef.current) {
+        clearTimeout(pollingTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <Section>
@@ -305,6 +341,11 @@ function Synopsis() {
           {successRate && (
             <SuccessRateDisplay>
               예상 흥행률: {successRate}
+            </SuccessRateDisplay>
+          )}
+          {isPolling && (
+            <SuccessRateDisplay>
+              흥행률 분석 중...
             </SuccessRateDisplay>
           )}
           <ButtonContainer>
