@@ -113,8 +113,6 @@ const LabelWrap = styled.div`
 function Synopsis() {
   const [plot, setPlot] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isSynopsisComplete, setIsSynopsisComplete] = useState(false);
-  const [successRate, setSuccessRate] = useState(null);
   const [selectedScenarioTitle, setSelectedScenarioTitle] = useState("");
   const [title, setTitle] = useState("");
   const [userScenarios, setUserScenarios] = useState([]);
@@ -153,8 +151,6 @@ function Synopsis() {
     } else {
       setTitle("");
       setPlot("");
-      setIsSynopsisComplete(false);
-      setSuccessRate(null);
     }
   };
 
@@ -170,12 +166,7 @@ function Synopsis() {
       const data = response.data;
       setTitle(data.title);
       setPlot(data.synopsis || "");
-      setIsSynopsisComplete(!!data.synopsis);
       setError(null);
-
-      if (data.synopsis) {
-        await fetchPrediction(data.id);
-      }
     } catch (error) {
       handleApiError(error, "시나리오 정보를 가져오는 중 오류가 발생했습니다.");
     }
@@ -188,8 +179,6 @@ function Synopsis() {
     }
     setIsGenerating(true);
     setPlot("");
-    setSuccessRate(null);
-    setIsSynopsisComplete(false);
     setError(null);
 
     try {
@@ -205,18 +194,17 @@ function Synopsis() {
       const eventSource = new EventSource(url);
       eventSourceRef.current = eventSource;
 
-      eventSource.onmessage = (e) => {
-        setPlot(prev => prev + e.data);
-      };
+      let synopsisText = "";
+      let predictionRate = "";
 
-      eventSource.addEventListener('prediction', (e) => {
-        const data = JSON.parse(e.data);
-        setSuccessRate(data.first_prediction_rate); // 응답 형식에 맞게 수정
-        setIsSynopsisComplete(true);
-        setIsGenerating(false);
-        eventSource.close();
-        eventSourceRef.current = null;
-      });
+      eventSource.onmessage = (e) => {
+        if (e.data.includes("예상 흥행률:")) {
+          predictionRate = e.data;
+        } else {
+          synopsisText += e.data;
+          setPlot(synopsisText + (predictionRate ? `\n\n${predictionRate}` : ""));
+        }
+      };
 
       eventSource.addEventListener('error', (e) => {
         console.error("EventSource failed:", e);
@@ -226,25 +214,15 @@ function Synopsis() {
         eventSourceRef.current = null;
       });
 
+      eventSource.addEventListener('complete', () => {
+        setIsGenerating(false);
+        eventSource.close();
+        eventSourceRef.current = null;
+      });
+
     } catch (error) {
       handleApiError(error, "시놉시스 생성 중 오류가 발생했습니다.");
       setIsGenerating(false);
-    }
-  };
-
-  const fetchPrediction = async (scenarioId) => {
-    try {
-      const response = await axios.get(
-        `http://43.200.111.65/api/v1/synopsis/prediction/${scenarioId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setSuccessRate(response.data.first_prediction_rate); // 응답 형식에 맞게 수정
-    } catch (error) {
-      handleApiError(error, "예측 결과를 가져오는 중 오류가 발생했습니다.");
     }
   };
 
@@ -287,12 +265,8 @@ function Synopsis() {
           <TextArea
             placeholder="시놉시스를 생성하려면 '시놉시스 생성' 버튼을 클릭하세요."
             value={plot}
-            onChange={(e) => setPlot(e.target.value)}
             readOnly={true}
           />
-          {successRate && (
-            <SuccessRateDisplay>예상 흥행률: {successRate}</SuccessRateDisplay>
-          )}
           <ButtonContainer>
             <Button
               onClick={generateSynopsis}
