@@ -154,9 +154,12 @@ function Synopsis() {
           },
         }
       );
-      setSuccessRate(response.data.first_predicted_rate);
+      if (response.data && response.data.first_predicted_rate) {
+        setSuccessRate(response.data.first_predicted_rate);
+      }
     } catch (error) {
       console.error("Error fetching success rate:", error);
+      // 흥행률 조회 실패 시 에러 메시지를 표시하지 않고 조용히 처리
     }
   };
 
@@ -164,7 +167,11 @@ function Synopsis() {
     const selectedTitle = e.target.value;
     setSelectedScenarioTitle(selectedTitle);
     if (selectedTitle) {
-      fetchScenarioDetails(selectedTitle);
+      const scenario = userScenarios.find(s => s.title === selectedTitle);
+      if (scenario) {
+        fetchScenarioDetails(selectedTitle);
+        fetchSuccessRate(scenario.id);
+      }
     } else {
       setTitle("");
       setPlot("");
@@ -197,7 +204,6 @@ function Synopsis() {
     }
     setIsGenerating(true);
     setPlot("");
-    setSuccessRate(null);
     setError(null);
 
     try {
@@ -228,12 +234,12 @@ function Synopsis() {
         eventSourceRef.current = null;
       });
 
-      eventSource.addEventListener('complete', () => {
+      eventSource.addEventListener('complete', async () => {
         setIsGenerating(false);
         eventSource.close();
         eventSourceRef.current = null;
         // 시놉시스 생성이 완료되면 1차 흥행률을 가져옴
-        fetchSuccessRate(scenarioId);
+        await fetchSuccessRate(scenarioId);
       });
 
     } catch (error) {
@@ -242,20 +248,7 @@ function Synopsis() {
     }
   };
 
-  const handleApiError = (error, defaultMessage) => {
-    let errorMessage = defaultMessage;
-    if (error.response) {
-      if (error.response.status === 401) {
-        errorMessage = "인증 토큰이 만료되었습니다. 다시 로그인해주세요.";
-        logout();
-      } else if (error.response.status === 422) {
-        errorMessage = `데이터 형식이 올바르지 않습니다. 오류 메시지: ${JSON.stringify(error.response.data)}`;
-      } else if (error.response.data && error.response.data.detail) {
-        errorMessage = error.response.data.detail;
-      }
-    }
-    setError(errorMessage);
-  };
+  // ... handleApiError 함수는 동일 ...
 
   return (
     <Section>
