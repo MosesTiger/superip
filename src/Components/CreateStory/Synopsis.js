@@ -86,6 +86,11 @@ const Select = styled.select`
 const ErrorMessage = styled.div`
   color: red;
   margin-bottom: 10px;
+  text-align: center;
+  padding: 10px;
+  background-color: #ffe6e6;
+  border-radius: 5px;
+  display: ${props => props.error ? 'block' : 'none'};
 `;
 
 const SuccessRateDisplay = styled.div`
@@ -149,7 +154,7 @@ function Synopsis() {
       });
       setUserScenarios(response.data);
     } catch (error) {
-      handleApiError(error, "시나리오 목록을 가져오는 중 오류가 발생했습니다.");
+      console.error("Error fetching scenarios:", error);
     }
   };
 
@@ -182,6 +187,8 @@ function Synopsis() {
     }
     
     setIsLoadingRate(true);
+    setError(null);
+    
     try {
       const success = await fetchSuccessRate(scenarioId);
       if (!success) {
@@ -197,6 +204,7 @@ function Synopsis() {
   const handleScenarioChange = (e) => {
     const selectedTitle = e.target.value;
     setSelectedScenarioTitle(selectedTitle);
+    setError(null);
     if (selectedTitle) {
       const scenario = userScenarios.find(s => s.title === selectedTitle);
       if (scenario) {
@@ -222,9 +230,8 @@ function Synopsis() {
       const data = response.data;
       setTitle(data.title);
       setPlot(data.synopsis || "");
-      setError(null);
     } catch (error) {
-      handleApiError(error, "시나리오 정보를 가져오는 중 오류가 발생했습니다.");
+      console.error("Error fetching scenario details:", error);
     }
   };
 
@@ -241,7 +248,6 @@ function Synopsis() {
     try {
       const scenarioId = userScenarios.find(s => s.title === selectedScenarioTitle)?.id;
       if (!scenarioId) {
-        setError("선택된 시나리오의 ID를 찾을 수 없습니다.");
         setIsGenerating(false);
         return;
       }
@@ -260,7 +266,6 @@ function Synopsis() {
 
       eventSource.addEventListener('error', (e) => {
         console.error("EventSource failed:", e);
-        setError("시놉시스 생성 중 오류가 발생했습니다.");
         setIsGenerating(false);
         eventSource.close();
         eventSourceRef.current = null;
@@ -273,24 +278,9 @@ function Synopsis() {
       });
 
     } catch (error) {
-      handleApiError(error, "시놉시스 생성 중 오류가 발생했습니다.");
+      console.error("Synopsis generation error:", error);
       setIsGenerating(false);
     }
-  };
-
-  const handleApiError = (error, defaultMessage) => {
-    let errorMessage = defaultMessage;
-    if (error.response) {
-      if (error.response.status === 401) {
-        errorMessage = "인증 토큰이 만료되었습니다. 다시 로그인해주세요.";
-        logout();
-      } else if (error.response.status === 422) {
-        errorMessage = `데이터 형식이 올바르지 않습니다. 오류 메시지: ${JSON.stringify(error.response.data)}`;
-      } else if (error.response.data && error.response.data.detail) {
-        errorMessage = error.response.data.detail;
-      }
-    }
-    setError(errorMessage);
   };
 
   return (
