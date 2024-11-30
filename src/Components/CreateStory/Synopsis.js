@@ -117,6 +117,7 @@ function Synopsis() {
   const [title, setTitle] = useState("");
   const [userScenarios, setUserScenarios] = useState([]);
   const [error, setError] = useState(null);
+  const [successRate, setSuccessRate] = useState(null);
   const { token, logout } = useAuth();
 
   useEffect(() => {
@@ -151,6 +152,7 @@ function Synopsis() {
     } else {
       setTitle("");
       setPlot("");
+      setSuccessRate(null);
     }
   };
 
@@ -179,6 +181,7 @@ function Synopsis() {
     }
     setIsGenerating(true);
     setPlot("");
+    setSuccessRate(null);
     setError(null);
 
     try {
@@ -195,14 +198,21 @@ function Synopsis() {
       eventSourceRef.current = eventSource;
 
       let synopsisText = "";
-      let predictionRate = "";
 
       eventSource.onmessage = (e) => {
-        if (e.data.includes("예상 흥행률:")) {
-          predictionRate = e.data;
-        } else {
+        try {
+          // 데이터가 JSON 형식인지 확인
+          const data = JSON.parse(e.data);
+          if (data.first_prediction_rate) {
+            setSuccessRate(data.first_prediction_rate);
+          } else {
+            synopsisText += e.data;
+            setPlot(synopsisText);
+          }
+        } catch {
+          // JSON이 아닌 경우 일반 텍스트로 처리
           synopsisText += e.data;
-          setPlot(synopsisText + (predictionRate ? `\n\n${predictionRate}` : ""));
+          setPlot(synopsisText);
         }
       };
 
@@ -267,6 +277,11 @@ function Synopsis() {
             value={plot}
             readOnly={true}
           />
+          {successRate && (
+            <SuccessRateDisplay>
+              예상 흥행률: {successRate}
+            </SuccessRateDisplay>
+          )}
           <ButtonContainer>
             <Button
               onClick={generateSynopsis}
