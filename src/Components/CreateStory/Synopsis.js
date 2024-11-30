@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from "../../context/AuthProvider";
 
 const Section = styled.section`
@@ -60,10 +59,6 @@ const Button = styled.button`
   &:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
-
-    &:hover {
-      background-color: #cccccc;
-    }
   }
 `;
 
@@ -110,25 +105,6 @@ const RefreshButton = styled.button`
   width: 120px;
 `;
 
-const ExpectButton = styled(Button)`
-  background-color: #e0a800;
-  color: #000;
-
-  &:hover {
-    background-color: #cc9a04;
-  }
-`;
-
-const CombinedButton = styled(Button)`
-  background-color: ${(props) =>
-    props.isSynopsisComplete ? "#28a745" : "#E23A3A"};
-
-  &:hover {
-    background-color: ${(props) =>
-      props.isSynopsisComplete ? "#218838" : "#C53838"};
-  }
-`;
-
 const LabelWrap = styled.div`
   display: flex;
   justify-content: space-between;
@@ -143,19 +119,15 @@ function Synopsis() {
   const [title, setTitle] = useState("");
   const [userScenarios, setUserScenarios] = useState([]);
   const [error, setError] = useState(null);
-  const [gptRequest, setGptRequest] = useState("");
-  const navigate = useNavigate();
   const { token, logout } = useAuth();
 
   useEffect(() => {
     fetchUserScenarios();
-    // Cleanup function to close EventSource when component unmounts
     return () => {
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   const eventSourceRef = React.useRef(null);
@@ -179,7 +151,6 @@ function Synopsis() {
     if (selectedTitle) {
       fetchScenarioDetails(selectedTitle);
     } else {
-      // 선택 취소 시 상태 초기화
       setTitle("");
       setPlot("");
       setIsSynopsisComplete(false);
@@ -203,7 +174,6 @@ function Synopsis() {
       setError(null);
 
       if (data.synopsis) {
-        // 시놉시스가 이미 존재하는 경우, 예측 결과 가져오기
         await fetchPrediction(data.id);
       }
     } catch (error) {
@@ -217,9 +187,9 @@ function Synopsis() {
       return;
     }
     setIsGenerating(true);
-    setPlot(""); // 기존 시놉시스 초기화
-    setSuccessRate(null); // 기존 예측 결과 초기화
-    setIsSynopsisComplete(false); // 시놉시스 완료 상태 초기화
+    setPlot("");
+    setSuccessRate(null);
+    setIsSynopsisComplete(false);
     setError(null);
 
     try {
@@ -230,7 +200,6 @@ function Synopsis() {
         return;
       }
 
-      // EventSource를 사용하여 서버로부터 시놉시스 스트리밍 수신
       const tokenParam = encodeURIComponent(token);
       const url = `http://43.200.111.65/api/v1/synopsis/generate-synopsis-stream/${scenarioId}?token=${tokenParam}`;
       const eventSource = new EventSource(url);
@@ -242,7 +211,7 @@ function Synopsis() {
 
       eventSource.addEventListener('prediction', (e) => {
         const data = JSON.parse(e.data);
-        setSuccessRate(data.first_predicted_rate);
+        setSuccessRate(data.first_prediction_rate); // 응답 형식에 맞게 수정
         setIsSynopsisComplete(true);
         setIsGenerating(false);
         eventSource.close();
@@ -273,44 +242,9 @@ function Synopsis() {
           },
         }
       );
-      setSuccessRate(response.data.first_predicted_rate);
+      setSuccessRate(response.data.first_prediction_rate); // 응답 형식에 맞게 수정
     } catch (error) {
       handleApiError(error, "예측 결과를 가져오는 중 오류가 발생했습니다.");
-    }
-  };
-
-  const handleCreateScenario = async () => {
-    if (!selectedScenarioTitle) {
-      setError("시나리오를 선택해주세요.");
-      return;
-    }
-    if (!plot) {
-      setError("시놉시스를 먼저 생성해주세요.");
-      return;
-    }
-
-    try {
-      const scenarioId = userScenarios.find(s => s.title === selectedScenarioTitle)?.id;
-      if (!scenarioId) {
-        setError("선택된 시나리오의 ID를 찾을 수 없습니다.");
-        return;
-      }
-
-      await axios.put(
-        `http://43.200.111.65/api/v1/scenario/${scenarioId}/user-request`,
-        { user_request: gptRequest },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      navigate("/create/script", {
-        state: { scenarioId: scenarioId, autoStart: true },
-        replace: true,
-      });
-    } catch (error) {
-      handleApiError(error, "시나리오 생성 페이지로 이동 중 오류가 발생했습니다.");
     }
   };
 
@@ -320,7 +254,6 @@ function Synopsis() {
       if (error.response.status === 401) {
         errorMessage = "인증 토큰이 만료되었습니다. 다시 로그인해주세요.";
         logout();
-        navigate("/login");
       } else if (error.response.status === 422) {
         errorMessage = `데이터 형식이 올바르지 않습니다. 오류 메시지: ${JSON.stringify(error.response.data)}`;
       } else if (error.response.data && error.response.data.detail) {
@@ -357,34 +290,16 @@ function Synopsis() {
             onChange={(e) => setPlot(e.target.value)}
             readOnly={true}
           />
-          {isSynopsisComplete && (
-            <>
-              {successRate && (
-                <SuccessRateDisplay>예상 흥행률: {successRate}</SuccessRateDisplay>
-              )}
-              <Label>수정 요청사항</Label>
-              <TextArea
-                placeholder="GPT에게 수정을 요청할 사항을 적어주세요."
-                value={gptRequest}
-                onChange={(e) => setGptRequest(e.target.value)}
-                height="150px"
-              />
-            </>
+          {successRate && (
+            <SuccessRateDisplay>예상 흥행률: {successRate}</SuccessRateDisplay>
           )}
           <ButtonContainer>
-            <CombinedButton
-              onClick={isSynopsisComplete ? handleCreateScenario : generateSynopsis}
+            <Button
+              onClick={generateSynopsis}
               disabled={isGenerating}
-              isSynopsisComplete={isSynopsisComplete}
             >
-              {isGenerating
-                ? "생성 중..."
-                : isSynopsisComplete
-                ? "시나리오 생성"
-                : successRate
-                ? `예상 흥행률: ${successRate}`
-                : "시놉시스 생성"}
-            </CombinedButton>
+              {isGenerating ? "생성 중..." : "시놉시스 생성"}
+            </Button>
           </ButtonContainer>
         </>
       )}
