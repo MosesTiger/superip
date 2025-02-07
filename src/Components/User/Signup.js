@@ -7,7 +7,6 @@ import {
 } from "react-icons/md";
 import axios from "axios";
 
-// 스타일드 컴포넌트 정의
 const SignupText = styled.div`
   font-size: 40px;
   font-weight: bold;
@@ -78,45 +77,34 @@ const CheckboxLabel = styled.label`
   margin-bottom: 10px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   cursor: pointer;
-  input {
-    margin-right: 10px;
-  }
-
-  a {
-    color: #0056b3;
-    text-decoration: none;
-    margin-left: 5px;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
 `;
 
 const CheckboxLabelBold = styled(CheckboxLabel)`
   font-size: 18px;
   font-weight: bold;
-  margin: 15px 0 15px 0;
+  margin: 15px 0;
 `;
 
 const ContentsWrap = styled.div`
   font-size: 13px;
-  display: flex;
-  align-items: center;
-  margin-top: -10px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  margin-top: -5px;
+  margin-bottom: 10px;
 `;
 
 const Passwordcheck = styled.p`
   font-size: 13px;
-  display: flex;
-  align-items: center;
-  margin-top: -10px;
+  margin-top: -5px;
+  text-align: left;
+  margin-left: 45px;
 `;
 
 const LoginLink = styled(Link)`
   display: block;
-  width: 100%;
   text-align: center;
   color: #0056b3;
   text-decoration: none;
@@ -128,6 +116,7 @@ const LoginLink = styled(Link)`
 `;
 
 function Signup() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -137,15 +126,12 @@ function Signup() {
   const [open0, setOpen0] = useState(false);
   const [open1, setOpen1] = useState(false);
   const [open2, setOpen2] = useState(false);
-  const [open3, setOpen3] = useState(false);
-
-  const navigate = useNavigate();
 
   const data = [
     {
       id: 0,
-      title: "이용약관 동의",
-      contents: "이용약관 내용...",
+      title: "서비스 이용약관 동의",
+      contents: "서비스 이용약관 내용...",
       status: "(필수)",
     },
     {
@@ -160,17 +146,13 @@ function Signup() {
       contents: "마케팅 정보 수신 내용...",
       status: "(선택)",
     },
-    {
-      id: 3,
-      title: "이벤트 정보 수신 동의",
-      contents: "이벤트 정보 수신 내용...",
-      status: "(선택)",
-    },
   ];
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+  const isPasswordMatch = password === confirmPassword && password !== "";
 
   const allChecked = (checked) => {
     if (checked) {
@@ -190,10 +172,14 @@ function Signup() {
     }
   };
 
-  const isPasswordMatch = password === confirmPassword;
+  const isPasswordValid = (password) => {
+    return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,16}$/.test(password);
+  };
+
   const allInputsFilled = email && password && confirmPassword && name;
   const allRequiredChecked = checkItems.includes(0) && checkItems.includes(1);
-  const canSignUp = allInputsFilled && isPasswordMatch && allRequiredChecked;
+  const isPasswordValidFormat = isPasswordValid(password);
+  const canSignUp = allInputsFilled && allRequiredChecked && isPasswordMatch && isPasswordValidFormat;
 
   const handleSignUp = async () => {
     if (!allInputsFilled) {
@@ -203,6 +189,11 @@ function Signup() {
 
     if (!allRequiredChecked) {
       alert("필수 약관에 동의해 주세요.");
+      return;
+    }
+
+    if (!isPasswordValidFormat) {
+      alert("비밀번호는 영문, 숫자 조합 8-16자로 입력해 주세요.");
       return;
     }
 
@@ -272,6 +263,11 @@ function Signup() {
           {showPassword ? "👁️" : "👁️‍🗨️"}
         </EyeButton>
       </InputContainer>
+      {password && !isPasswordValidFormat && (
+        <Passwordcheck style={{ color: "red" }}>
+          비밀번호는 영문, 숫자 조합 8-16자로 입력해 주세요.
+        </Passwordcheck>
+      )}
       <InputContainer>
         <Input
           type={showPassword ? "text" : "password"}
@@ -304,51 +300,77 @@ function Signup() {
         <CheckboxLabelBold>
           <input
             type="checkbox"
-            name="all-checked"
             onChange={(e) => allChecked(e.target.checked)}
             checked={checkItems.length === data.length}
           />
-          <span>약관에 모두 동의합니다.</span>
+          약관에 모두 동의합니다.
         </CheckboxLabelBold>
         {data.map((item, index) => (
           <React.Fragment key={item.id}>
             <CheckboxLabel>
-              <label>
+              <div>
                 <input
                   type="checkbox"
-                  name="select-checked"
                   onChange={(e) => selectChecked(e.target.checked, item.id)}
                   checked={checkItems.includes(item.id)}
                 />
                 <span
                   style={{
-                    marginRight: "5px",
+                    marginLeft: "5px",
                     color: item.status === "(필수)" ? "red" : "gray",
                   }}
                 >
                   {item.status}
                 </span>
                 {item.title}
-              </label>
-              {eval(`open${index}`) ? (
+              </div>
+              {index === 0 ? (
+                open0 ? (
+                  <MdOutlineKeyboardArrowUp
+                    size={30}
+                    color="gray"
+                    onClick={() => setOpen0(!open0)}
+                  />
+                ) : (
+                  <MdOutlineKeyboardArrowDown
+                    size={30}
+                    color="gray"
+                    onClick={() => setOpen0(!open0)}
+                  />
+                )
+              ) : index === 1 ? (
+                open1 ? (
+                  <MdOutlineKeyboardArrowUp
+                    size={30}
+                    color="gray"
+                    onClick={() => setOpen1(!open1)}
+                  />
+                ) : (
+                  <MdOutlineKeyboardArrowDown
+                    size={30}
+                    color="gray"
+                    onClick={() => setOpen1(!open1)}
+                  />
+                )
+              ) : open2 ? (
                 <MdOutlineKeyboardArrowUp
                   size={30}
                   color="gray"
-                  onClick={() => eval(`setOpen${index}(!open${index})`)}
+                  onClick={() => setOpen2(!open2)}
                 />
               ) : (
                 <MdOutlineKeyboardArrowDown
                   size={30}
                   color="gray"
-                  onClick={() => eval(`setOpen${index}(!open${index})`)}
+                  onClick={() => setOpen2(!open2)}
                 />
               )}
             </CheckboxLabel>
-            {eval(`open${index}`) && (
-              <ContentsWrap>
-                <p>{item.contents}</p>
-              </ContentsWrap>
-            )}
+            {(index === 0 && open0) ||
+            (index === 1 && open1) ||
+            (index === 2 && open2) ? (
+              <ContentsWrap>{item.contents}</ContentsWrap>
+            ) : null}
           </React.Fragment>
         ))}
       </CheckboxContainer>

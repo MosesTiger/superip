@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
 
 const Section = styled.section`
@@ -41,6 +40,7 @@ const ButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
   margin-top: 20px;
+  gap: 10px;
 `;
 
 const Button = styled.button`
@@ -48,114 +48,99 @@ const Button = styled.button`
   background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 4px;
-  font-size: 16px;
+  border-radius: 5px;
   cursor: pointer;
-  margin-left: 10px;
-
-  &:hover {
+  font-size: 16px;
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  &:hover:not(:disabled) {
     background-color: #0056b3;
   }
+`;
 
-  &:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-
-    &:hover {
-      background-color: #cccccc;
-    }
+const RateButton = styled(Button)`
+  background-color: #28a745;
+  &:hover:not(:disabled) {
+    background-color: #218838;
   }
-`;
-
-const ErrorMessage = styled.div`
-  color: red;
-  margin-top: 10px;
-`;
-
-const SuccessRateDisplay = styled.div`
-  font-size: 20px;
-  margin-top: 10px;
-  color: #4a4a4a;
-  font-weight: bold;
-  padding: 10px;
-  background-color: #f0f0f0;
-  border-radius: 5px;
-  text-align: center;
 `;
 
 const Label = styled.label`
-  font-weight: bold;
-  margin-top: 20px;
+  font-size: 16px;
+  color: #4a4a4a;
   margin-bottom: 10px;
   display: block;
 `;
 
 const Select = styled.select`
   width: 100%;
-  padding: 10px;
-  margin-top: 5px;
+  padding: 8px;
+  margin-bottom: 20px;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 16px;
 `;
 
-const RefreshButton = styled.button`
-  background-color: #f5f5f5;
-  color: black;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  margin-left: 10px;
-  width: 120px;
+const ErrorMessage = styled.div`
+  color: red;
+  margin-bottom: 10px;
+  text-align: center;
+  padding: 10px;
+  background-color: #ffe6e6;
+  border-radius: 5px;
+  display: ${(props) => (props.error ? "block" : "none")};
 `;
 
-const ExpectButton = styled(Button)`
-  background-color: #e0a800;
-  color: #000;
-
-  &:hover {
-    background-color: #cc9a04;
-  }
-`;
-
-const CombinedButton = styled(Button)`
-  background-color: ${(props) =>
-    props.isSynopsisComplete ? "#28a745" : "#E23A3A"};
-
-  &:hover {
-    background-color: ${(props) =>
-      props.isSynopsisComplete ? "#218838" : "#C53838"};
-  }
+const SuccessRateDisplay = styled.div`
+  font-size: 18px;
+  color: #28a745;
+  margin: 15px 0;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  text-align: center;
 `;
 
 const LabelWrap = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+`;
+
+const RefreshButton = styled.button`
+  padding: 5px 10px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  &:hover {
+    background-color: #5a6268;
+  }
 `;
 
 function Synopsis() {
   const [plot, setPlot] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isSynopsisComplete, setIsSynopsisComplete] = useState(false);
-  const [successRate, setSuccessRate] = useState(null);
   const [selectedScenarioTitle, setSelectedScenarioTitle] = useState("");
   const [title, setTitle] = useState("");
   const [userScenarios, setUserScenarios] = useState([]);
   const [error, setError] = useState(null);
-  const [gptRequest, setGptRequest] = useState("");
-  const navigate = useNavigate();
+  const [successRate, setSuccessRate] = useState(null);
+  const [isLoadingRate, setIsLoadingRate] = useState(false);
   const { token, logout } = useAuth();
 
   useEffect(() => {
     fetchUserScenarios();
-    // Cleanup function to close EventSource when component unmounts
     return () => {
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   const eventSourceRef = React.useRef(null);
@@ -172,20 +157,70 @@ function Synopsis() {
       );
       setUserScenarios(response.data);
     } catch (error) {
-      handleApiError(error, "시나리오 목록을 가져오는 중 오류가 발생했습니다.");
+      console.error("Error fetching scenarios:", error);
+    }
+  };
+
+  const fetchSuccessRate = async (scenarioId) => {
+    try {
+      const response = await axios.get(
+        `http://43.200.111.65/api/v1/success_rate/scenario/${scenarioId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.data && response.data.first_predicted_rate) {
+        setSuccessRate(response.data.first_predicted_rate);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error fetching success rate:", error);
+      return false;
+    }
+  };
+
+  const handleViewSuccessRate = async () => {
+    const scenarioId = userScenarios.find(
+      (s) => s.title === selectedScenarioTitle
+    )?.id;
+    if (!scenarioId) {
+      setError("시나리오 ID를 찾을 수 없습니다.");
+      return;
+    }
+
+    setIsLoadingRate(true);
+    setError(null);
+
+    try {
+      const success = await fetchSuccessRate(scenarioId);
+      if (!success) {
+        setError(
+          "흥행률 데이터가 아직 준비되지 않았습니다. 잠시 후 다시 시도해주세요."
+        );
+      }
+    } catch (error) {
+      setError("흥행률을 가져오는데 실패했습니다.");
+    } finally {
+      setIsLoadingRate(false);
     }
   };
 
   const handleScenarioChange = (e) => {
     const selectedTitle = e.target.value;
     setSelectedScenarioTitle(selectedTitle);
+    setError(null);
     if (selectedTitle) {
-      fetchScenarioDetails(selectedTitle);
+      const scenario = userScenarios.find((s) => s.title === selectedTitle);
+      if (scenario) {
+        fetchScenarioDetails(selectedTitle);
+        fetchSuccessRate(scenario.id);
+      }
     } else {
-      // 선택 취소 시 상태 초기화
       setTitle("");
       setPlot("");
-      setIsSynopsisComplete(false);
       setSuccessRate(null);
     }
   };
@@ -202,15 +237,8 @@ function Synopsis() {
       const data = response.data;
       setTitle(data.title);
       setPlot(data.synopsis || "");
-      setIsSynopsisComplete(!!data.synopsis);
-      setError(null);
-
-      if (data.synopsis) {
-        // 시놉시스가 이미 존재하는 경우, 예측 결과 가져오기
-        await fetchPrediction(data.id);
-      }
     } catch (error) {
-      handleApiError(error, "시나리오 정보를 가져오는 중 오류가 발생했습니다.");
+      console.error("Error fetching scenario details:", error);
     }
   };
 
@@ -220,9 +248,8 @@ function Synopsis() {
       return;
     }
     setIsGenerating(true);
-    setPlot(""); // 기존 시놉시스 초기화
-    setSuccessRate(null); // 기존 예측 결과 초기화
-    setIsSynopsisComplete(false); // 시놉시스 완료 상태 초기화
+    setPlot("");
+    setSuccessRate(null);
     setError(null);
 
     try {
@@ -230,115 +257,38 @@ function Synopsis() {
         (s) => s.title === selectedScenarioTitle
       )?.id;
       if (!scenarioId) {
-        setError("선택된 시나리오의 ID를 찾을 수 없습니다.");
         setIsGenerating(false);
         return;
       }
 
-      // EventSource를 사용하여 서버로부터 시놉시스 스트리밍 수신
       const tokenParam = encodeURIComponent(token);
       const url = `http://43.200.111.65/api/v1/synopsis/generate-synopsis-stream/${scenarioId}?token=${tokenParam}`;
       const eventSource = new EventSource(url);
       eventSourceRef.current = eventSource;
 
-      eventSource.onmessage = (e) => {
-        setPlot((prev) => prev + e.data);
-      };
+      let synopsisText = "";
 
-      eventSource.addEventListener("prediction", (e) => {
-        const data = JSON.parse(e.data);
-        setSuccessRate(data.first_predicted_rate);
-        setIsSynopsisComplete(true);
-        setIsGenerating(false);
-        eventSource.close();
-        eventSourceRef.current = null;
-      });
+      eventSource.onmessage = (e) => {
+        synopsisText += e.data;
+        setPlot(synopsisText);
+      };
 
       eventSource.addEventListener("error", (e) => {
         console.error("EventSource failed:", e);
-        setError("시놉시스 생성 중 오류가 발생했습니다.");
+        setIsGenerating(false);
+        eventSource.close();
+        eventSourceRef.current = null;
+      });
+
+      eventSource.addEventListener("complete", () => {
         setIsGenerating(false);
         eventSource.close();
         eventSourceRef.current = null;
       });
     } catch (error) {
-      handleApiError(error, "시놉시스 생성 중 오류가 발생했습니다.");
+      console.error("Synopsis generation error:", error);
       setIsGenerating(false);
     }
-  };
-
-  const fetchPrediction = async (scenarioId) => {
-    try {
-      const response = await axios.get(
-        `http://43.200.111.65/api/v1/synopsis/prediction/${scenarioId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setSuccessRate(response.data.first_predicted_rate);
-    } catch (error) {
-      handleApiError(error, "예측 결과를 가져오는 중 오류가 발생했습니다.");
-    }
-  };
-
-  const handleCreateScenario = async () => {
-    if (!selectedScenarioTitle) {
-      setError("시나리오를 선택해주세요.");
-      return;
-    }
-    if (!plot) {
-      setError("시놉시스를 먼저 생성해주세요.");
-      return;
-    }
-
-    try {
-      const scenarioId = userScenarios.find(
-        (s) => s.title === selectedScenarioTitle
-      )?.id;
-      if (!scenarioId) {
-        setError("선택된 시나리오의 ID를 찾을 수 없습니다.");
-        return;
-      }
-
-      await axios.put(
-        `http://43.200.111.65/api/v1/scenario/${scenarioId}/user-request`,
-        { user_request: gptRequest },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      navigate("/create/script", {
-        state: { scenarioId: scenarioId, autoStart: true },
-        replace: true,
-      });
-    } catch (error) {
-      handleApiError(
-        error,
-        "시나리오 생성 페이지로 이동 중 오류가 발생했습니다."
-      );
-    }
-  };
-
-  const handleApiError = (error, defaultMessage) => {
-    let errorMessage = defaultMessage;
-    if (error.response) {
-      if (error.response.status === 401) {
-        errorMessage = "인증 토큰이 만료되었습니다. 다시 로그인해주세요.";
-        logout();
-        navigate("/login");
-      } else if (error.response.status === 422) {
-        errorMessage = `데이터 형식이 올바르지 않습니다. 오류 메시지: ${JSON.stringify(
-          error.response.data
-        )}`;
-      } else if (error.response.data && error.response.data.detail) {
-        errorMessage = error.response.data.detail;
-      }
-    }
-    setError(errorMessage);
   };
 
   return (
@@ -365,34 +315,23 @@ function Synopsis() {
           <TextArea
             placeholder="시놉시스를 생성하려면 '시놉시스 생성' 버튼을 클릭하세요."
             value={plot}
-            onChange={(e) => setPlot(e.target.value)}
             readOnly={true}
           />
-          {isSynopsisComplete && (
-            <>
-              {successRate && (
-                <SuccessRateDisplay>
-                  예상 흥행률: {successRate}
-                </SuccessRateDisplay>
-              )}
-            </>
+          {successRate && (
+            <SuccessRateDisplay>예상 흥행률: {successRate}</SuccessRateDisplay>
           )}
           <ButtonContainer>
-            <CombinedButton
-              onClick={
-                isSynopsisComplete ? handleCreateScenario : generateSynopsis
-              }
-              disabled={isGenerating}
-              isSynopsisComplete={isSynopsisComplete}
-            >
-              {isGenerating
-                ? "생성 중..."
-                : isSynopsisComplete
-                ? "시나리오 생성"
-                : successRate
-                ? `예상 흥행률: ${successRate}`
-                : "시놉시스 생성"}
-            </CombinedButton>
+            <Button onClick={generateSynopsis} disabled={isGenerating}>
+              {isGenerating ? "생성 중..." : "시놉시스 생성"}
+            </Button>
+            {plot && !successRate && (
+              <RateButton
+                onClick={handleViewSuccessRate}
+                disabled={isLoadingRate}
+              >
+                {isLoadingRate ? "분석 중..." : "1차 흥행률 보기"}
+              </RateButton>
+            )}
           </ButtonContainer>
         </>
       )}

@@ -82,7 +82,7 @@ export function AuthProvider({ children }) {
   const register = async (email, password, fullName, username) => {
     try {
       const response = await axios.post(
-        "http://43.200.111.65/api/v1/auth/register",
+        "http://http://43.200.111.65/api/v1/auth/register",
         {
           email,
           password,
