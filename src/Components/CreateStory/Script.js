@@ -1,8 +1,10 @@
+// Script.js
+
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import axios from "axios";
 import { GoChevronRight, GoChevronLeft } from "react-icons/go";
 import { useAuth } from '../../context/AuthProvider';
-
 
 const Section = styled.section`
   display: flex;

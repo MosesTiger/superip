@@ -26,11 +26,15 @@ const MainWrapper = styled.div`
 `;
 
 function CreateStory() {
+  const location = useLocation();
+  const hideStoryNav =
+    location.pathname === "/create/show" ||
+    location.pathname === "/create/predict";
   return (
     <div className="page">
       <Header />
       <MainWrapper>
-        <StoryNav />
+        {!hideStoryNav && <StoryNav />}
         <Main>
           <Outlet />
         </Main>
